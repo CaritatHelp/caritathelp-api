@@ -120,14 +120,20 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('associations')
   def associations
-    render :json => create_response(@volunteer.assocs)
+    query = "assocs.id, assocs.name, av_links.rights"
+    render :json => create_response(Assoc.joins(:av_links)
+                                      .where(av_links: { volunteer_id: @volunteer.id })
+                                      .select(query).limit(100))
   end
 
   api :GET, '/volunteers/:id/events', "Return a list of the volunteer's events"
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('events')
   def events
-    render :json => create_response(@volunteer.events)
+    query = "events.id, events.title, events.assoc_id, event_volunteers.rights"
+    render :json => create_response(Event.joins(:event_volunteers)
+                                      .where(event_volunteers: { volunteer_id: @volunteer.id })
+                                      .select(query).limit(100))
   end
 
   private

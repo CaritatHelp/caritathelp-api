@@ -1,6 +1,10 @@
 class Volunteer < ActiveRecord::Base
   has_and_belongs_to_many :assocs, join_table: :av_links
+  has_many :av_links
+
   has_and_belongs_to_many :events, join_table: :event_volunteers
+  has_many :event_volunteers
+
   require 'securerandom'
 
   VALID_EMAIL_REGEX = /\b[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}\z/

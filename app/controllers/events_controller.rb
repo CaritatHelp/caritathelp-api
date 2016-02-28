@@ -81,7 +81,10 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('guests')
   def guests
-    render :json => create_response(@event.volunteers)
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, event_volunteers.rights"
+    render :json => create_response(Volunteer.joins(:event_volunteers)
+                                      .where(event_volunteers: { event_id: @event.id })
+                                      .select(query).limit(100))
   end
 
   api :PUT, '/events/:id', "Update event"

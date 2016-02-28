@@ -1,5 +1,6 @@
 class Assoc < ActiveRecord::Base
   has_and_belongs_to_many :volunteers, join_table: :av_links
+  has_many :av_links
 
   validates :name, presence: true, :on => :create
   validates :description, presence: true, :on => :create

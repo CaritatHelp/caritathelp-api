@@ -9,13 +9,8 @@ localhost:3000/volunteers/2/events?token=cvHPGCWh0QYyvhADQnIZ0Q
     {
       "id": 1,
       "title": "tata",
-      "description": "Event de ouf",
-      "place": null,
-      "begin": null,
-      "end": null,
       "assoc_id": 1,
-      "created_at": "2016-02-21T10:29:29.093Z",
-      "updated_at": "2016-02-21T10:39:51.581Z"
+      "rights": "host"
     }
   ]
 }

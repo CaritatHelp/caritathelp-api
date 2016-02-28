@@ -71,7 +71,10 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('members')
   def members
-    render :json => create_response(@assoc.volunteers)
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, av_links.rights"
+    render :json => create_response(Volunteer.joins(:av_links)
+                                      .where(av_links: { assoc_id: @assoc.id })
+                                      .select(query).limit(100))
   end
 
   api :GET, '/associations/:id/events', "Get a list of all association's events"
