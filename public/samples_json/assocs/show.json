@@ -1,0 +1,27 @@
+SUCCESS =>
+
+localhost:3000/associations/1/?token=bCdmSC5oUxpty11MDU6iFw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 1,
+    "name": "Test",
+    "description": "yolo",
+    "city": null,
+    "birthday": null,
+    "latitude": null,
+    "longitude": null
+  }
+}
+
+FAILURE =>
+
+localhost:3000/associations/987?token=jw35EAIZFb90bpPpDs_wwQ
+
+{
+    status: 400,
+    message: "Unknown assoc id",
+    response: null
+}

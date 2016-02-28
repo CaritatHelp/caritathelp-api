@@ -1,0 +1,26 @@
+SUCCESS =>
+
+localhost:3000/volunteers/2/friends?token=J2ykGbCW50k924rQeFWmlw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 1,
+      "mail": "root@root.com",
+      "firstname": "root",
+      "lastname": "root"
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/volunteers/1/friends?token=toto
+
+{
+    status: 400,
+    message: "Wrong token",
+    response: null
+}

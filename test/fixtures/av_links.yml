@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  assoc_id: 1
+  volunteer_id: 1
+  rights: MyString
+
+two:
+  assoc_id: 2
+  volunteer_id: 1
+  rights: MyString

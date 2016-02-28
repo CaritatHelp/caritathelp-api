@@ -1,0 +1,37 @@
+SUCCESS =>
+
+localhost:3000/events/1/guests?token=MqxwIe94c0by9--2c0PPbQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 1,
+      "mail": "root1@root.com",
+      "token": "MqxwIe94c0by9--2c0PPbQ",
+      "created_at": "2016-02-21T10:20:01.390Z",
+      "updated_at": "2016-02-21T10:20:01.390Z",
+      "password": "4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2",
+      "firstname": "root",
+      "lastname": "root",
+      "birthday": null,
+      "gender": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "allowgps": false
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/events/1/guests?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+

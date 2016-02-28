@@ -1,0 +1,29 @@
+SUCCESS =>
+
+localhost:3000/associations?token=jw35EAIZFb90bpPpDs_wwQ&name=fat assoc&description=very fat assoc
+
+{
+    status : 200,
+    message: "ok",
+    response: {
+	id: 2,
+	name: "fat assoc",
+	description: "very fat assoc",
+	birthday: null,
+	city: null,
+	latitude: null,
+	longitude: null,
+	created_at: "2015-12-09T08:49:21.735Z",
+	updated_at: "2015-12-09T08:49:21.735Z"
+    }
+}
+
+FAILURE =>
+
+localhost:3000/associations?token=toto&name=fat assoc&description=very fat assoc
+
+{
+    status: 400,
+    message: "Wrong token",
+    response: null
+}

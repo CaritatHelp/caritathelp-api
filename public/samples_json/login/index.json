@@ -1,0 +1,31 @@
+SUCCESS =>
+
+localhost:3000/login?mail=first@root.com&password=root
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 1,
+    "mail": "root@root.com",
+    "token": "bCdmSC5oUxpty11MDU6iFw",
+    "firstname": "root",
+    "lastname": "root",
+    "birthday": null,
+    "gender": null,
+    "city": null,
+    "latitude": null,
+    "longitude": null,
+    "allowgps": false
+  }
+}
+
+FAILURE =>
+
+localhost:3000/login?mail=first@root.com&password=rootyoyo
+
+{
+    status: 400,
+    message: "Wrong password",
+    response: null
+}

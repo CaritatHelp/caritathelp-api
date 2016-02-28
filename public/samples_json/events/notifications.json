@@ -1,0 +1,29 @@
+SUCCESS =>
+
+localhost:3000/events/1/notifications?token=MqxwIe94c0by9--2c0PPbQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "guest_request": [
+      {
+        "notif_id": 1,
+        "id": 2,
+        "mail": "root2@root.com",
+        "firstname": "root",
+        "lastname": "root"
+      }
+    ]
+  }
+}
+
+FAILURE =>
+
+localhost:3000/events/1/notifications?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

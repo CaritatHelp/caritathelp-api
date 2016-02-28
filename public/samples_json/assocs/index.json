@@ -1,0 +1,29 @@
+SUCCESS =>
+
+localhost:3000/associations?token=jw35EAIZFb90bpPpDs_wwQ
+
+{
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: 1,
+	    name: "Croix Rouge",
+	    description: "'La croix rouge quoi'",
+	    birthday: null,
+	    city: null,
+	    latitude: null,
+	    longitude: null
+	}
+    ]
+}
+
+FAILURE =>
+
+localhost:3000/associations?token=toto
+
+{
+    status: 400,
+    message: "Wrong token",
+    response: null
+}

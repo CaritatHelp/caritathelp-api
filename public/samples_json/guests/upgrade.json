@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/guests/upgrade?token=MqxwIe94c0by9--2c0PPbQ&volunteer_id=2&event_id=1&rights=admin
+
+{
+  "status": 200,
+  "message": "Guest successfuly upgraded",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/guests/upgrade?token=cvHPGCWh0QYyvhADQnIZ0Q&volunteer_id=2&event_id=1&rights=admin
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}

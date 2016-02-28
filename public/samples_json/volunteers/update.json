@@ -1,0 +1,31 @@
+SUCCESS =>
+
+localhost:3000/volunteers/2?token=J2ykGbCW50k924rQeFWmlw&birthday=29/07/1991
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 2,
+    "mail": "root2@root.com",
+    "firstname": "root",
+    "lastname": "root",
+    "birthday": "1991-07-29",
+    "gender": null,
+    "city": null,
+    "latitude": null,
+    "longitude": null,
+    "allowgps": false,
+    "allow_notifications": false
+  }
+}
+
+FAILURE =>
+
+localhost:3000/volunteers/2?token=lrztIFFvUf9xY9Dtur_rxg&gender=yo
+
+{
+    status: 400,
+    message: "Validation failed: Gender is not included in the list",
+    response: null
+}

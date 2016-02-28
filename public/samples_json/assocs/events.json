@@ -1,0 +1,25 @@
+SUCCESS =>
+
+localhost:3000/associations/1/events?token=MqxwIe94c0by9--2c0PPbQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 1,
+      "title": "tata",
+      "place": null
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/associations/1/events?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/guests/reply_invite?token=cvHPGCWh0QYyvhADQnIZ0Q&notif_id=1acceptance=true
+
+{
+  "status": 200,
+  "message": "You successfuly replied to this invitation",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/guests/reply_invite?token=MqxwIe94c0by9--2c0PPbQ&notif_id=1acceptance=true
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}

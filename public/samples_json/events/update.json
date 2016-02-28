@@ -1,0 +1,27 @@
+SUCCESS =>
+
+localhost:3000/events/1?token=MqxwIe94c0by9--2c0PPbQ&title=tata
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 1,
+    "title": "tata",
+    "description": "Event de ouf",
+    "place": null,
+    "begin": null,
+    "end": null,
+    "assoc_id": 1
+  }
+}
+
+FAILURE =>
+
+localhost:3000/events/1?token=cvHPGCWh0QYyvhADQnIZ0Q&title=toto
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}

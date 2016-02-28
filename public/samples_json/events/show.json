@@ -1,0 +1,27 @@
+SUCCESS =>
+
+localhost:3000/events/1?token=MqxwIe94c0by9--2c0PPbQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 1,
+    "title": "Fat event",
+    "description": "Event de ouf",
+    "place": null,
+    "begin": null,
+    "end": null,
+    "assoc_id": 1
+  }
+}
+
+FAILURE =>
+
+localhost:3000/events/9874?token=MqxwIe94c0by9--2c0PPbQ
+
+{
+  "status": 400,
+  "message": "Unknow event id",
+  "response": null
+}

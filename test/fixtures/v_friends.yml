@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  current_volunteer_id: 1
+  friend_volunteer_id: 2
+
+two:
+  current_volunteer_id: 2
+  friend_volunteer_id: 1
+
+three:
+  current_volunteer_id: 1
+  friend_volunteer_id: 3
+
+four:
+  current_volunteer_id: 3
+  friend_volunteer_id: 1

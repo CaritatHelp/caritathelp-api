@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/membership/reply_invite?token=J2ykGbCW50k924rQeFWmlw&notif_id=1&acceptance=true
+
+{
+  "status": 200,
+  "message": "You successfuly answered to the invitation",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/membership/reply_invite?token=J2ykGbCW50k924rQeFWmlw&notif_id=897&acceptance=true
+
+{
+  "status": 400,
+  "message": "Couldn't find Notification::InviteMember",
+  "response": null
+}

@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/guests/kick?token=MqxwIe94c0by9--2c0PPbQ&volunteer_id=2&event_id=1
+
+{
+  "status": 200,
+  "message": "Guest has been kicked",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/guests/kick?token=cvHPGCWh0QYyvhADQnIZ0Q&volunteer_id=1&event_id=1
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}

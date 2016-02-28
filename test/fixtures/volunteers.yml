@@ -1,0 +1,41 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id: 1
+  firstname: "robin"
+  lastname: "vasseur"
+  mail: "robin@root.com"
+  token: "tokenrobin"
+  password: "root"
+
+two:
+  id: 2
+  firstname: "nicolas"
+  lastname: "temenides"
+  mail: "nicolas@root.com"
+  token: "tokennicolas"
+  password: "root"
+
+three:
+  id: 3
+  firstname: "pierre"
+  lastname: "enjalbert"
+  mail: "pierre@root.com"
+  token: "tokenpierre"
+  password: "root"
+
+four:
+  id: 4
+  firstname: "jeremy"
+  lastname: "gros"
+  mail: "jeremy@root.com"
+  token: "tokenjeremy"
+  password: "root"
+
+five:
+  id: 5
+  firstname: "aude"
+  lastname: "sikorav"
+  mail: "aude@root.com"
+  token: "tokenaude"
+  password: "root"

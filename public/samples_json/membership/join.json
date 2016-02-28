@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/membership/join?token=J2ykGbCW50k924rQeFWmlw&assoc_id=1
+
+{
+  "status": 200,
+  "message": "You successfuly applied to this association",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/membership/join?token=bCdmSC5oUxpty11MDU6iFw&assoc_id=1
+
+{
+  "status": 400,
+  "message": "You've already applied in this association or you received an invitation",
+  "response": null
+}

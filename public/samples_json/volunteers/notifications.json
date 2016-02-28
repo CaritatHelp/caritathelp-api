@@ -1,0 +1,30 @@
+SUCCESS =>
+
+localhost:3000/volunteers/2/notifications?token=J2ykGbCW50k924rQeFWmlw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "add_friend": [
+      {
+        "notif_id": 1,
+        "id": 1,
+        "mail": "root@root.com",
+        "firstname": "root",
+        "lastname": "root"
+      }
+    ],
+    "assoc_invite": []
+  }
+}
+
+FAILURE =>
+
+localhost:3000/volunteers/2/notifications?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

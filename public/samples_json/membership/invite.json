@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/membership/invite?token=bCdmSC5oUxpty11MDU6iFw&assoc_id=1&volunteer_id=2
+
+{
+  "status": 200,
+  "message": "Member successfuly invited",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/membership/invite?token=zob&assoc_id=1&volunteer_id=2
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

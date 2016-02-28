@@ -1,0 +1,57 @@
+SUCCESS => (3 matches for "root root")
+
+localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=root%20root
+
+{
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: 2,
+	    mail: "first@root.com",
+	    firstname: "root",
+	    lastname: "root",
+	    birthday: null,
+	    gender: null,
+	    city: null
+	},
+	{
+	    id: 14,
+	    mail: "robin@root.com",
+	    firstname: "root",
+	    lastname: "root",
+	    birthday: null,
+	    gender: "m",
+	    city: null
+	},
+	{
+	    id: 1,
+	    mail: "root@root.com",
+	    firstname: "root",
+	    lastname: "root",
+	    birthday: null,
+	    gender: null,
+	    city: null
+	}
+    ]
+}
+
+SUCCESS => (No match)
+
+localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=prout
+
+{
+    status: 200,
+    message: "ok",
+    response: [ ]
+}
+
+FAILURE =>
+
+localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ
+
+{
+    status: 400,
+    message: "Research field is missing",
+    response: null
+}

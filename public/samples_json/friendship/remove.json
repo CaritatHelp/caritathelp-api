@@ -1,0 +1,27 @@
+SUCCESS =>
+
+localhost:3000/friendship/remove?token=J2ykGbCW50k924rQeFWmlw&id=1
+
+{
+  "status": 200,
+  "message": "Successfuly deleted friendship",
+  "response": null
+}
+
+FAILURE =>
+
+localhost:3000/friendship/remove?token=J2ykGbCW50k924rQeFWmlw&id=7894
+
+{
+  "status": 400,
+  "message": "Couldn't find Volunteer",
+  "response": null
+}
+
+localhost:3000/friendship/remove?token=J2ykGbCW50k924rQeFWmlw&id=1
+
+{
+  "status": 400,
+  "message": "No such friendship",
+  "response": null
+}

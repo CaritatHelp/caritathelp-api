@@ -1,0 +1,52 @@
+fr:
+  token:
+    wrong: "Mauvais token"
+
+  assocs:
+    failure:
+      name:
+        unavailable: "Ce nom n'est pas disponible"
+        invalid: "Ce nom n'est pas valide"
+
+        update: "Erreur lors de la modification de l'association"
+        id: "Id d'association inconnu"
+        rights: "Permission refusée"
+
+    success:
+      deleted: "Association supprimée"
+
+  volunteers:
+    failure:
+      mail:
+        unavailable: "Ce mail n'est pas disponible"
+        invalid: "Ce mail n'est pas valide"
+
+      update: "Erreur lors de la modification du profil"
+      id: "Id de bénévole inconnu"
+
+    success:
+      deleted: "Bénévole supprimé"
+
+  notifications:
+    failure:
+      addfriend:
+        self: "Impossible de s'ajouter sois-même en ami"
+      responsefriend:
+        right: "Permission refusée"
+
+  login:
+    failure:
+      params:
+        password:
+          wrong: "Mauvais mot de passe"
+          missing: "Mot de passe manquant"
+        mail:
+          wrong: "Mail inconnu"
+          missing: "Mail manquant"
+
+  logout:
+    success: "L'utilisateur s'est deconnecté"
+
+  doc:
+    url: "Adresse introuvable"
+    response: "Voir documentation: /doc"

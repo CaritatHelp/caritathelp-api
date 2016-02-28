@@ -1,0 +1,46 @@
+SUCCESS =>
+
+localhost:3000/volunteers?token=jw35EAIZFb90bpPpDs_wwQ
+
+{
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: 2,
+	    mail: "first@root.com",
+	    firstname: "root",
+	    lastname: "root",
+	    birthday: null,
+	    gender: null,
+	    city: null,
+	    latitude: null,
+	    longitude: null,
+	    allowgps: false,
+	    allow_notifications: false
+	},
+	{
+	    id: 3,
+	    mail: "second@root.com",
+	    firstname: "second",
+	    lastname: "root",
+	    birthday: null,
+	    gender: null,
+	    city: null,
+	    latitude: null,
+	    longitude: null,
+	    allowgps: false,
+	    allow_notifications: false
+	}
+    ]
+}
+
+FAILURE =>
+
+localhost:3000/volunteers?token=toto
+
+{
+    status: 400,
+    message: "Wrong token",
+    response: null
+}

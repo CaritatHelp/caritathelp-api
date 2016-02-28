@@ -1,0 +1,37 @@
+SUCCESS =>
+
+localhost:3000/events?token=MqxwIe94c0by9--2c0PPbQ&assoc_id=1&title=Fat event&description=Event de ouf
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 1,
+    "title": "Fat event",
+    "description": "Event de ouf",
+    "place": null,
+    "begin": null,
+    "end": null,
+    "assoc_id": 1,
+    "created_at": "2016-02-21T10:29:29.093Z",
+    "updated_at": "2016-02-21T10:29:29.093Z"
+  }
+}
+
+FAILURE =>
+
+localhost:3000/events?token=cvHPGCWh0QYyvhADQnIZ0Q&assoc_id=1&title=Fat event&description=Event de ouf
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/events?token=cvHPGCWh0QYyvhADQnIZ0Q&assoc_id=9874&title=Fat event&description=Event de ouf
+
+{
+  "status": 400,
+  "message": "Couldn't find Assoc",
+  "response": null
+}

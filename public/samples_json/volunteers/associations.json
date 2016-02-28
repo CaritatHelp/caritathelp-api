@@ -1,0 +1,31 @@
+SUCCESS =>
+
+localhost:3000/volunteers/2/associations?token=J2ykGbCW50k924rQeFWmlw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 1,
+      "name": "renamed",
+      "description": "yolo",
+      "birthday": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "created_at": "2016-02-21T06:03:06.672Z",
+      "updated_at": "2016-02-21T06:08:21.010Z"
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/volunteers/9/associations?token=J2ykGbCW50k924rQeFWmlw
+
+{
+  "status": 400,
+  "message": "Unknown volunteer id",
+  "response": null
+}

@@ -1,0 +1,38 @@
+SUCCESS =>
+
+localhost:3000/associations/1/members?token=bCdmSC5oUxpty11MDU6iFw&name=Test&description=yolo
+
+(Ici ça donne beaucoup trop d info sur le user mais la modif est prevu)
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 1,
+      "mail": "root@root.com",
+      "token": "bCdmSC5oUxpty11MDU6iFw",
+      "created_at": "2016-02-21T05:22:00.023Z",
+      "updated_at": "2016-02-21T06:00:53.793Z",
+      "password": "4813494d137e1631bba301d5acab6e7bb7aa74ce1185d456565ef51d737677b2",
+      "firstname": "root",
+      "lastname": "root",
+      "birthday": null,
+      "gender": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "allowgps": false
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/associations/1/members?token=zob&name=Test&description=yolo
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

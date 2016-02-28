@@ -1,0 +1,32 @@
+SUCCESS =>
+
+localhost:3000/volunteers?mail=root2@root.com&password=root&firstname=root&lastname=root
+    
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 2,
+    "mail": "root2@root.com",
+    "token": "J2ykGbCW50k924rQeFWmlw",
+    "firstname": "root",
+    "lastname": "root",
+    "birthday": null,
+    "gender": null,
+    "city": null,
+    "latitude": null,
+    "longitude": null,
+    "allowgps": false,
+    "allow_notifications": false
+  }
+}
+
+FAILURE => (if mail already taken)
+    
+localhost:3000/volunteers?mail=root2@root.com&password=root&firstname=root&lastname=root
+
+{
+    status: 400,
+    message: "Unavailable mail",
+    response: null
+}
