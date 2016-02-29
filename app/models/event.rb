@@ -14,10 +14,10 @@ class Event < ActiveRecord::Base
     end
   end
 
-  def complete_description
+  def complete_description(isGuest = false)
     {'id' => self.id, 'title' => self.title, 'description' => self.description,
       'place' => self.place, 'begin' => self.begin,
-      'end' => self.end, 'assoc_id' => self.assoc_id}
+      'end' => self.end, 'assoc_id' => self.assoc_id, 'is_guest' => isGuest}
   end
 
   # need to handle possible exception

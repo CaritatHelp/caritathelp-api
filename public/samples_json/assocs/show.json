@@ -12,7 +12,8 @@ localhost:3000/associations/1/?token=bCdmSC5oUxpty11MDU6iFw
     "city": null,
     "birthday": null,
     "latitude": null,
-    "longitude": null
+    "longitude": null,
+    "is_member": true
   }
 }
 

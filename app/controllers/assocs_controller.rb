@@ -46,7 +46,7 @@ class AssocsController < ApplicationController
       link = AvLink.create!([assoc_id: new_assoc.id,
                             volunteer_id: @volunteer.id, rights: 'owner'])
 
-      render :json => create_response(new_assoc)
+      render :json => create_response(new_assoc.complete_description(true))
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s)
       return
@@ -57,7 +57,10 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('show')
   def show
-    render :json => create_response(@assoc.complete_description)
+    if AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first != nil
+      render :json => create_response(@assoc.complete_description(true)) and return
+    end
+    render :json => create_response(@assoc.complete_description(false))
   end
 
   api :GET, '/associations/:id/notifications', 'Get assoc notifications'
@@ -93,7 +96,7 @@ class AssocsController < ApplicationController
                                              @assoc.name)
         render :json => create_error(400, t("assocs.failure.name.unavailable"))
       elsif @assoc.update!(assoc_params)
-        render :json => create_response(@assoc.complete_description)
+        render :json => create_response(@assoc.complete_description(true))
       else
         render :json => create_error(400, t("assocs.failure.update"))
       end

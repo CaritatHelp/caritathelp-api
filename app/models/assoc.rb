@@ -13,10 +13,11 @@ class Assoc < ActiveRecord::Base
     end
   end
 
-  def complete_description
+  def complete_description(isMember = false)
     {'id' => self.id, 'name' => self.name, 'description' => self.description,
       'city' => self.city, 'birthday' => self.birthday,
-      'latitude' => self.latitude, 'longitude' => self.longitude}
+      'latitude' => self.latitude, 'longitude' => self.longitude,
+      'is_member' => isMember}
   end
 
   # need to handle possible exception

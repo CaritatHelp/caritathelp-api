@@ -12,7 +12,7 @@ localhost:3000/associations/2?token=jw35EAIZFb90bpPpDs_wwQ&name=fat assoc rename
 	city: null,
 	latitude: null,
 	longitude: null,
-	members: null
+	is_member: true
     }
 }
 
