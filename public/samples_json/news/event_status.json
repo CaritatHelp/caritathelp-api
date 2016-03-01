@@ -1,0 +1,50 @@
+SUCCESS =>
+
+localhost:3000/news/event_status?token=6H5_pvZSf5fkxI5d4ztR-Q&content=Status de l event&event_id=1
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "type": "New::Event::Status",
+    "object": {
+      "id": 7,
+      "event_id": 1,
+      "content": "Status de l event"
+    }
+  }
+}
+
+FAILURE =>
+
+localhost:3000/news/event_status?token=6H5_pvZSf5fkxI5d4ztR-Q&content=&event_id=1
+
+{
+  "status": 400,
+  "message": "Validation failed: Content can't be blank, Content is too short (minimum is 1 character)",
+  "response": null
+}
+
+localhost:3000/news/event_status?token=6H5_pvZSf5fkxI5d4ztR-Q&content=Status de l event&event_id=
+
+{
+  "status": 400,
+  "message": "Unknow event id",
+  "response": null
+}
+
+localhost:3000/news/event_status?token=TOKENEXISTANTMAISKAPALEDROI&content=Status de l event&event_id=1
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/news/event_status?token=zob&content=Status de l event&event_id=1
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

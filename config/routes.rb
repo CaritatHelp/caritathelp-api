@@ -2,6 +2,14 @@ Rails.application.routes.draw do
 
   apipie
 
+  scope '/news' do
+    post '/volunteer_status', to: 'news#volunteer_status'
+    post '/assoc_status', to: 'news#assoc_status'
+    post '/event_status', to: 'news#event_status'
+
+    get '/', to: 'news#index'
+  end
+
   scope '/friendship' do
     post '/add', to: 'friendship#add'
     post '/reply', to: 'friendship#reply'

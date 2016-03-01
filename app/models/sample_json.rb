@@ -34,4 +34,8 @@ class SampleJson < ActiveRecord::Base
   def self.guests(filename)
     File.open("#{Rails.root}/public/samples_json/guests/"+filename+".json").read
   end
+
+  def self.news(filename)
+    File.open("#{Rails.root}/public/samples_json/news/"+filename+".json").read
+  end
 end

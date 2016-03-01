@@ -1,0 +1,46 @@
+SUCCESS =>
+
+localhost:3000/news?token=6H5_pvZSf5fkxI5d4ztR-Q
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "news": [
+      {
+        "type": "New::Event::Status",
+        "object": {
+          "id": 7,
+          "event_id": 1,
+          "content": "Status de l'event 2"
+        }
+      },
+      {
+        "type": "New::Assoc::Status",
+        "object": {
+          "id": 5,
+          "assoc_id": 1,
+          "content": "Status de l'asso"
+        }
+      },
+      {
+        "type": "New::Event::Status",
+        "object": {
+          "id": 6,
+          "event_id": 1,
+          "content": "Status de l'event"
+        }
+      }
+    ]
+  }
+}
+
+FAILURE =>
+
+localhost:3000/news?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
