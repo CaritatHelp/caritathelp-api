@@ -8,6 +8,15 @@ Rails.application.routes.draw do
     post '/event_status', to: 'news#event_status'
 
     get '/', to: 'news#index'
+    get '/:id', to: 'news#show'
+    get '/:id/comments', to: 'news#comments'
+  end
+
+  scope '/comments' do
+    post '/', to: 'comment#create'
+    get '/:id', to: 'comment#show'
+    put '/:id', to: 'comment#update'
+    delete '/:id', to: 'comment#delete'
   end
 
   scope '/friendship' do

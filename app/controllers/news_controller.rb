@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 class NewsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
+  before_action :set_new, only: [:show, :comments]
   before_action :set_assoc, only: [:assoc_status]
   before_action :set_event, only: [:event_status]
   before_action :check_assoc_rights, only: [:assoc_status]
@@ -68,6 +70,25 @@ class NewsController < ApplicationController
     end
   end
 
+  api :GET, '/news/:id', 'Get information of the new'
+  param :token, String, "Your token", :required => true
+  example SampleJson.news('show')
+  def show
+    render :json => create_response(@new.complete_description)
+  end
+
+  api :GET, '/news/:id/comments', 'Get comments of the new'
+  param :token, String, "Your token", :required => true
+  example SampleJson.news('comments')
+  def comments
+    # voir à faire des associations
+    comments = []
+    Comment.where(new_id: @new.id).each do |comment|
+      comments.push comment.complete_description
+    end
+    render :json => create_response({'comments' => comments})
+  end
+
   private
   def set_event
     begin
@@ -82,6 +103,14 @@ class NewsController < ApplicationController
       @assoc = Assoc.find(params[:assoc_id])
     rescue
       render :json => create_error(400, t("assocs.failure.id"))
+    end
+  end
+
+  def set_new
+    begin
+      @new = New::New.find(params[:id])
+    rescue
+      render :json => create_error(400, t("news.failure.id"))
     end
   end
 
@@ -108,5 +137,5 @@ class NewsController < ApplicationController
     end
     return true
   end
-
+  
 end

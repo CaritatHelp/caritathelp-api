@@ -90,6 +90,18 @@ en:
       invitemember: 'Member successfuly invited'
       acceptinvite: 'You successfuly answered to the invitation'
 
+  news:
+    failure:
+      id: 'Unknown new id'
+
+  comments:
+    failure:
+      id: 'Unknown comment id'
+      rights: 'Permission denied'
+
+    success:
+      deleted: 'Successfuly deleted comment'
+
   login:
     failure:
       params:

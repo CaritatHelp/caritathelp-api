@@ -38,4 +38,8 @@ class SampleJson < ActiveRecord::Base
   def self.news(filename)
     File.open("#{Rails.root}/public/samples_json/news/"+filename+".json").read
   end
+
+  def self.comments(filename)
+    File.open("#{Rails.root}/public/samples_json/comments/"+filename+".json").read
+  end
 end
