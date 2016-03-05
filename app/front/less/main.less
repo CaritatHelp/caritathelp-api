@@ -33,6 +33,21 @@ body {
 	&>li>a {&:focus, &:hover {outline: none;}}
 }
 
+.panel-heading {
+	display: flex;
+	align-items: center;
+	.panel-title {flex-grow: 1;}
+	.label {
+		margin-right: 1em;
+		padding:.3em .6em;
+	}
+}
+.panel-resource {
+	.panel-heading {font-size: 1.2em;}
+	.panel-title {font-size: 1.3em;}
+	.panel-body {font-size: 1.2em;}
+}
+
 .label {background-color: @gray-light;}
 .label.get {background-color: @brand-success;}
 .label.post {background-color: @brand-info;}
