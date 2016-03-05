@@ -24,42 +24,30 @@
 <% end %>
 
 <% unless method[:params].blank? %>
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<%= t('apipie.params') %>
-			</div>
-		</div>
-		<div class="panel-body">
-			<table class='table table-striped'>
-				<thead>
-					<tr>
-						<th><%= t('apipie.param_name') %></th>
-						<th><%= t('apipie.description') %></th>
-						<th><%= t('apipie.value') %></th>
-					</tr>
-				</thead>
-				<tbody>
-					<%= render(:partial => "params", :locals => {:params => method[:params]}) %>
-				</tbody>
-			</table>
-		</div>
-	</div>
+	<h5 class="text-primary">
+		<%= t('apipie.params') %>
+	</h5>
+	<table class='table'>
+		<thead>
+			<tr>
+				<th><%= t('apipie.param_name') %></th>
+				<th><%= t('apipie.description') %></th>
+				<th><%= t('apipie.value') %></th>
+			</tr>
+		</thead>
+		<tbody>
+			<%= render(:partial => "params", :locals => {:params => method[:params]}) %>
+		</tbody>
+	</table>
 <% end %>
 
 <% unless method[:examples].blank? %>
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<%= t('apipie.examples') %>
-			</div>
-		</div>
-		<div class="panel-body">
-			<% method[:examples].each do |example| %>
-				<pre class="prettyprint"><%= example %></pre>
-			<% end %>
-		</div>
-	</div>
+	<h5 class="text-primary">
+		<%= t('apipie.examples') %>
+	</h5>
+	<% method[:examples].each do |example| %>
+		<pre class="prettyprint"><%= example %></pre>
+	<% end %>
 <% end %>
 
 

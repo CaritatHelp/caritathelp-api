@@ -62,8 +62,8 @@
 				<% unless m[:see].empty? %>
 					Also see <%= m[:see].map { |s| link_to(s[:description], "#{s[:link]}#{@doc[:link_extension]}") }.to_sentence.html_safe %>.
 				<% end %>
-				<div id="description-<%= m[:name] %>" class="collapse panel-body">
-					<%= render(:partial => "method_detail", :locals => {:method => m, :h_level => 3}) %>
+				<div id="description-<%= m[:name] %>" class="collapse panel-body table-method">
+					<%= render(:partial => "method_body", :locals => {:method => m, :h_level => 3}) %>
 				</div>
 			<% end %>
 		</div>
