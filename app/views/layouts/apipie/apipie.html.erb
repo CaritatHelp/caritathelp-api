@@ -9,7 +9,7 @@
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#scrollspy">
 	<div class='container' id='container'>
 		<div class="row">
 		<div class="logo">
@@ -20,6 +20,8 @@
 		</div>
 	</div>
 	<%= Apipie.include_javascripts %>
+	<script src="/jquery.min.js"></script>
+	<script src="/bootstrap.min.js"></script>
 	<script src="/main.min.js"></script>
 </body>
 </html>

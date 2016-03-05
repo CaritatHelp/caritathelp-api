@@ -13,10 +13,27 @@ body {
 }
 .logo {
 	text-align: center;
-	margin-bottom: 2em;
+	margin: 2em 0;
 	img {margin: auto;}
 }
+.left-fixed {
+	position: fixed;
+	left: 2%;
+	width: 10%;
+}
+.nav {
+	.list-group-item {
+		padding: 0;
+		margin-bottom: -3px;
+		&.active>a {
+			color: #fff;
+			&:hover {background-color: transparent;}
+		}
+	}
+	&>li>a {&:focus, &:hover {outline: none;}}
+}
 
+.label {background-color: @gray-light;}
 .label.get {background-color: @brand-success;}
 .label.post {background-color: @brand-info;}
 .label.delete {background-color: @brand-danger;}

@@ -8,12 +8,20 @@
 	<% end %>
 </ul>
 
+<div id="scrollspy" class="left-fixed">
+	<ul class="nav nav-stacked list-group">
+		<% @doc[:resources].sort_by(&:first).each do |key, api| %>
+			<li class="list-group-item"><a href="#<%= api[:name].downcase %>"><%= api[:name] %></a></li>
+		<% end %>
+	</ul>
+</div>
+
 <%#<div><%= raw @doc[:info] %/></div> %>
 
 <%#<h1 class='page-header'><%= t('apipie.resources') %/></h1> %>
 
 <% @doc[:resources].sort_by(&:first).each do |key, api| %>
-	<div class="panel panel-primary">
+	<div class="panel panel-primary" id="<%= api[:name].downcase %>">
 		<div class="panel-heading">
 			<h3 class="panel-title">
 				<a href='<%= api[:doc_url] %><%= @doc[:link_extension] %>'>
@@ -26,9 +34,9 @@
 			<table class='table'>
 				<thead>
 					<tr>
-						<th><%= t('apipie.methode') %></th>
-						<th><%= t('apipie.resource') %></th>
-						<th><%= t('apipie.description') %></th>
+						<th style="width:7%"><%= t('apipie.methode') %></th>
+						<th style="width:25%"><%= t('apipie.resource') %></th>
+						<th style="width:68%"><%= t('apipie.description') %></th>
 					</tr>
 				</thead>
 				<tbody>

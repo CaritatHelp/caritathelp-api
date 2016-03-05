@@ -24,7 +24,7 @@ gulp.task('styles', function () {
 		.pipe(browserSync.reload({stream:true}));
 });
 gulp.task('scripts', function() {
-	gulp.src('js/main.js')
+	gulp.src('js/**/*.js')
 		.pipe(g.plumber({
 			errorHandler: function (error) {
 				console.log(error.message);
