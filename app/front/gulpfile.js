@@ -36,9 +36,15 @@ gulp.task('scripts', function() {
 		.pipe(gulp.dest('../../public/'))
 		.pipe(browserSync.reload({stream:true}));
 });
+gulp.task('img', function() {
+	 gulp.src('img/**/*')
+		.pipe(g.changed('../../public/img'))
+		.pipe(gulp.dest('../../public/img'))
+		.pipe(browserSync.reload({stream:true}));
+});
 
 gulp.task('build', function () {
-	runSequence(['styles', 'scripts']);
+	runSequence(['img', 'styles', 'scripts']);
 });
 
 gulp.task('reload', function () {
@@ -49,7 +55,7 @@ gulp.task('serve', function () {
 	browserSync({
 		proxy: 'localhost:3000/doc',
 		online: false
-  });
+	});
 });
 
 gulp.task('watch', function () {
