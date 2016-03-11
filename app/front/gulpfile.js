@@ -4,8 +4,7 @@ var g = require('gulp-load-plugins')({
 	replaceString: /\bgulp[\-.]/
 });
 var runSequence = require('run-sequence'),
-		browserSync = require('browser-sync'),
-		clean = require('del');
+		browserSync = require('browser-sync');
 
 gulp.task('styles', function () {
 	gulp.src(['less/main.less'])
@@ -15,8 +14,6 @@ gulp.task('styles', function () {
 				this.emit('end');
 			}
 		}))
-		// .pipe(g.recess())
-		// .pipe(g.recess.reporter())
 		.pipe(g.less())
 		.pipe(g.autoprefixer('last 2 versions'))
 		.pipe(g.rename({suffix: '.min'}))
@@ -25,7 +22,9 @@ gulp.task('styles', function () {
 		.pipe(browserSync.reload({stream:true}));
 });
 gulp.task('scripts', function() {
-	gulp.src('js/**/*.js')
+	gulp.src('js/*.min.js')
+	  .pipe(gulp.dest('../../public/'));
+	gulp.src('js/main.js')
 		.pipe(g.plumber({
 			errorHandler: function (error) {
 				console.log(error.message);
@@ -42,10 +41,6 @@ gulp.task('img', function() {
 		.pipe(g.changed('../../public/img'))
 		.pipe(gulp.dest('../../public/img'))
 		.pipe(browserSync.reload({stream:true}));
-});
-
-gulp.task('clean', function() {
-	clean(['../../public/', '!../../public'])
 });
 
 gulp.task('build', function () {
