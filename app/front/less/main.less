@@ -1,0 +1,78 @@
+
+@import "bootstrap/bootstrap.less";
+@import "bootswatch/variables.less";
+@import "bootswatch/bootswatch.less";
+
+@body-green: #436435;
+// @text-color: #fff;
+// @link-color: #53a634;
+// @link-hover: #30a01c;
+
+body {
+	background-color: @body-green;
+}
+.logo {
+	text-align: center;
+	margin: 2em 0;
+	img {margin: auto;}
+}
+.left-fixed {
+	position: fixed;
+	left: 2%;
+	width: 10%;
+}
+.nav {
+	.list-group-item {
+		padding: 0;
+		margin-bottom: -3px;
+		&.active>a {
+			color: #fff;
+			&:hover {background-color: transparent;}
+		}
+	}
+	&>li>a {&:focus, &:hover {outline: none;}}
+}
+
+.panel-heading {
+	display: flex;
+	align-items: center;
+	.panel-title {flex-grow: 1;}
+	.label {
+		margin-right: 1em;
+		padding:.3em .6em;
+	}
+}
+.panel-resource {
+	.panel-heading {font-size: 1.2em;}
+	.panel-title {font-size: 1.3em;}
+	.panel-body {font-size: 1.2em;}
+}
+.page-method {
+	display: flex;
+	align-items: center;
+	.label {font-size: 24px;}
+	h2 {margin: 0 .5em;}
+}
+
+.table-method {
+	td.param-line {
+		display: flex;
+		align-items: center;
+	}
+	.param-name {
+		flex-grow: 1;
+		font-weight: bold;
+	}
+	.param-infos {
+		font-size: .9em;
+	}
+	td.param-description {
+		width: 50%;
+	}
+}
+
+.label {background-color: @gray-light;}
+.label.get {background-color: @brand-success;}
+.label.post {background-color: @brand-info;}
+.label.delete {background-color: @brand-danger;}
+.label.put {background-color: @brand-warning;}

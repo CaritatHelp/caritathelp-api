@@ -1,6 +1,6 @@
 Apipie.configure do |config|
   config.app_name                = "Caritathelp"
-  config.api_base_url            = "localhost:3000"
+  config.api_base_url            = ""
   config.doc_base_url            = "/doc"
   config.validate                = false
   config.validate_value          = false

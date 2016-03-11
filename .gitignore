@@ -2,3 +2,7 @@ log
 tmp
 config/database.yml
 db/schema.rb
+node_modules
+public/*.css
+public/*.js
+public/img

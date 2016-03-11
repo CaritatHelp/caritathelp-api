@@ -1,17 +1,18 @@
-<h1 class='page-header'>
-  <%= t('apipie.oops') %>
-  <small>
-  <% if @resource == 'null' %>
-    <%= t('apipie.resource_not_found_html', :resource => "<code>#{params[:resource]}</code>") %>
-  <% else %>
-    <%= t('apipie.method_not_found_html', :resource => "<code>#{params[:resource]}</code>",
-        :method => "<code>#{params[:resource]}</code>") %>
-  <% end %>
-  </small>
-</h1>
-
-<% if @doc %>
-  <%= t('apipie.goto_homepage_html', :href => link_to(
-    t('apipie.goto_homepage_href', :app_name => @doc[:name]),
-    File.join(@doc[:doc_url], @doc[:link_extension]))) %>
-<% end %>
+<div class="modal-content col-sm-8 col-sm-offset-2">
+	<div class="modal-header">
+		<h4 class="modal-title text-danger"><%= t('apipie.oops') %></h4>
+	</div>
+	<div class="modal-body">
+		<p class="h5 text-muted">
+			<% if @resource == 'null' %>
+				<%= t('apipie.resource_not_found_html', :resource => "<code>#{params[:resource]}</code>") %>
+			<% else %>
+				<%= t('apipie.method_not_found_html', :resource => "<code>#{params[:resource]}</code>",
+						:method => "<code>#{params[:resource]}</code>") %>
+			<% end %>
+		</p>
+	</div>
+	<div class="modal-footer">
+		<a href="/doc" class="btn btn-primary">Retour à l'accueil</a>
+	</div>
+</div>
