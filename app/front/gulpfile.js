@@ -4,7 +4,8 @@ var g = require('gulp-load-plugins')({
 	replaceString: /\bgulp[\-.]/
 });
 var runSequence = require('run-sequence'),
-		browserSync = require('browser-sync');
+		browserSync = require('browser-sync'),
+		clean = require('del');
 
 gulp.task('styles', function () {
 	gulp.src(['less/main.less'])
@@ -41,6 +42,10 @@ gulp.task('img', function() {
 		.pipe(g.changed('../../public/img'))
 		.pipe(gulp.dest('../../public/img'))
 		.pipe(browserSync.reload({stream:true}));
+});
+
+gulp.task('clean', function() {
+	clean(['../../public/', '!../../public'])
 });
 
 gulp.task('build', function () {
