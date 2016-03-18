@@ -13,7 +13,7 @@ localhost:3000/associations?token=jw35EAIZFb90bpPpDs_wwQ&name=fat assoc&descript
 	city: null,
 	latitude: null,
 	longitude: null,
-	is_member: true
+	rights: "owner" // can be 'admin', 'member', or 'none' if not member
     }
 }
 

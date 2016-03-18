@@ -13,7 +13,7 @@ localhost:3000/associations/1/?token=bCdmSC5oUxpty11MDU6iFw
     "birthday": null,
     "latitude": null,
     "longitude": null,
-    "is_member": true
+    "rights": "owner" // can be 'admin', 'member', and 'none' if not member
   }
 }
 

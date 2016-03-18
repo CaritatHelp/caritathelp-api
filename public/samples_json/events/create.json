@@ -13,7 +13,7 @@ localhost:3000/events?token=MqxwIe94c0by9--2c0PPbQ&assoc_id=1&title=Fat event&de
     "begin": null,
     "end": null,
     "assoc_id": 1,
-    "is_guest": true
+    "rights": "host" // can be 'admin', 'member', or 'none' if not member
   }
 }
 

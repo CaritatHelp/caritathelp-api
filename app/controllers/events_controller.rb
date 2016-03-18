@@ -49,11 +49,11 @@ class EventsController < ApplicationController
 
       new_event = Event.create!(event_params_creation)
 
-      event_link = EventVolunteer.create!([event_id: new_event.id,
+      event_link = EventVolunteer.create!(event_id: new_event.id,
                                           volunteer_id: @volunteer.id,
-                                          rights: 'host'])
+                                          rights: 'host')
 
-      render :json => create_response(new_event.complete_description(true))
+      render :json => create_response(new_event.complete_description(event_link.rights))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       begin
         new_event.destroy
@@ -67,10 +67,11 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('show')
   def show
-    if EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first != nil
-      render :json => create_response(@event.complete_description(true)) and return
+    link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first
+    if link != nil
+      render :json => create_response(@event.complete_description(link.rights)) and return
     end
-    render :json => create_response(@event.complete_description(false))    
+    render :json => create_response(@event.complete_description)
   end
 
   api :GET, '/events/:id/notifications', 'Get event notifications'
@@ -96,7 +97,7 @@ class EventsController < ApplicationController
   def update
     begin
       @event.update!(event_params_update)
-      render :json => create_response(@event.complete_description(true))
+      render :json => create_response(@event.complete_description(@link.rights))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
