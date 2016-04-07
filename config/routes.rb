@@ -56,6 +56,7 @@ Rails.application.routes.draw do
 
   scope '/associations' do
     get '/', to: 'assocs#index'
+    get '/search', to: 'assocs#search'
     get '/:id', to: 'assocs#show'
     get '/:id/members', to: 'assocs#members'
     get '/:id/notifications', to: 'assocs#notifications'
@@ -71,6 +72,7 @@ Rails.application.routes.draw do
 
   scope '/events' do
     get '/', to: 'events#index'
+    get '/search', to: 'events#search'
     get '/:id', to: 'events#show'
     get '/:id/guests', to: 'events#guests'
     get '/:id/notifications', to: 'events#notifications'

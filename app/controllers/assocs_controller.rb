@@ -64,6 +64,25 @@ class AssocsController < ApplicationController
     render :json => create_response(@assoc.complete_description)
   end
 
+  api :GET, '/associations/search', "Search for association by its name, return a list of matching associations"
+  param :token, String, "Your token", :required => true
+  param :research, String, "Association's name", :required => true
+  example SampleJson.assocs('search')
+  def search
+    begin
+      name = params[:research].downcase
+
+      if name.length.eql?(0)
+        render :json => create_error(400, t("assocs.failure.research")) and return
+      end
+      query = "lower(name) LIKE ?"
+      render :json => create_response(Assoc.select('id, name, description, city')
+                                        .where(query, "#{name}%"))
+    rescue => e
+      render :json => create_error(400, t("assocs.failure.research")) and return
+    end
+  end
+
   api :GET, '/associations/:id/notifications', 'Get assoc notifications'
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('notifications')
@@ -102,8 +121,7 @@ class AssocsController < ApplicationController
         render :json => create_error(400, t("assocs.failure.update"))
       end
     rescue ActiveRecord::RecordInvalid => e
-      render :json => create_error(400, e.to_s)
-      return
+      render :json => create_error(400, e.to_s) and return
     end
   end
 

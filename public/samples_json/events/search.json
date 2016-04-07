@@ -1,0 +1,62 @@
+SUCCESS =>
+
+localhost:3000/events/search?token=qbyLcVTBLFwaUd6hIqoIxQ&research=toto
+
+ici on a 2 events qui ont pour title toto, chacun venant d une asso differente
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 4,
+      "title": "toto",
+      "description": "to",
+      "place": null,
+      "begin": null
+    },
+    {
+      "id": 7,
+      "title": "toto",
+      "description": "to",
+      "place": null,
+      "begin": null
+    }
+  ]
+}
+
+localhost:3000/events/search?token=qbyLcVTBLFwaUd6hIqoIxQ&research=toto&assoc_id=2
+
+si on précise l id d une asso (optionnel donc) ça va get que les event liés a cette asso
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 4,
+      "title": "toto",
+      "description": "to",
+      "place": null,
+      "begin": null
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/events/search?token=qbyLcVTBLFwaUd6hIqoIxQ&research=
+
+{
+  "status": 400,
+  "message": "Research field is missing",
+  "response": null
+}
+
+localhost:3000/events/search?token=zobtoken&research=to
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
