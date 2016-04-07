@@ -203,6 +203,31 @@ class MembershipController < ApplicationController
     end
   end
 
+  api :DELETE, '/membership/leave', "Leave an association"
+  param :token, String, "Your token", :required => true
+  param :assoc_id, String, "Id of the assoc to leave", :required => true
+  example SampleJson.membership('leave')
+  def leave_assoc
+    begin
+      volunteer = Volunteer.find_by!(token: params[:token])
+      assoc = Assoc.find_by!(id: params[:assoc_id])
+
+      link = AvLink.where(:volunteer_id => volunteer.id).where(:assoc_id => assoc.id).first
+
+      if link.eql?(nil)
+        render :json => create_error(400, t("assocs.failure.notmember")) and return        
+      elsif link.rights.eql?('owner')
+        render :json => create_error(400, t("assocs.failure.owner")) and return
+      end
+
+      link.destroy
+
+      render :json => create_response(t("assocs.success.leaved")) and return
+    rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
+      render :json => create_error(400, e.to_s) and return
+    end
+  end
+
   private
   def join_params
     params.permit(:token)

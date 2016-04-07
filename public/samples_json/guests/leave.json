@@ -1,0 +1,43 @@
+SUCCESS =>
+
+localhost:3000/guests/leave?token=U6PvUjQCG0nakm1rwQtcng&event_id=1
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": "You successfuly leaved this event"
+}
+
+FAILURE =>
+
+localhost:3000/guests/leave?token=qbyLcVTBLFwaUd6hIqoIxQ&event_id=1
+
+{
+  "status": 400,
+  "message": "You can't leave the event because you are the host",
+  "response": null
+}
+
+localhost:3000/guests/leave?token=un autre token&event_id=1
+
+{
+  "status": 400,
+  "message": "This volunteer is not a guest",
+  "response": null
+}
+
+localhost:3000/guests/leave?token=zobtoken&event_id=1
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+localhost:3000/guests/leave?token=qbyLcVTBLFwaUd6hIqoIxQ&event_id=987
+
+{
+  "status": 400,
+  "message": "Unknow event id",
+  "response": null
+}

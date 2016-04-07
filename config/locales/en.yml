@@ -33,11 +33,13 @@ en:
       id: 'Unknown assoc id'
       rights: 'Permission denied'
       notmember: 'This volunteer is not a member of this association'
+      owner: "You can't leave this association because you are the owner"
 
     success:
       deleted: 'Successfuly deleted assoc'
       kicked: 'Member has been kicked'
       upgraded: 'Member successfuly upgraded'
+      leaved: 'You successfuly leaved this association'
 
   volunteers:
     failure:
@@ -62,6 +64,7 @@ en:
       not_guest: 'This volunteer is not a guest'
       join_link_exist: 'You have already applied in this event or you received an invitation'
       invite_link_exist: 'This volunteer already applied or received an invitation'
+      host: "You can't leave the event because you are the host"
 
     success:
       kicked: 'Guest has been kicked'
@@ -70,6 +73,7 @@ en:
       reply_guest: 'You successfuly replied to this guest request'
       invite_guest: 'You successfuly invited this guest to join your event'
       reply_invite: 'You successfuly replied to this invitation'
+      leaved: 'You successfuly leaved this event'
 
   notifications:
     failure:

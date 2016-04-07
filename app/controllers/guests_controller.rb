@@ -199,6 +199,31 @@ class GuestsController < ApplicationController
     end
   end
 
+  api :DELETE, '/guests/leave', "Leave an event"
+  param :token, String, "Your token", :required => true
+  param :event_id, String, "Id of the event to leave", :required => true
+  example SampleJson.guests('leave')
+  def leave_event
+    begin
+      volunteer = Volunteer.find_by!(token: params[:token])
+      event = Event.find_by!(id: params[:event_id])
+
+      link = EventVolunteer.where(:volunteer_id => volunteer.id).where(:event_id => event.id).first
+
+      if link.eql?(nil)
+        render :json => create_error(400, t("events.failure.not_guest")) and return        
+      elsif link.rights.eql?('host')
+        render :json => create_error(400, t("events.failure.host")) and return
+      end
+
+      link.destroy
+
+      render :json => create_response(t("events.success.leaved")) and return
+    rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
+      render :json => create_error(400, e.to_s) and return
+    end
+  end
+
   private
   def join_params
     params.permit(:token)

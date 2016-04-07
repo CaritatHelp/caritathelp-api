@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     put '/upgrade', to: 'membership#upgrade'
 
     delete '/kick', to: 'membership#kick'
+    delete '/leave', to: 'membership#leave_assoc'
   end
 
   scope '/volunteers' do
@@ -88,6 +89,7 @@ Rails.application.routes.draw do
     put '/upgrade', to: 'guests#upgrade'
 
     delete '/kick', to: 'guests#kick'    
+    delete '/leave', to: 'guests#leave_event'
   end
   
   scope '/login' do
