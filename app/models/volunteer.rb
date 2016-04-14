@@ -1,9 +1,15 @@
 class Volunteer < ActiveRecord::Base
+  has_many :chatrooms, through: :chatroom_volunteers
+  has_many :chatroom_volunteers
+
   has_and_belongs_to_many :assocs, join_table: :av_links
   has_many :av_links
 
   has_and_belongs_to_many :events, join_table: :event_volunteers
   has_many :event_volunteers
+
+  has_and_belongs_to_many :volunteers, join_table: :v_friends
+  has_many :v_friends
 
   require 'securerandom'
 
@@ -67,9 +73,10 @@ class Volunteer < ActiveRecord::Base
   end
 
   # gerer les exception
+  # a modifier
   def friends
     friend_list = []
-    VFriend.where(current_volunteer_id: self.id).each do |link|
+    VFriend.where(volunteer_id: self.id).each do |link|
       friend = Volunteer.find_by(id: link.friend_volunteer_id)
       friend_list.push friend.short_description
     end

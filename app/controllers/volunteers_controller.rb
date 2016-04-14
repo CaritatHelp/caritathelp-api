@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events]
+  before_action :set_current_volunteer, only: [:index]
 
   def_param_group :volunteers_creation do
     param :mail, String, "Your mail address", :required => true
@@ -36,7 +38,15 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('index')
   def index
-    render :json => create_response(Volunteer.select('id, mail, firstname, lastname, birthday, gender, city, latitude, longitude, allowgps, allow_notifications').limit(100))
+    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+      "city, latitude, longitude, allowgps, allow_notifications, " +
+      "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
+      "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
+      "link.volunteer_id=#{@current_volunteer.id} AND " +
+      "v_friends.volunteer_id=volunteers.id AND " +
+      "v_friends.volunteer_id<>#{@current_volunteer.id}) AS nb_common_friends FROM volunteers"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :POST, '/volunteers', "Allow volunteer to create an account"
@@ -126,20 +136,29 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('associations')
   def associations
-    query = "assocs.id, assocs.name, av_links.rights"
-    render :json => create_response(Assoc.joins(:av_links)
-                                      .where(av_links: { volunteer_id: @volunteer.id })
-                                      .select(query).limit(100))
+    query = "SELECT assocs.id, assocs.name, assocs.city, av_links.rights, " +
+      "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
+      "av_links.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM assocs INNER JOIN av_links ON av_links.assoc_id=assocs.id " + 
+      "WHERE av_links.volunteer_id=#{@volunteer.id}"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :GET, '/volunteers/:id/events', "Return a list of the volunteer's events"
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('events')
   def events
-    query = "events.id, events.title, events.assoc_id, event_volunteers.rights"
-    render :json => create_response(Event.joins(:event_volunteers)
-                                      .where(event_volunteers: { volunteer_id: @volunteer.id })
-                                      .select(query).limit(100))
+    query = "SELECT events.id, events.title, events.place, events.begin, " +
+      "events.assoc_id, event_volunteers.rights, " +
+      "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
+      "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM events INNER JOIN event_volunteers ON event_volunteers.event_id=events.id " + 
+      "WHERE event_volunteers.volunteer_id=#{@volunteer.id}"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   private
@@ -150,6 +169,10 @@ class VolunteersController < ApplicationController
       render :json => create_error(400, t("volunteers.failure.id"))
       return
     end
+  end
+
+  def set_current_volunteer
+    @current_volunteer = Volunteer.find_by(token: params[:token])
   end
   
   def volunteer_params

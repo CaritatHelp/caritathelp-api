@@ -1,0 +1,60 @@
+SUCCESS =>
+
+localhost:3000/chatrooms/79?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 1,
+      "chatroom_id": 79,
+      "volunteer_id": 1,
+      "content": "coucou",
+      "created_at": "2016-04-14T06:39:22.433Z",
+      "updated_at": "2016-04-14T06:39:22.433Z"
+    },
+    {
+      "id": 2,
+      "chatroom_id": 79,
+      "volunteer_id": 1,
+      "content": "ça va?",
+      "created_at": "2016-04-14T06:39:37.877Z",
+      "updated_at": "2016-04-14T06:39:37.877Z"
+    },
+    {
+      "id": 3,
+      "chatroom_id": 79,
+      "volunteer_id": 3,
+      "content": "ouais et toi?",
+      "created_at": "2016-04-14T06:39:57.485Z",
+      "updated_at": "2016-04-14T06:39:57.485Z"
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/chatrooms/78/?token=zobtoken
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+localhost:3000/chatrooms/78?token=autre token
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/chatrooms/999?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 400,
+  "message": "Unknown chatroom id",
+  "response": null
+}

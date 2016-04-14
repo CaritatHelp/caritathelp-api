@@ -42,4 +42,8 @@ class SampleJson < ActiveRecord::Base
   def self.comments(filename)
     File.open("#{Rails.root}/public/samples_json/comments/"+filename+".json").read
   end
+
+  def self.chatrooms(filename)
+    File.open("#{Rails.root}/public/samples_json/chatrooms/"+filename+".json").read
+  end
 end

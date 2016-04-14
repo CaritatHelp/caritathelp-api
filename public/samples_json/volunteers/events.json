@@ -3,16 +3,19 @@ SUCCESS =>
 localhost:3000/volunteers/2/events?token=cvHPGCWh0QYyvhADQnIZ0Q
 
 {
-  "status": 200,
-  "message": "ok",
-  "response": [
-    {
-      "id": 1,
-      "title": "tata",
-      "assoc_id": 1,
-      "rights": "host"
-    }
-  ]
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: "1",
+	    title: "fat event",
+	    place: null,
+	    begin: "1991-07-29 00:00:00",
+	    assoc_id: "1",
+	    rights: "host", // null if not member at all
+	    nb_friends_members: "1"
+	}
+    ]
 }
 
 FAILURE =>

@@ -27,7 +27,15 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('index')
   def index
-    render :json => create_response(Event.select('id, title, description, place, begin, assoc_id').limit(100))
+    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, " +
+      "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
+      "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
+      "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM events"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :POST, '/events', "Allow an association to create an event"

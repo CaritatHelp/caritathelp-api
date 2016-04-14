@@ -19,7 +19,7 @@ class NewsController < ApplicationController
     fields = "new_news.type, new_news.id, new_news.assoc_id, new_news.event_id, new_news.volunteer_id, new_news.content"
 
     query = "(SELECT " + fields + " FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = ?) UNION " +
-      "(SELECT " + fields + " FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.current_volunteer_id WHERE v_friends.friend_volunteer_id = ?) UNION " +
+      "(SELECT " + fields + " FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = ?) UNION " +
       "(SELECT " + fields + " FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = ?)"
 
     news = New::New.find_by_sql([query, @volunteer.id, @volunteer.id, @volunteer.id]).map(&:complete_description)

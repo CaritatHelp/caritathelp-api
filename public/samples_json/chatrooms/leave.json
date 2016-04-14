@@ -1,0 +1,35 @@
+SUCCESS =>
+
+localhost:3000/chatrooms/82/leave?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": "You successfuly leaved this chatroom"
+}
+
+FAILURE =>
+
+localhost:3000/chatrooms/78/leave?token=zobtoken
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+localhost:3000/chatrooms/78/leave?token=autre token
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/chatrooms/999/leave?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 400,
+  "message": "Unknown chatroom id",
+  "response": null
+}

@@ -93,6 +93,23 @@ Rails.application.routes.draw do
     delete '/kick', to: 'guests#kick'    
     delete '/leave', to: 'guests#leave_event'
   end
+
+  scope '/chatrooms' do
+    post '/', to: 'messages#create'
+
+    get '/', to: 'messages#index'
+    get '/:id', to: 'messages#show'
+    get '/:id/volunteers', to: 'messages#participants'
+
+    put '/:id/set_name', to: 'messages#set_name'
+    put '/:id/add_volunteers', to: 'messages#add_volunteers'
+    put '/:id/new_message', to: 'messages#new_message'
+
+    delete '/', to: 'messages#reset' # a supprimer
+    delete '/:id/kick', to: 'messages#kick_volunteer'
+    delete '/:id/leave', to: 'messages#leave'
+    delete '/:id/delete_message', to: 'messages#delete_message'
+  end
   
   scope '/login' do
     post '/', to: 'login#index'

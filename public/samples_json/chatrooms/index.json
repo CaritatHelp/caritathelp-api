@@ -1,0 +1,56 @@
+SUCCESS =>
+
+localhost:3000/chatrooms?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 83,
+      "name": null,
+      "number_volunteers": 3,
+      "number_messages": 0
+    },
+    {
+      "id": 82,
+      "name": null,
+      "number_volunteers": 3,
+      "number_messages": 0
+    },
+    {
+      "id": 81,
+      "name": null,
+      "number_volunteers": 3,
+      "number_messages": 0
+    },
+    {
+      "id": 80,
+      "name": null,
+      "number_volunteers": 3,
+      "number_messages": 0
+    },
+    {
+      "id": 79,
+      "name": null,
+      "number_volunteers": 2,
+      "number_messages": 0
+    },
+    {
+      "id": 78,
+      "name": null,
+      "number_volunteers": 2,
+      "number_messages": 0
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/chatrooms?token=zobtoken
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

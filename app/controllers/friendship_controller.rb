@@ -17,7 +17,7 @@ class FriendshipController < ApplicationController
       @volunteer = Volunteer.find_by!(token: params[:token])
       @friend = Volunteer.find_by!(id: params[:volunteer_id])
       
-      if ((VFriend.where(current_volunteer_id: @volunteer.id)
+      if ((VFriend.where(volunteer_id: @volunteer.id)
              .where(friend_volunteer_id: @friend.id).first != nil) ||
           (Notification::AddFriend.where(sender_volunteer_id: @volunteer.id)
              .where(receiver_volunteer_id: @friend.id).first != nil) ||
@@ -82,9 +82,9 @@ class FriendshipController < ApplicationController
       @volunteer = Volunteer.find_by!(token: params[:token])
       @friend = Volunteer.find_by!(id: params[:id])
 
-      link1 = VFriend.where(current_volunteer_id: @volunteer.id)
+      link1 = VFriend.where(volunteer_id: @volunteer.id)
         .where(friend_volunteer_id: @friend.id).first 
-      link2 = VFriend.where(current_volunteer_id: @friend.id)
+      link2 = VFriend.where(volunteer_id: @friend.id)
         .where(friend_volunteer_id: @volunteer.id).first 
       if link1 == nil || link2 == nil
         render :json => create_error(400, t("volunteers.failure.unfriend"))
@@ -107,8 +107,8 @@ class FriendshipController < ApplicationController
 
   def create_friend_link(sender, receiver)
     begin
-      VFriend.create!([current_volunteer_id: sender, friend_volunteer_id: receiver])
-      VFriend.create!([current_volunteer_id: receiver, friend_volunteer_id: sender])
+      VFriend.create!([volunteer_id: sender, friend_volunteer_id: receiver])
+      VFriend.create!([volunteer_id: receiver, friend_volunteer_id: sender])
       return true
     rescue ActiveRecord::RecordInvalid => e
       return false

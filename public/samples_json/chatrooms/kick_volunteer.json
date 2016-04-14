@@ -1,0 +1,43 @@
+SUCCESS =>
+
+localhost:3000/chatrooms/80/kick?token=kBEGNc9rtC1e1v5k_ys8Ng&volunteer_id=2
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": "Volunteer has been kicked from chatroom"
+}
+
+FAILURE =>
+
+localhost:3000/chatrooms/78/kick?token=zobtoken
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+localhost:3000/chatrooms/78/kick?token=autre token
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/chatrooms/999/kick?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 400,
+  "message": "Unknown chatroom id",
+  "response": null
+}
+
+localhost:3000/chatrooms/80/kick?token=tMb7m0B8cyuWCIHnUQT_cw&volunteer_id=2
+
+{
+  "status": 400,
+  "message": "This volunteer is not in the chatroom",
+  "response": null
+}

@@ -1,0 +1,46 @@
+SUCCESS =>
+
+localhost:3000/chatrooms?token=tMb7m0B8cyuWCIHnUQT_cw&volunteers[]=2&volunteers[]=3
+
+// ça inclut automatique le volunteer représenté par le token
+// quand on crée une chatroom entre juste 2 personnes
+// si on chatroom entre ces 2 personnes existe déjà, on retourne la chatroom existante
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 76,
+    "created_at": "2016-04-14T05:46:14.833Z",
+    "updated_at": "2016-04-14T05:46:14.833Z",
+    "name": null,
+    "number_volunteers": 3,
+    "number_messages": 0
+  }
+}
+
+localhost:3000/chatrooms?token=tMb7m0B8cyuWCIHnUQT_cw&volunteers[]=2&volunteers[]=3&name=mabite
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 77,
+    "created_at": "2016-04-14T05:46:54.491Z",
+    "updated_at": "2016-04-14T05:46:54.491Z",
+    "name": "mabite",
+    "number_volunteers": 3,
+    "number_messages": 0
+  }
+}
+
+FAILURE =>
+
+localhost:3000/chatrooms?token=tMb7m0B8cyuWCIHnUQT_cw
+
+{
+  "status": 400,
+  "message": "You must be at least 2 to create a chatroom",
+  "response": null
+}
+

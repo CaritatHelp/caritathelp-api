@@ -29,7 +29,14 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('index')
   def index
-    render :json => create_response(Assoc.select('id, name, description, birthday, city, latitude, longitude').limit(100))
+    query = "SELECT assocs.id, assocs.name, assocs.city, " +
+      "(SELECT av_links.rights FROM av_links WHERE av_links.assoc_id=assocs.id " + 
+      "AND av_links.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
+      "av_links.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM assocs"
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :POST, '/associations', "Allow volunteer to create an association"
@@ -104,7 +111,15 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('events')
   def events
-    render :json => create_response(@assoc.events)
+    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, " +
+      "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
+      "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
+      "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM events WHERE events.assoc_id=#{@assoc.id}"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :PUT, '/associations/:id', "Update association"

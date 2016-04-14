@@ -7,13 +7,11 @@ localhost:3000/associations?token=jw35EAIZFb90bpPpDs_wwQ
     message: "ok",
     response: [
 	{
-	    id: 1,
-	    name: "Croix Rouge",
-	    description: "'La croix rouge quoi'",
-	    birthday: null,
+	    id: "1",
+	    name: "Croix rouge",
 	    city: null,
-	    latitude: null,
-	    longitude: null
+	    rights: "owner",   // null if not member at all
+	    nb_friends_members: "1"
 	}
     ]
 }

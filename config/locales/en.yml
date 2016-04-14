@@ -108,6 +108,25 @@ en:
     success:
       deleted: 'Successfuly deleted comment'
 
+  messages:
+    failure:
+      id: 'Unknown message id'
+      rights: 'Permission denied'
+
+    success:
+      deleted: 'Message successfuly deleted'
+
+  chatrooms:
+    failure:
+      rights: 'Permission denied'
+      id: 'Unknown chatroom id'
+      min_two: "You must be at least 2 to create a chatroom"
+      not_found: 'This volunteer is not in the chatroom'
+
+    success:
+      kicked: 'Volunteer has been kicked from chatroom'
+      leave: 'You successfuly leaved this chatroom'
+
   login:
     failure:
       params:

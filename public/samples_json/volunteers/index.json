@@ -7,30 +7,60 @@ localhost:3000/volunteers?token=jw35EAIZFb90bpPpDs_wwQ
     message: "ok",
     response: [
 	{
-	    id: 2,
-	    mail: "first@root.com",
-	    firstname: "root",
-	    lastname: "root",
+	    id: "1",
+	    mail: "robin@root.com",
+	    firstname: "Rob",
+	    lastname: "Vasseur",
 	    birthday: null,
 	    gender: null,
 	    city: null,
 	    latitude: null,
 	    longitude: null,
-	    allowgps: false,
-	    allow_notifications: false
+	    allowgps: "f",
+	    allow_notifications: null,
+	    nb_common_friends: "0"
 	},
 	{
-	    id: 3,
-	    mail: "second@root.com",
-	    firstname: "second",
-	    lastname: "root",
+	    id: "2",
+	    mail: "pierre@root.com",
+	    firstname: "Pierre",
+	    lastname: "Enjalbert",
 	    birthday: null,
 	    gender: null,
 	    city: null,
 	    latitude: null,
 	    longitude: null,
-	    allowgps: false,
-	    allow_notifications: false
+	    allowgps: "f",
+	    allow_notifications: null,
+	    nb_common_friends: "1"
+	},
+	{
+	    id: "3",
+	    mail: "jerem@root.com",
+	    firstname: "Jerem",
+	    lastname: "Gros",
+	    birthday: null,
+	    gender: null,
+	    city: null,
+	    latitude: null,
+	    longitude: null,
+	    allowgps: "f",
+	    allow_notifications: null,
+	    nb_common_friends: "1"
+	},
+	{
+	    id: "4",
+	    mail: "nico@root.com",
+	    firstname: "nico",
+	    lastname: "temeni",
+	    birthday: null,
+	    gender: null,
+	    city: null,
+	    latitude: null,
+	    longitude: null,
+	    allowgps: "f",
+	    allow_notifications: null,
+	    nb_common_friends: "2"
 	}
     ]
 }
