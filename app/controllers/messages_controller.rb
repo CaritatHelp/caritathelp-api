@@ -138,6 +138,8 @@ class MessagesController < ApplicationController
   example SampleJson.chatrooms('add_volunteers')
   def add_volunteers
     begin
+      # avoid adding on is_private chatroom ?
+
       volunteers = params[:volunteers]
       names = []
 
@@ -152,6 +154,7 @@ class MessagesController < ApplicationController
 
       # increment the total number of participants in the chatroom
       @chatroom.number_volunteers += names.count
+      @chatroom.is_private = false
       @chatroom.save!
 
       render :json => create_response(names) and return
