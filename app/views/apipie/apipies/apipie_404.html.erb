@@ -3,7 +3,7 @@
 		<h4 class="modal-title text-danger"><%= t('apipie.oops') %></h4>
 	</div>
 	<div class="modal-body">
-		<p class="h5 text-muted">
+		<p class="h5">
 			<% if @resource == 'null' %>
 				<%= t('apipie.resource_not_found_html', :resource => "<code>#{params[:resource]}</code>") %>
 			<% else %>

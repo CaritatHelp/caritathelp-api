@@ -16,7 +16,7 @@
 <% @method[:apis].each do |api| %>
 	<div class='page-header page-method'>
 		<div class="label <%= api[:http_method].downcase %>"><%= api[:http_method] %></div>
-		<h2 class="text-muted">
+		<h2>
 			<%= api[:api_url] %>
 			<% if api[:deprecated] %>
 				<code>DEPRECATED</code>
@@ -24,7 +24,7 @@
 			<br>
 		</h2>
 	</div>
-	<h5 class="text-muted"><%= raw api[:short_description] %></h5>
+	<h5><%= raw api[:short_description] %></h5>
 <% end %>
 
 <div class="table-method">
