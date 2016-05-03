@@ -12,15 +12,12 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('index')
   def index
-    # query = "((event_id = 1) AND (EXISTS(SELECT * FROM event_volunteers WHERE ((event_id = 1) AND (volunteer_id = ?)))))"
-    # news = New::New.joins(:event_volunteers).where(event_volunteers: { volunteer_id: @volunteer.id }).all.map(&:complete_description)
-    # news = New::New.where(query, @volunteer.id).map(&:complete_description)
-
     fields = "new_news.type, new_news.id, new_news.assoc_id, new_news.event_id, new_news.volunteer_id, new_news.content"
 
     query = "(SELECT " + fields + " FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = ?) UNION " +
       "(SELECT " + fields + " FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = ?) UNION " +
-      "(SELECT " + fields + " FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = ?)"
+      "(SELECT " + fields + " FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = ?) UNION " +
+      "(SELECT " + fields + " FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id})"
 
     news = New::New.find_by_sql([query, @volunteer.id, @volunteer.id, @volunteer.id]).map(&:complete_description)
     render :json => create_response({'news' => news})
