@@ -66,7 +66,7 @@ Rails.application.routes.draw do
 
     put '/:id', to: 'assocs#update' 
 
-    delete '/:id', to: 'assocs#destroy'
+    delete '/:id', to: 'assocs#delete'
     match '/', to: 'doc#index', via: :all
   end
 

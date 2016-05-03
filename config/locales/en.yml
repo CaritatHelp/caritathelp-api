@@ -41,7 +41,8 @@ en:
       kicked: 'Member has been kicked'
       upgraded: 'Member successfuly upgraded'
       leaved: 'You successfuly leaved this association'
-
+      deleted: 'You successfuly deleted this association'
+      
   volunteers:
     failure:
       mail:

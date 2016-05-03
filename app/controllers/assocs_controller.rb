@@ -1,8 +1,8 @@
 class AssocsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events]
-  before_action :check_rights, only: [:update]
+  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete]
+  before_action :check_rights, only: [:update, :delete]
 
   def_param_group :assocs_create do
     param :token, String, "Creator's token", :required => true
@@ -152,6 +152,21 @@ class AssocsController < ApplicationController
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
+  end
+
+  
+  api :DELETE, '/associations/:id', "Delete association (need to be owner)"
+  param :token, String, "Your token", :required => true
+  example SampleJson.assocs('delete')
+  def delete
+    if @link.rights.eql?('owner')
+      Notification::JoinAssoc.where(receiver_assoc_id: @assoc.id).destroy_all
+      Notification::InviteMember.where(sender_assoc_id: @assoc.id).destroy_all
+      AvLink.where(assoc_id: @assoc.id).destroy_all
+      @assoc.destroy
+      render :json => create_response(t("assocs.success.deleted")) and return
+    end
+    render :json => create_error(400, t("assocs.failure.rights"))    
   end
 
   private

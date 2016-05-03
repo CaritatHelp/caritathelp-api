@@ -1,0 +1,35 @@
+SUCCESS =>
+
+localhost:3000/associations/1?token=R0SJki1HXqOK847G2rJZ3Q
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": "You successfuly deleted this association"
+}
+
+FAILURE =>
+
+localhost:3000/associations/1?token=JFJIJN94d1DDF15DE
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/associations/11111?token=JFJIJN94d1DDF15DE
+
+{
+  "status": 400,
+  "message": "Unknown assoc id",
+  "response": null
+}
+
+localhost:3000/associations/1?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
