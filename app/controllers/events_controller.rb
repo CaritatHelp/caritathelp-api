@@ -25,6 +25,7 @@ class EventsController < ApplicationController
 
   api :GET, '/events', "Get a list of all events"
   param :token, String, "Your token", :required => true
+  param :range, String, "can be 'past', 'current' or 'futur'", :required => true
   example SampleJson.events('index')
   def index
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, events.assoc_id, " +

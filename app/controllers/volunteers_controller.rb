@@ -148,6 +148,7 @@ class VolunteersController < ApplicationController
 
   api :GET, '/volunteers/:id/events', "Return a list of the volunteer's events"
   param :token, String, "Your token", :required => true
+  param :range, String, "can be 'past', 'current' or 'futur'", :required => true
   example SampleJson.volunteers('events')
   def events
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
