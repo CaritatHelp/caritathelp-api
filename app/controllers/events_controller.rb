@@ -79,7 +79,23 @@ class EventsController < ApplicationController
     if link != nil
       render :json => create_response(@event.complete_description(link.rights)) and return
     end
-    render :json => create_response(@event.complete_description)
+    rights = 'none'
+
+    notif = Notification::InviteGuest.where(event_id: @event.id)
+      .where(volunteer_id: @volunteer.id).first
+    
+    if notif != nil
+      rights = 'invited'
+    end
+
+    notif = Notification::JoinEvent.where(event_id: @event.id)
+      .where(volunteer_id: @volunteer.id).first
+
+    if notif != nil
+      rights = 'waiting'
+    end
+
+    render :json => create_response(@event.complete_description(rights))
   end
 
   api :GET, '/events/search', "Search for event by its name, return a list of matching events"

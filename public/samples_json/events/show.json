@@ -13,7 +13,9 @@ localhost:3000/events/1?token=MqxwIe94c0by9--2c0PPbQ
     "begin": null,
     "end": null,
     "assoc_id": 1,
-    "rights": "host" // can be 'admin', 'member', or 'none' of not member
+    "rights": "host" // can be 'admin', 'member', 'none' of not member
+                      // 'invited' if the user received an invitation
+                      // 'waiting' if the user already asked to join
   }
 }
 
