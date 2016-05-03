@@ -150,13 +150,23 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('events')
   def events
-    query = "SELECT events.id, events.title, events.place, events.begin, " +
+    query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
       "events.assoc_id, event_volunteers.rights, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
       " FROM events INNER JOIN event_volunteers ON event_volunteers.event_id=events.id " + 
       "WHERE event_volunteers.volunteer_id=#{@volunteer.id}"
+
+    range = params[:range]
+
+    if range.eql?('past')
+      query += " AND events.end < NOW()"
+    elsif range.eql?('current')
+      query += " AND events.begin < NOW() AND events.end > NOW()"
+    elsif range.eql?('futur')
+      query += " AND events.begin > NOW()"
+    end
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end

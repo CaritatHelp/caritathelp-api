@@ -27,13 +27,23 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('index')
   def index
-    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, " +
+    query = "SELECT events.id, events.title, events.place, events.begin, events.end, events.assoc_id, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
       " FROM events"
+
+    range = params[:range]
+
+    if range.eql?('past')
+      query += " WHERE events.end < NOW()"
+    elsif range.eql?('current')
+      query += " WHERE events.begin < NOW() AND events.end > NOW()"
+    elsif range.eql?('futur')
+      query += " WHERE events.begin > NOW()"
+    end
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
