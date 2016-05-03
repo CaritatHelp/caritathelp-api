@@ -13,7 +13,7 @@ localhost:3000/associations/1/?token=bCdmSC5oUxpty11MDU6iFw
     "birthday": null,
     "latitude": null,
     "longitude": null,
-    "rights": "owner" // can be 'admin', 'member', 'none' if not member,
+    "rights": "owner" // can be 'owner', 'admin', 'member', 'none' if not member,
                       // 'invited' if the user received an invitation
                       // 'waiting' if the user already asked to join
   }

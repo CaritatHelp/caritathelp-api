@@ -1,8 +1,8 @@
 class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests]
-  before_action :check_rights, only: [:update]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete]
+  before_action :check_rights, only: [:update, :delete]
 
   def_param_group :create_event do
     param :token, String, "Creator's token", :required => true
@@ -155,6 +155,21 @@ class EventsController < ApplicationController
     end
   end
   
+
+  api :DELETE, '/events/:id', "Delete event (need to be host)"
+  param :token, String, "Your token", :required => true
+  example SampleJson.events('delete')
+  def delete
+    if @link.rights.eql?('host')
+      Notification::JoinEvent.where(event_id: @event.id).destroy_all
+      Notification::InviteGuest.where(event_id: @event.id).destroy_all
+      EventVolunteer.where(event_id: @event.id).destroy_all
+      @event.destroy
+      render :json => create_response(t("events.success.deleted")) and return
+    end
+    render :json => create_error(400, t("events.failure.rights"))    
+  end
+
   private
   def set_volunteer
     @volunteer = Volunteer.find_by(token: params[:token])

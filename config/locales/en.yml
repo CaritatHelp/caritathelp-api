@@ -76,6 +76,7 @@ en:
       invite_guest: 'You successfuly invited this guest to join your event'
       reply_invite: 'You successfuly replied to this invitation'
       leaved: 'You successfuly leaved this event'
+      deleted: 'You successfuly deleted this event'
 
   notifications:
     failure:

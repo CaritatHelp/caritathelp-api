@@ -80,6 +80,8 @@ Rails.application.routes.draw do
     post '/', to: 'events#create'
 
     put '/:id', to: 'events#update'
+
+    delete '/:id', to: 'events#delete'
   end
 
   scope '/guests' do
