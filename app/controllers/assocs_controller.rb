@@ -65,10 +65,24 @@ class AssocsController < ApplicationController
   example SampleJson.assocs('show')
   def show
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
-    if  link != nil
+    if link != nil
       render :json => create_response(@assoc.complete_description(link.rights)) and return
     end
-    render :json => create_response(@assoc.complete_description)
+    rights = 'none'
+
+    notif = Notification::InviteMember.where(sender_assoc_id: @assoc.id)
+      .where(receiver_volunteer_id: @volunteer.id).first
+    if notif != nil
+      rights = 'invited'
+    end
+
+    notif = Notification::JoinAssoc.where(sender_volunteer_id: @volunteer.id)
+      .where(receiver_assoc_id: @assoc.id).first
+    if notif != nil
+      rights = 'waiting'
+    end
+    
+    render :json => create_response(@assoc.complete_description(rights))
   end
 
   api :GET, '/associations/search', "Search for association by its name, return a list of matching associations"
