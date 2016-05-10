@@ -46,4 +46,8 @@ class SampleJson < ActiveRecord::Base
   def self.chatrooms(filename)
     File.open("#{Rails.root}/public/samples_json/chatrooms/"+filename+".json").read
   end
+
+  def self.pictures(filename)
+    File.open("#{Rails.root}/public/samples_json/pictures/"+filename+".json").read
+  end
 end

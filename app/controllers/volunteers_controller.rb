@@ -2,7 +2,7 @@
 class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
-  before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events]
+  before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture]
   before_action :set_current_volunteer, only: [:index]
 
   def_param_group :volunteers_creation do
@@ -170,6 +170,27 @@ class VolunteersController < ApplicationController
     end
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
+  end
+
+  api :GET, '/volunteers/:id/pictures', "Return a list of all volunteer's pictures path"
+  param :token, String, "Your token", :required => true
+  example SampleJson.volunteers('pictures')
+  def pictures
+    query = "id, file_size, picture_path, is_main"
+    pictures = Picture.where(:volunteer_id => @volunteer.id)
+      .where(:event_id => nil).where(:assoc_id => nil).select(query).limit(100)
+    render :json => create_response(pictures)
+  end
+
+  api :GET, '/volunteers/:id/main_picture', "Return path of main picture"
+  param :token, String, "Your token", :required => true
+  example SampleJson.volunteers('main_picture')
+  def main_picture
+    query = "id, file_size, picture_path"
+    pictures = Picture.where(:volunteer_id => @volunteer.id)
+      .where(:event_id => nil).where(:assoc_id => nil).where(:is_main => true)
+      .select(query).first
+    render :json => create_response(pictures)
   end
 
   private

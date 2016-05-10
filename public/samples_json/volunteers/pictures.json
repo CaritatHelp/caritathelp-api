@@ -1,0 +1,39 @@
+SUCCESS =>
+
+http://localhost:3000/volunteers/1/pictures?token=sBRraq6CHSXTYGYq0bMiwQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+      {
+	  "id": 3,
+	  "file_size": 51038,
+	  "picture_path": {
+              "url": "/uploads/picture/picture_path/3/1462868681_tatoo.jpg",
+              "thumb": {
+		  "url": "/uploads/picture/picture_path/3/thumb_1462868681_tatoo.jpg"
+              }
+	  },
+	  "is_main": false
+      }
+  ]
+}
+
+FAILURE =>
+
+http://localhost:3000/volunteers/1/pictures?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+http://localhost:3000/volunteers/999999/pictures?token=sBRraq6CHSXTYGYq0bMiwQ
+
+{
+  "status": 400,
+  "message": "Unknown volunteer id",
+  "response": null
+}

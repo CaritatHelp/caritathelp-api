@@ -1,5 +1,10 @@
 source 'https://rubygems.org'
 
+# Carrierwave & MiniMagick for handling files upload system
+gem 'carrierwave', '~> 0.10.0'
+gem 'mini_magick', '~> 4.4'
+# Bootstrap
+gem 'twitter-bootstrap-rails', '~> 3.2', '>= 3.2.2'
 # Awesome Print
 gem "awesome_print", require:"ap"
 # Apipie
@@ -12,6 +17,8 @@ gem 'json', '~> 1.8.3'
 gem 'rails', '4.2.4'
 # Use postgresql as the database for Active Record
 gem 'pg'
+# Use MYSQL for showing multiDB
+gem 'mysql2', '~> 0.3.18'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets

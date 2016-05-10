@@ -1,0 +1,40 @@
+SUCCESS =>
+
+http://localhost:3000/events/1/pictures?token=sBRraq6CHSXTYGYq0bMiwQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 4,
+      "file_size": 51038,
+      "picture_path": {
+        "url": "/uploads/picture/picture_path/4/1462868920_tatoo.jpg",
+        "thumb": {
+          "url": "/uploads/picture/picture_path/4/thumb_1462868920_tatoo.jpg"
+        }
+      },
+      "is_main": true
+    }
+  ]
+}
+
+FAILURE =>
+
+http://localhost:3000/events/1/pictures?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+http://localhost:3000/events/9999999/pictures?token=sBRraq6CHSXTYGYq0bMiwQ
+
+{
+  "status": 400,
+  "message": "Unknown event id",
+  "response": null
+}
+

@@ -1,7 +1,7 @@
 class AssocsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete]
+  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture]
   before_action :check_rights, only: [:update, :delete]
 
   def_param_group :assocs_create do
@@ -182,6 +182,24 @@ class AssocsController < ApplicationController
       "WHERE notification_invite_members.receiver_volunteer_id=#{@volunteer.id}"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
+  end
+
+  api :GET, '/associations/:id/pictures', "Return a list of all assoc's pictures path"
+  param :token, String, "Your token", :required => true
+  example SampleJson.assocs('pictures')
+  def pictures
+    query = "id, file_size, picture_path, is_main"
+    pictures = Picture.where(:assoc_id => @assoc.id).select(query).limit(100)
+    render :json => create_response(pictures)
+  end
+
+  api :GET, '/associations/:id/main_picture', "Return path of main picture"
+  param :token, String, "Your token", :required => true
+  example SampleJson.assocs('main_picture')
+  def main_picture
+    query = "id, file_size, picture_path"
+    pictures = Picture.where(:assoc_id => @assoc.id).where(:is_main => true).select(query).first
+    render :json => create_response(pictures)
   end
 
   private

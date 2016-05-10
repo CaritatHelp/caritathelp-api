@@ -1,0 +1,51 @@
+SUCCESS =>
+
+http://localhost:3000/associations/1/pictures?token=sBRraq6CHSXTYGYq0bMiwQ
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 6,
+      "file_size": 51038,
+      "picture_path": {
+        "url": "/uploads/picture/picture_path/6/1462868960_tatoo.jpg",
+        "thumb": {
+          "url": "/uploads/picture/picture_path/6/thumb_1462868960_tatoo.jpg"
+        }
+      },
+      "is_main": true
+    },
+    {
+      "id": 8,
+      "file_size": 51038,
+      "picture_path": {
+        "url": "/uploads/picture/picture_path/8/1462869009_tatoo.jpg",
+        "thumb": {
+          "url": "/uploads/picture/picture_path/8/thumb_1462869009_tatoo.jpg"
+        }
+      },
+      "is_main": false
+    }
+  ]
+}
+
+FAILURE =>
+
+http://localhost:3000/associations/1/pictures?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+http://localhost:3000/associations/99999/pictures?token=sBRraq6CHSXTYGYq0bMiwQ
+
+{
+  "status": 400,
+  "message": "Unknown assoc id",
+  "response": null
+}
+

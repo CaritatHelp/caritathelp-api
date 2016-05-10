@@ -1,7 +1,7 @@
 class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture]
   before_action :check_rights, only: [:update, :delete]
 
   def_param_group :create_event do
@@ -210,6 +210,24 @@ class EventsController < ApplicationController
       "WHERE notification_invite_guests.volunteer_id=#{@volunteer.id}"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))    
+  end
+
+  api :GET, '/events/:id/pictures', "Return a list of all event's pictures path"
+  param :token, String, "Your token", :required => true
+  example SampleJson.events('pictures')
+  def pictures
+    query = "id, file_size, picture_path, is_main"
+    pictures = Picture.where(:event_id => @event.id).select(query).limit(100)
+    render :json => create_response(pictures)
+  end
+
+  api :GET, '/events/:id/main_picture', "Return path of main picture"
+  param :token, String, "Your token", :required => true
+  example SampleJson.events('main_picture')
+  def main_picture
+    query = "id, file_size, picture_path"
+    pictures = Picture.where(:event_id => @event.id).where(:is_main => true).select(query).first
+    render :json => create_response(pictures)
   end
 
   private

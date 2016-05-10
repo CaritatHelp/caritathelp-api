@@ -142,6 +142,17 @@ en:
   logout:
     success: 'User logged out'
 
+  pictures:
+    failure:
+      id: "Unknown picture id"
+      is_main: "An error occured while setting the main picture, please try again"
+      not_deleted: "You can't delete the main picture"
+      rights: "Permission denied"
+      specify: "Please specify only event_id OR assoc_id"
+
+    success:
+      deleted: "Picture has been successfuly deleted"
+
   doc:
     url: 'Url not found'
     response: 'See documentation at: /doc'

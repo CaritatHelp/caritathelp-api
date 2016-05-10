@@ -1,5 +1,11 @@
 Rails.application.routes.draw do
 
+  get 'pictures/create'
+
+  get 'pictures/delete'
+
+  get 'pictures/update'
+
   apipie
 
   scope '/news' do
@@ -45,6 +51,8 @@ Rails.application.routes.draw do
     get '/:id/notifications', to: 'volunteers#notifications'
     get '/:id/associations', to: 'volunteers#associations'
     get '/:id/events', to: 'volunteers#events'
+    get '/:id/pictures', to: 'volunteers#pictures'
+    get '/:id/main_picture', to: 'volunteers#main_picture'
 
     post '/', to: 'volunteers#create'
 
@@ -57,10 +65,13 @@ Rails.application.routes.draw do
   scope '/associations' do
     get '/', to: 'assocs#index'
     get '/search', to: 'assocs#search'
+    get '/invited', to: 'assocs#invited'
     get '/:id', to: 'assocs#show'
     get '/:id/members', to: 'assocs#members'
     get '/:id/notifications', to: 'assocs#notifications'
     get '/:id/events', to: 'assocs#events'
+    get '/:id/pictures', to: 'assocs#pictures'
+    get '/:id/main_picture', to: 'assocs#main_picture'
 
     post '/', to: 'assocs#create'
 
@@ -73,9 +84,13 @@ Rails.application.routes.draw do
   scope '/events' do
     get '/', to: 'events#index'
     get '/search', to: 'events#search'
+    get '/owned', to: 'events#owned'
+    get '/invited', to: 'events#invited'
     get '/:id', to: 'events#show'
     get '/:id/guests', to: 'events#guests'
     get '/:id/notifications', to: 'events#notifications'
+    get '/:id/pictures', to: 'events#pictures'
+    get '/:id/main_picture', to: 'events#main_picture'
     
     post '/', to: 'events#create'
 
@@ -111,6 +126,14 @@ Rails.application.routes.draw do
     delete '/:id/kick', to: 'messages#kick_volunteer'
     delete '/:id/leave', to: 'messages#leave'
     delete '/:id/delete_message', to: 'messages#delete_message'
+  end
+
+  scope '/pictures' do
+    post '/', to: 'pictures#create'
+
+    put '/:id', to: 'pictures#update'
+
+    delete '/:id', to: 'pictures#delete'
   end
   
   scope '/login' do
