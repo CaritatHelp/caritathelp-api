@@ -14,7 +14,7 @@ class PicturesController < ApplicationController
     param :is_main, String, "True to make it the main picture of your profile/event. Will be automatically set to true if it's the first picture to be upload, and to false otherwise"
   end
 
-  api :POST, '/pictures/upload', "Upload a picture on the server"
+  api :POST, '/pictures', "Upload a picture on the server"
   param_group :upload
   example SampleJson.pictures('create')
   def create
