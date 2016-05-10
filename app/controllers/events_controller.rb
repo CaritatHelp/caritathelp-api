@@ -181,6 +181,37 @@ class EventsController < ApplicationController
     render :json => create_error(400, t("events.failure.rights"))    
   end
 
+  api :GET, '/events/owned', "Get all event where you're owner"
+  param :token, String, "Your token", :required => true
+  example SampleJson.events('owned')
+  def owned
+    query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
+      "events.assoc_id, event_volunteers.rights, " +
+      "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
+      "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM events INNER JOIN event_volunteers ON event_volunteers.event_id=events.id " +
+      "WHERE event_volunteers.volunteer_id=#{@volunteer.id} AND event_volunteers.rights='host'"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+  end
+
+  api :GET, '/events/invited', "Get all event where you're invited"
+  param :token, String, "Your token", :required => true
+  example SampleJson.events('invited')
+  def invited
+    query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
+      "events.assoc_id, " +
+      "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
+      "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM events INNER JOIN notification_invite_guests " + 
+      "ON notification_invite_guests.event_id=events.id " +
+      "WHERE notification_invite_guests.volunteer_id=#{@volunteer.id}"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))    
+  end
+
   private
   def set_volunteer
     @volunteer = Volunteer.find_by(token: params[:token])

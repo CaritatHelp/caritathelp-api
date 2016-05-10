@@ -1,0 +1,31 @@
+SUCCESS =>
+
+localhost:3000/events/owned?token=uiNE0fs4EATfBpvuMHQpWA
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": "4",
+      "title": "Soirée Pizza !",
+      "place": "Italie",
+      "begin": "2016-05-01 00:00:00",
+      "end": "2016-12-30 00:00:00",
+      "assoc_id": "2",
+      "rights": "host",
+      "nb_friends_members": "0"
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/events/owned?token=uiNE0fs4EATfBpvuMHQpWA
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
