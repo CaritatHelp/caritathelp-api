@@ -1,7 +1,7 @@
 class GuestsController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
-  before_action :set_event, except: [:reply_invite]
+  before_action :set_event, except: [:reply_invite, :reply_guest]
   before_action :set_volunteer
   before_action :check_rights, only: [:kick, :upgrade]
 
