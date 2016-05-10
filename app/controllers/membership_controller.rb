@@ -2,6 +2,7 @@ class MembershipController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
+  before_action :set_assoc, except: [:reply_member, :reply_invite]
   before_action :check_rights, only: [:kick, :upgrade]
 
   api :DELETE, '/membership/kick', "Kick member from the association"
@@ -12,7 +13,6 @@ class MembershipController < ApplicationController
   def kick
     begin
       @to_kick = Volunteer.find_by!(id: params[:volunteer_id])
-      @assoc = Assoc.find_by!(id: params[:assoc_id])
 
       volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
       if (volunteer_link == nil)
@@ -44,7 +44,6 @@ class MembershipController < ApplicationController
   def upgrade
     begin
       @to_up = Volunteer.find_by!(id: params[:volunteer_id])
-      @assoc = Assoc.find_by!(id: params[:assoc_id])
       
       volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
       if (volunteer_link == nil)
@@ -72,9 +71,7 @@ class MembershipController < ApplicationController
   param :assoc_id, String, "Association concerned", :required => true
   example SampleJson.membership('join')
   def join_assoc
-    begin
-      @assoc = Assoc.find_by!(id: params[:assoc_id])
-      
+    begin      
       # Check if already member or if already applied
       if ((AvLink.where(volunteer_id: @volunteer.id)
              .where(assoc_id: @assoc.id).first != nil) ||
@@ -137,7 +134,6 @@ class MembershipController < ApplicationController
   def invite
     begin
       @invited_vol = Volunteer.find_by!(id: params[:volunteer_id])
-      @assoc = Assoc.find_by!(id: params[:assoc_id])
       
       # Check if @volunteer has the permission to invite a member in assoc
       tmp = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
@@ -204,9 +200,7 @@ class MembershipController < ApplicationController
   example SampleJson.membership('leave')
   def leave_assoc
     begin
-      assoc = Assoc.find_by!(id: params[:assoc_id])
-
-      link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => assoc.id).first
+      link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id).first
 
       if link.eql?(nil)
         render :json => create_error(400, t("assocs.failure.notmember")) and return        
@@ -250,11 +244,19 @@ class MembershipController < ApplicationController
     @volunteer = Volunteer.find_by!(token: params[:token])
   end
 
+  def set_assoc
+    begin
+      @assoc = Assoc.find_by!(id: params[:assoc_id])
+    rescue
+      render :json => create_error(400, t("assocs.failure.id")) and return
+    end
+  end
+
   def check_rights
-    @link = EventVolunteer.where(:volunteer_id => @volunteer.id)
-      .where(:event_id => @event.id).first
+    @link = AvLink.where(:volunteer_id => @volunteer.id)
+      .where(:assoc_id => @assoc.id).first
     if @link.eql?(nil) || @link.rights.eql?('member')
-      render :json => create_error(400, t("events.failure.rights"))
+      render :json => create_error(400, t("assocs.failure.rights"))
       return false
     end
     return true
