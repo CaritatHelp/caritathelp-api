@@ -169,6 +169,21 @@ class AssocsController < ApplicationController
     render :json => create_error(400, t("assocs.failure.rights"))    
   end
 
+  api :GET, '/assocs/invited', "Get all assocs where you're invited"
+  param :token, String, "Your token", :required => true
+  example SampleJson.assocs('invited')
+  def invited
+    query = "SELECT assocs.id, assocs.name, assocs.city, " +
+      "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
+      "av_links.volunteer_id=v_friends.friend_volunteer_id " +
+      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      " FROM assocs INNER JOIN notification_invite_members " +
+      "ON notification_invite_members.sender_assoc_id=assocs.id " +
+      "WHERE notification_invite_members.receiver_volunteer_id=#{@volunteer.id}"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+  end
+
   private
   def set_assoc
     begin

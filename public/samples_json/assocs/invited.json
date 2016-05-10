@@ -1,0 +1,26 @@
+SUCCESS =>
+
+localhost:3000/associations/invited?token=pg5xzmf7G2AJ6xN4aHaB6Q
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": "2",
+      "name": "Les resto de l'estomac",
+      "city": "Là-bas",
+      "nb_friends_members": "0"
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/associations/invited?token=pg5xzmf7G2AJ6xN4aHaB6
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
