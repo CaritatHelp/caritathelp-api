@@ -1,6 +1,7 @@
 class MembershipController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
+  before_action :set_volunteer
   before_action :check_rights, only: [:kick, :upgrade]
 
   api :DELETE, '/membership/kick', "Kick member from the association"
@@ -10,7 +11,6 @@ class MembershipController < ApplicationController
   example SampleJson.membership('kick')
   def kick
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @to_kick = Volunteer.find_by!(id: params[:volunteer_id])
       @assoc = Assoc.find_by!(id: params[:assoc_id])
 
@@ -43,7 +43,6 @@ class MembershipController < ApplicationController
   example SampleJson.membership('upgrade')
   def upgrade
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @to_up = Volunteer.find_by!(id: params[:volunteer_id])
       @assoc = Assoc.find_by!(id: params[:assoc_id])
       
@@ -74,7 +73,6 @@ class MembershipController < ApplicationController
   example SampleJson.membership('join')
   def join_assoc
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @assoc = Assoc.find_by!(id: params[:assoc_id])
       
       # Check if already member or if already applied
@@ -104,7 +102,6 @@ class MembershipController < ApplicationController
   example SampleJson.membership('reply_member')
   def reply_member
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @notif = Notification::JoinAssoc.find_by!(id: params[:notif_id])
       
       # Check the rights of the person who's trying to accept a member
@@ -140,11 +137,10 @@ class MembershipController < ApplicationController
   def invite
     begin
       @invited_vol = Volunteer.find_by!(id: params[:volunteer_id])
-      @inviting_vol = Volunteer.find_by!(token: params[:token])
       @assoc = Assoc.find_by!(id: params[:assoc_id])
       
-      # Check if inviting_vol has the permission to invite a member in assoc
-      tmp = AvLink.where(volunteer_id: @inviting_vol.id).where(assoc_id: @assoc.id).first
+      # Check if @volunteer has the permission to invite a member in assoc
+      tmp = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
       if ((tmp.eql? nil) || (tmp.rights.eql? 'member'))
         render :json => create_error(400, t("notifications.failure.rights")) and return
       end      
@@ -175,7 +171,6 @@ class MembershipController < ApplicationController
   example SampleJson.membership('reply_invite')
   def reply_invite
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @notif = Notification::InviteMember.find_by!(id: params[:notif_id])
       
       # Check the right of the person who's trying to accept invitation
@@ -209,10 +204,9 @@ class MembershipController < ApplicationController
   example SampleJson.membership('leave')
   def leave_assoc
     begin
-      volunteer = Volunteer.find_by!(token: params[:token])
       assoc = Assoc.find_by!(id: params[:assoc_id])
 
-      link = AvLink.where(:volunteer_id => volunteer.id).where(:assoc_id => assoc.id).first
+      link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => assoc.id).first
 
       if link.eql?(nil)
         render :json => create_error(400, t("assocs.failure.notmember")) and return        
@@ -250,6 +244,10 @@ class MembershipController < ApplicationController
     rescue ActiveRecord::RecordInvalid => e
       return false
     end
+  end
+
+  def set_volunteer
+    @volunteer = Volunteer.find_by!(token: params[:token])
   end
 
   def check_rights
