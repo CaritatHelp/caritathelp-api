@@ -17,6 +17,7 @@ localhost:3000/volunteers/2?token=J2ykGbCW50k924rQeFWmlw
     "longitude": null,
     "allowgps": false,
     "allow_notifications": false
+    "friendship": 'true' // can be 'false' if not friend, and 'yourself' if you're on your own profil
   }
 }
 

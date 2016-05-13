@@ -3,7 +3,7 @@ class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture]
-  before_action :set_current_volunteer, only: [:index]
+  before_action :set_current_volunteer, only: [:index, :show, :update]
 
   def_param_group :volunteers_creation do
     param :mail, String, "Your mail address", :required => true
@@ -70,7 +70,21 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('show')
   def show
-    render :json => create_response(@volunteer.simple_description)
+    begin
+      if @current_volunteer.id == @volunteer.id
+        render :json => create_response(@volunteer.simple_description('yourself')) and return
+      end
+      link = VFriend
+        .where(:volunteer_id => @volunteer.id)
+        .where(:friend_volunteer_id => @current_volunteer.id).first
+      if link.eql?(nil)
+        render :json => create_response(@volunteer.simple_description('false')) and return
+      else
+        render :json => create_response(@volunteer.simple_description('true')) and return
+      end
+    rescue => e
+      render :json => create_response(@volunteer.simple_description('failure'))
+    end
   end
 
   api :GET, '/volunteers/search', "Search for volunteer by its firstname and/or lastname, return a list of matching volunteers"
@@ -105,10 +119,13 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('update')
   def update
     begin
+      if @current_volunteer.id != @volunteer.id
+        render :json => create_error(400, t("volunteers.failure.rights")) and return        
+      end
       if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @volunteer.mail)
         render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
       elsif @volunteer.update!(volunteer_params)
-        render :json => create_response(@volunteer.simple_description)
+        render :json => create_response(@volunteer.simple_description('yourself'))
       else
         render :json => create_error(400, t("volunteers.failure.update"))
       end

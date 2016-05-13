@@ -55,12 +55,13 @@ class Volunteer < ActiveRecord::Base
     end
   end
 
-  def simple_description
+  def simple_description(friendship)
     {'id' => self.id, 'mail' => self.mail, 'firstname' => self.firstname,
       'lastname' => self.lastname, 'birthday' => self.birthday,
       'gender' => self.gender, 'city' => self.city,
       'latitude' => self.latitude, 'longitude' => self.longitude,
-      'allowgps' => self.allowgps, 'allow_notifications' => self.allow_notifications}
+      'allowgps' => self.allowgps, 'allow_notifications' => self.allow_notifications,
+      'friendship' => friendship}
   end
 
   def complete_description
