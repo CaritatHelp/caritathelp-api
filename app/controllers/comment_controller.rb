@@ -3,7 +3,7 @@ class CommentController < ApplicationController
   before_action :set_volunteer
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
-  # before_action :check_rights
+  before_action :check_rights, only: [:create]
 
   api :POST, '/comments', 'Create a comment linked to the new'
   param :token, String, "Your token", :required => true
@@ -45,7 +45,7 @@ class CommentController < ApplicationController
     render :json => create_response(@comment.complete_description)
   end
 
-  api :DELTE, '/comments/:id', 'Get the comment'
+  api :DELETE, '/comments/:id', 'Get the comment'
   param :token, String, "Your token", :required => true
   example SampleJson.comments('delete')
   def delete
@@ -78,15 +78,13 @@ class CommentController < ApplicationController
     end
   end
 
-  # checker pour chaque operation que l'actu concerne bien le volunteer
-  # def check_rights
-  #   new_id = nil
-  #   if @comment != nil
-  #     new_id = @comment.new_id
-  #   else
-  #     new_id = params[:new_id]
-  #   end
-
-    
-  # end
+  def check_rights
+    if ((!@new.assoc_id.eql?(nil) and AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).first.nil?) or (!@new.event_id.eql?(nil) and EventVolunteer.where(event_id: @new.event_id)
+                                                                                                                                 .where(volunteer_id: @volunteer.id).first.nil?) or (!@new.volunteer_id.eql?(nil) and VFriend.where(friend_volunteer_id: @new.volunteer_id)
+                                                                                                                                                                                       .where(volunteer_id: @volunteer.id).first.nil?))
+      render :json => create_error(400, t("comments.failure.rights"))
+      return false
+    end
+    return true
+  end
 end
