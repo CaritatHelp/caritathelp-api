@@ -49,6 +49,7 @@ en:
         unavailable: 'Unavailable mail'
         invalid: 'Invalid mail'
 
+      rights: 'Permission denied'
       update: 'Could not update profil'
       id: 'Unknown volunteer id'
       research: 'Research field is missing'
@@ -152,6 +153,15 @@ en:
 
     success:
       deleted: "Picture has been successfuly deleted"
+
+  shelters:
+    failure:
+      exist: "This shelter already exist"
+      id: 'Unknown shelter id'
+      name: 'This name is not available, a shelter as the same name at the same address'
+
+    success:
+      deleted: "Shelter successfuly deleted"
 
   doc:
     url: 'Url not found'

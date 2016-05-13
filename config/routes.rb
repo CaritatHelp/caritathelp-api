@@ -25,6 +25,14 @@ Rails.application.routes.draw do
     delete '/:id', to: 'comment#delete'
   end
 
+  scope '/shelters' do
+    post '/', to: 'shelters#create'
+    get '/', to: 'shelters#index'
+    get '/:id', to: 'shelters#show'
+    put '/:id', to: 'shelters#update'
+    delete '/:id', to: 'shelters#delete'
+  end
+
   scope '/friendship' do
     post '/add', to: 'friendship#add'
     post '/reply', to: 'friendship#reply'

@@ -1,0 +1,35 @@
+SUCCESS =>
+
+localhost:3000/shelters/2
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 2,
+    "name": "2nd shelter",
+    "address": "9 allée de la lune",
+    "zipcode": 95280,
+    "city": "Cergy",
+    "latitude": null,
+    "longitude": null,
+    "total_places": 95,
+    "free_places": 85,
+    "tags": [
+      "coucou",
+      "yolo"
+    ],
+    "created_at": "2016-05-13T09:22:30.459Z",
+    "updated_at": "2016-05-13T09:22:30.459Z"
+  }
+}
+
+FAILURE =>
+
+localhost:3000/shelters/9999
+
+{
+  "status": 400,
+  "message": "Unknown shelter id",
+  "response": null
+}

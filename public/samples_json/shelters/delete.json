@@ -1,0 +1,35 @@
+SUCCESS =>
+
+localhost:3000/shelters/1?token=kMArXehE0Hu6doNTxP9lJQ&assoc_id=1
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": "Shelter successfuly deleted"
+}
+
+FAILURE =>
+
+localhost:3000/shelters/1?token=kMArXehE0Hu6doNTxP9lJQ&assoc_id=99999
+
+{
+  "status": 400,
+  "message": "Unknown assoc id",
+  "response": null
+}
+
+localhost:3000/shelters/1?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+localhost:3000/shelters/1?token=autre token&assoc_id=1
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}

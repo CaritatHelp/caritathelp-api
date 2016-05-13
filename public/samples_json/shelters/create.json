@@ -1,0 +1,63 @@
+SUCCESS =>
+
+localhost:3000/shelters?token=kMArXehE0Hu6doNTxP9lJQ&assoc_id=1&name=Shelter of the death&address=9 allée de la lune&zipcode=95280&city=Cergy&total_places=95&free_places=85&tags[]=coucou&tags[]=yolo
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 3,
+    "name": "Shelter of the death",
+    "address": "9 allée de la lune",
+    "zipcode": 95280,
+    "city": "Cergy",
+    "latitude": null,
+    "longitude": null,
+    "total_places": 95,
+    "free_places": 85,
+    "tags": [
+      "coucou",
+      "yolo"
+    ],
+    "created_at": "2016-05-13T09:22:46.670Z",
+    "updated_at": "2016-05-13T09:22:46.670Z"
+  }
+}
+
+FAILURE =>
+
+localhost:3000/shelters?token=kMArXehE0Hu6doNTxP9lJQ&assoc_id=1&name=Shelter of the death&address=9 allée de la lune&zipcode=95280&city=Cergy&total_places=95&free_places=85&tags[]=coucou&tags[]=yolo
+
+{
+  "status": 400,
+  "message": "This shelter already exist",
+  "response": null
+}
+
+localhost:3000/shelters?token=kMArXehE0Hu6doNTxP9lJQ&assoc_id=2
+
+// if your not admin or owner of the association
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/shelters?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
+
+localhost:3000/shelters?token=kMArXehE0Hu6doNTxP9lJQ&assoc_id=99999
+
+{
+  "status": 400,
+  "message": "Unknown assoc id",
+  "response": null
+}
+
+// Après y'a pleins d'erreur différentes en fonction des paramètres que vous oubliez de fournir, donc regarder la doc et gérez ça coté front pour obliger la requête à etre bien formaté

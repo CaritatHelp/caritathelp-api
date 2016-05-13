@@ -10,10 +10,6 @@ class MessagesController < ApplicationController
   param :volunteers, ["1", "2", "..."], "Array of volunteers ids", :required => true
   example SampleJson.chatrooms('create')
   def create
-    # on peut créer une chatroom en invitant plusieurs personnes d'un coup
-    # si on invite qu'une personne, faut checker que la chatroom de ces deux la existe pas deja
-    # si elle existe, on crée pas, on redirige vers l'existante
-    # on retourne un success message avec la liste des participant a la conv
     begin
       volunteers = chatroom_params[:volunteers]
       is_private = false
@@ -45,7 +41,6 @@ class MessagesController < ApplicationController
         #   "LEFT JOIN chatroom_volunteers link2 ON chatrooms.id=link2.chatroom_id AND " +
         #   "link2.volunteer_id=#{volunteers[1].to_s} GROUP BY chatrooms.id " +
         #   "WHERE chatrooms.is_private=true"
-          
 
         # p "###"
         # p volunteers
@@ -224,12 +219,6 @@ class MessagesController < ApplicationController
     rescue => e
       render :json => create_error(400, e.to_s)
     end    
-  end
-
-  def reset
-    Chatroom.delete_all
-    ChatroomVolunteer.delete_all
-    render :json => "deleted"
   end
 
   api :DELETE, '/chatrooms/:id/delete_message', "Delete a message of the chatroom"

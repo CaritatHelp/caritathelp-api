@@ -50,4 +50,8 @@ class SampleJson < ActiveRecord::Base
   def self.pictures(filename)
     File.open("#{Rails.root}/public/samples_json/pictures/"+filename+".json").read
   end
+
+  def self.shelters(filename)
+    File.open("#{Rails.root}/public/samples_json/shelters/"+filename+".json").read
+  end
 end
