@@ -2,6 +2,9 @@ class Volunteer < ActiveRecord::Base
   has_many :chatrooms, through: :chatroom_volunteers
   has_many :chatroom_volunteers
 
+  has_many :notifications, through: :notification_volunteers
+  has_many :notification_volunteers
+
   has_and_belongs_to_many :assocs, join_table: :av_links
   has_many :av_links
 
@@ -82,31 +85,6 @@ class Volunteer < ActiveRecord::Base
       friend_list.push friend.short_description
     end
     friend_list
-  end
-
-  # gerer les exception
-  def notifications
-    notif_friend_list = []
-    Notification::AddFriend.where(receiver_volunteer_id: self.id).each do |link|
-      sender = Volunteer.find_by(id: link.sender_volunteer_id)
-      notif_friend_list.push sender.short_description(link.id)
-    end
-
-    notif_assoc_list = []
-    Notification::InviteMember.where(receiver_volunteer_id: self.id).each do |link|
-      sender = Assoc.find_by(id: link.sender_assoc_id)
-      notif_assoc_list.push sender.short_description(link.id)
-    end
-
-    notif_event_list = []
-    Notification::InviteGuest.where(volunteer_id: self.id).each do |link|
-      sender = Event.find_by(id: link.event_id)
-      notif_event_list.push sender.short_description(link.id)
-    end
-
-    {'add_friend' => notif_friend_list,
-      'assoc_invite' => notif_assoc_list,
-      'event_invite' => notif_event_list}
   end
   
   def self.exist?(mail)

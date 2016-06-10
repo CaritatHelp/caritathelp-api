@@ -79,16 +79,30 @@ class GuestsController < ApplicationController
       # Check if already guest or if already applied
       if ((EventVolunteer.where(volunteer_id: @volunteer.id)
              .where(event_id: @event.id).first != nil) ||
-          (Notification::JoinEvent.where(volunteer_id: @volunteer.id)
+          (Notification.where(notif_type: 'JoinEvent')
+             .where(sender_id: @volunteer.id)
              .where(event_id: @event.id).first != nil) ||
-          (Notification::InviteGuest.where(event_id: @event.id)
-             .where(volunteer_id: @volunteer.id).first != nil))
+          (Notification.where(notif_type: 'InviteGuest')
+             .where(event_id: @event.id)
+             .where(receiver_id: @volunteer.id).first != nil))
         render :json => create_error(400, t("events.failure.join_link_exist"))
         return
       end
       
       # create a notification for the event receiving the request
-      notif = Notification::JoinEvent.create!(create_join_event)
+      notif = Notification.create!(create_join_event)
+
+      # create a link between the notification and each admin of the event
+      Volunteer.joins(:event_volunteers)
+        .where(event_volunteers: { event_id: @event.id })
+        .where("event_volunteers.level > ?", 1)
+        .select("volunteers.id").all.each do |volunteer|
+        NotificationVolunteer.create!([
+                                       volunteer_id: volunteer['id'],
+                                       notification_id: notif[0].id,
+                                       read: false
+                                      ])
+      end
       
       render :json => create_response(nil, 200, t("events.success.join_event"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -103,7 +117,7 @@ class GuestsController < ApplicationController
   example SampleJson.guests('reply_guest')
   def reply_guest
     begin
-      @notif = Notification::JoinEvent.find_by!(id: params[:notif_id])
+      @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the rights of the person who's trying to accept a guest
       link = EventVolunteer.where(volunteer_id: @volunteer.id)
@@ -112,13 +126,14 @@ class GuestsController < ApplicationController
         render :json => create_error(400, t("events.failure.rights")) and return
       end
       
-      guest_id = @notif.volunteer_id
+      guest_id = @notif.sender_id
       event_id = @notif.event_id
       acceptance = params[:acceptance]
  
-      # destroy the notification if there is a clear answer
+      # modify the notification if there is a clear answer
       if acceptance != nil
-        @notif.destroy
+        @notif.notif_type = 'NewGuest'
+        @notif.save!
       end
       
       if acceptance.eql? 'true'
@@ -149,15 +164,17 @@ class GuestsController < ApplicationController
       # Check if invited_vol is already guest or if already applied
       if ((EventVolunteer.where(volunteer_id: @invited_vol.id)
              .where(event_id: @event.id).first != nil) ||
-          (Notification::JoinEvent.where(volunteer_id: @invited_vol.id)
+          (Notification.where(notif_type: 'JoinEvent')
+             .where(sender_id: @invited_vol.id)
              .where(event_id: @event.id).first != nil) ||
-          (Notification::InviteGuest.where(event_id: @event.id)
-             .where(volunteer_id: @invited_vol.id).first != nil))
+          (Notification.where(notif_type: 'InviteGuest')
+             .where(event_id: @event.id)
+             .where(receiver_id: @invited_vol.id).first != nil))
         render :json => create_error(400, t("events.failure.invite_link_exist")) and return
       end
       
       # create a notification for volunteer receiving invitation
-      notif = Notification::InviteGuest.create!(create_invite_guest)
+      notif = Notification.create!(create_invite_guest)
       
       render :json => create_response(nil, 200, t("events.success.invite_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -172,14 +189,14 @@ class GuestsController < ApplicationController
   example SampleJson.guests('reply_invite')
   def reply_invite
     begin
-      @notif = Notification::InviteGuest.find_by!(id: params[:notif_id])
+      @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the right of the person who's trying to accept invitation
-      if @volunteer.id != @notif.volunteer_id
+      if @volunteer.id != @notif.receiver_id
         render :json => create_error(400, t("events.failure.rights")) and return        
       end
       
-      guest_id = @notif.volunteer_id
+      guest_id = @notif.receiver_id
       event_id = @notif.event_id
       acceptance = params[:acceptance]
       
@@ -246,13 +263,16 @@ class GuestsController < ApplicationController
   end
 
   def create_join_event
-    [volunteer_id: @volunteer.id,
-     event_id: @event.id]
+    [sender_id: @volunteer.id,
+     event_id: @event.id,
+     notif_type: 'JoinEvent']
   end
 
   def create_invite_guest
     [event_id: @event.id,
-     volunteer_id: @invited_vol.id]
+     sender_id: @volunteer.id,
+     receiver_id: @invited_vol.id,
+     notif_type: 'InviteGuest']
   end
 
   def create_guest_link(guest_id, event_id)

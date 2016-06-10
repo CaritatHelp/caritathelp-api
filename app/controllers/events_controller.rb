@@ -92,15 +92,17 @@ class EventsController < ApplicationController
     end
     rights = 'none'
 
-    notif = Notification::InviteGuest.where(event_id: @event.id)
-      .where(volunteer_id: @volunteer.id).first
+    notif = Notification.where(notif_type: 'InviteGuest')
+      .where(event_id: @event.id)
+      .where(receiver_id: @volunteer.id).first
     
     if notif != nil
       rights = 'invited'
     end
 
-    notif = Notification::JoinEvent.where(event_id: @event.id)
-      .where(volunteer_id: @volunteer.id).first
+    notif = Notification.where(notif_type: 'JoinEvent')
+      .where(event_id: @event.id)
+      .where(sender_id: @volunteer.id).first
 
     if notif != nil
       rights = 'waiting'
@@ -137,13 +139,6 @@ class EventsController < ApplicationController
     end
   end
 
-  api :GET, '/events/:id/notifications', 'Get event notifications'
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('notifications')
-  def notifications
-    render :json => create_response(@event.notifications)
-  end
-
   api :GET, '/events/:id/guests', 'Get a list of all guests'
   param :token, String, "Your token", :required => true
   example SampleJson.events('guests')
@@ -172,8 +167,7 @@ class EventsController < ApplicationController
   example SampleJson.events('delete')
   def delete
     if @link.rights.eql?('host')
-      Notification::JoinEvent.where(event_id: @event.id).destroy_all
-      Notification::InviteGuest.where(event_id: @event.id).destroy_all
+      Notification.where(event_id: @event.id).destroy_all
       EventVolunteer.where(event_id: @event.id).destroy_all
       @event.destroy
       render :json => create_response(t("events.success.deleted")) and return
@@ -205,9 +199,9 @@ class EventsController < ApplicationController
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM events INNER JOIN notification_invite_guests " + 
-      "ON notification_invite_guests.event_id=events.id " +
-      "WHERE notification_invite_guests.volunteer_id=#{@volunteer.id}"
+      " FROM events INNER JOIN notification " + 
+      "ON notification.event_id=events.id " +
+      "WHERE notification.receiver_id=#{@volunteer.id} AND notification.notif_type='InviteGuest'"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))    
   end

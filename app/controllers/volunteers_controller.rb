@@ -138,8 +138,18 @@ class VolunteersController < ApplicationController
   api :GET, '/volunteers/:id/notifications', "Get notifications of volunteer"
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('notifications')
-  def notifications
-    render :json => create_response(@volunteer.notifications)
+  def notifications  
+    fields = "notifications.id, notifications.sender_id, notifications.receiver_id, " +
+      "notifications.assoc_id, notifications.event_id, notifications.notif_type, " +
+      "notifications.created_at"
+    query = "SELECT #{fields} FROM notifications WHERE " +
+      "notifications.receiver_id=#{@volunteer.id} UNION " +
+      "SELECT #{fields} FROM notifications INNER JOIN notification_volunteers ON " +
+      "notification_volunteers.notification_id=notifications.id " +
+      "WHERE notification_volunteers.volunteer_id=#{@volunteer.id} " +
+      "ORDER BY created_at DESC"
+
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :GET, '/volunteers/:id/friends', 'Return a list of the friends of the volunteer referred by id'

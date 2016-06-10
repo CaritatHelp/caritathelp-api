@@ -19,20 +19,20 @@ class FriendshipController < ApplicationController
       
       if ((VFriend.where(volunteer_id: @volunteer.id)
              .where(friend_volunteer_id: @friend.id).first != nil) ||
-          (Notification::AddFriend.where(sender_volunteer_id: @volunteer.id)
-             .where(receiver_volunteer_id: @friend.id).first != nil) ||
-          (Notification::AddFriend.where(sender_volunteer_id: @friend.id)
-             .where(receiver_volunteer_id: @volunteer.id).first != nil))
+          (Notification.where(notif_type: 'AddFriend').where(sender_id: @volunteer.id)
+             .where(receiver_id: @friend.id).first != nil) ||
+          (Notification.where(notif_type: 'AddFriend').where(sender_id: @friend.id)
+             .where(receiver_id: @volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.addfriend.error"))
         return
       end
-
+      
       if @volunteer.id == @friend.id
         render :json => create_error(400, t("notifications.failure.addfriend.self"))
         return
       end
-
-      notif = Notification::AddFriend.create!(create_add_friend)
+      
+      notif = Notification.create!(create_add_friend)
 
       render :json => create_response(nil, 200, t("notifications.success.invitefriend"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -47,14 +47,14 @@ class FriendshipController < ApplicationController
   def reply
     begin
       @volunteer = Volunteer.find_by!(token: params[:token])
-      @notif = Notification::AddFriend.find_by!(id: params[:notif_id])
+      @notif = Notification.find_by!(id: params[:notif_id])
       
-      if @volunteer.id != @notif.receiver_volunteer_id
+      if @volunteer.id != @notif.receiver_id
         render :json => create_error(400, t("notifications.failure.rights")) and return
       end
 
-      first_id = @notif.sender_volunteer_id
-      second_id = @notif.receiver_volunteer_id
+      first_id = @notif.receiver_id
+      second_id = @notif.sender_id
       acceptance = params[:acceptance]
       
       if acceptance != nil
@@ -101,8 +101,9 @@ class FriendshipController < ApplicationController
 
   private
   def create_add_friend
-    [sender_volunteer_id: @volunteer.id,
-     receiver_volunteer_id: @friend.id]
+    [sender_id: @volunteer.id,
+     receiver_id: @friend.id,
+     notif_type: 'AddFriend']
   end
 
   def create_friend_link(sender, receiver)

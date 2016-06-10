@@ -20,16 +20,6 @@ class Assoc < ActiveRecord::Base
       'rights' => rights}
   end
 
-  # need to handle possible exception
-  def notifications
-    notif_member_list = []
-    Notification::JoinAssoc.where(receiver_assoc_id: self.id).each do |link|
-      sender = Volunteer.find_by(id: link.sender_volunteer_id)
-      notif_member_list.push sender.short_description(link.id)
-    end
-    {'member_request' => notif_member_list}
-  end
-
   def events
     events_list = []
     Event.where(assoc_id: self.id).each do |link|

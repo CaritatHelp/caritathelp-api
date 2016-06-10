@@ -75,16 +75,29 @@ class MembershipController < ApplicationController
       # Check if already member or if already applied
       if ((AvLink.where(volunteer_id: @volunteer.id)
              .where(assoc_id: @assoc.id).first != nil) ||
-          (Notification::JoinAssoc.where(sender_volunteer_id: @volunteer.id)
-             .where(receiver_assoc_id: @assoc.id).first != nil) ||
-          (Notification::InviteMember.where(sender_assoc_id: @assoc.id)
-             .where(receiver_volunteer_id: @volunteer.id).first != nil))
+          (Notification.where(notif_type: 'JoinAssoc')
+             .where(sender_id: @volunteer.id)
+             .where(assoc_id: @assoc.id).first != nil) ||
+          (Notification.where(notif_type: 'InviteMember')
+             .where(assoc_id: @assoc.id)
+             .where(receiver_id: @volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.joinassoc.exist"))
         return
       end
       
       # create a notification for the association receiving the request
-      notif = Notification::JoinAssoc.create!(create_join_assoc)
+      notif = Notification.create!(create_join_assoc)
+
+      Volunteer.joins(:av_links)
+        .where(av_links: { assoc_id: @assoc.id })
+        .where("av_links.level > ?", 1)
+        .select("volunteers.id").all.each do |volunteer|
+        NotificationVolunteer.create!([
+                                       volunteer_id: volunteer['id'],
+                                       notification_id: notif[0].id,
+                                       read: false
+                                      ])
+      end
       
       render :json => create_response(nil, 200, t("notifications.success.joinassoc"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -99,21 +112,22 @@ class MembershipController < ApplicationController
   example SampleJson.membership('reply_member')
   def reply_member
     begin
-      @notif = Notification::JoinAssoc.find_by!(id: params[:notif_id])
+      @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the rights of the person who's trying to accept a member
-      tmp = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @notif.receiver_assoc_id).first
+      tmp = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @notif.assoc_id).first
       if ((tmp.eql? nil) || (tmp.rights.eql? 'member'))
         render :json => create_error(400, t("notifications.failure.rights")) and return
       end
       
-      member_id = @notif.sender_volunteer_id
-      assoc_id = @notif.receiver_assoc_id
+      member_id = @notif.sender_id
+      assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
  
       # destroy the notification if there is a clear answer
       if acceptance != nil
-        @notif.destroy
+        @notif.notif_type = 'NewMember'
+        @notif.save!
       end
       
       if acceptance.eql? 'true'
@@ -144,15 +158,17 @@ class MembershipController < ApplicationController
       # Check if invited_member is already member or if already applied
       if ((AvLink.where(volunteer_id: @invited_vol.id)
              .where(assoc_id: @assoc.id).first != nil) ||
-          (Notification::JoinAssoc.where(sender_volunteer_id: @invited_vol.id)
-             .where(receiver_assoc_id: @assoc.id).first != nil) ||
-          (Notification::InviteMember.where(sender_assoc_id: @assoc.id)
-             .where(receiver_volunteer_id: @invited_vol.id).first != nil))
+          (Notification.where(notif_type: 'JoinAssoc')
+             .where(sender_id: @invited_vol.id)
+             .where(assoc_id: @assoc.id).first != nil) ||
+          (Notification.where(notif_type: 'InviteMember')
+             .where(assoc_id: @assoc.id)
+             .where(receiver_id: @invited_vol.id).first != nil))
         render :json => create_error(400, t("notifications.failure.invitemember.exist")) and return
       end
       
       # create a notification for volunteer receiving invitation
-      notif = Notification::InviteMember.create!(create_invite_member)
+      notif = Notification.create!(create_invite_member)
       
       render :json => create_response(nil, 200, t("notifications.success.invitemember"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -167,15 +183,15 @@ class MembershipController < ApplicationController
   example SampleJson.membership('reply_invite')
   def reply_invite
     begin
-      @notif = Notification::InviteMember.find_by!(id: params[:notif_id])
+      @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the right of the person who's trying to accept invitation
-      if @volunteer.id != @notif.receiver_volunteer_id
+      if @volunteer.id != @notif.receiver_id
         render :json => create_error(400, t("notifications.failure.rights")) and return        
       end
       
-      member_id = @notif.receiver_volunteer_id
-      assoc_id = @notif.sender_assoc_id
+      member_id = @notif.receiver_id
+      assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
       
       # destroy the notification if there is a clear answer
@@ -222,13 +238,16 @@ class MembershipController < ApplicationController
   end
 
   def create_join_assoc
-    [sender_volunteer_id: @volunteer.id,
-     receiver_assoc_id: @assoc.id]
+    [sender_id: @volunteer.id,
+     assoc_id: @assoc.id,
+     notif_type: 'JoinAssoc']
   end
 
   def create_invite_member
-    [sender_assoc_id: @assoc.id,
-     receiver_volunteer_id: @invited_vol.id]
+    [assoc_id: @assoc.id,
+     sender_id: @volunteer.id,
+     receiver_id: @invited_vol.id,
+     notif_type: 'InviteMember']
   end
 
   def create_member_link(member_id, assoc_id)

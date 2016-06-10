@@ -19,14 +19,4 @@ class Event < ActiveRecord::Base
       'place' => self.place, 'begin' => self.begin,
       'end' => self.end, 'assoc_id' => self.assoc_id, 'rights' => rights}
   end
-
-  # need to handle possible exception
-  def notifications
-    notif_guest_list = []
-    Notification::JoinEvent.where(event_id: self.id).each do |link|
-      sender = Volunteer.find_by(id: link.volunteer_id)
-      notif_guest_list.push sender.short_description(link.id)
-    end
-    {'guest_request' => notif_guest_list}
-  end
 end

@@ -60,11 +60,11 @@ event_two = Event.create([title: 'Sauvetage du soldat Ryan',
                          place: 'Normandie', begin: '06/06/1970', end: '07/06/1970', assoc_id: 1])
 
 event_three = Event.create([title: 'Donnage de miam miam', description: 'bonap',
-                         place: 'Paris', begin: '21/02/2016', end: '22/02/2016', assoc_id: 2])
+                         place: 'Paris', begin: '21/07/2016', end: '22/07/2016', assoc_id: 2])
 event_four = Event.create([title: 'Soirée Pizza !', description: "Mais seulement avec de l'ananas",
-                         place: 'Italie', begin: '21/02/2016', end: '22/02/2016', assoc_id: 2])
+                         place: 'Italie', begin: '01/05/2016', end: '30/12/2016', assoc_id: 2])
 event_five = Event.create([title: 'Buffet à volonté', description: 'Sushi Maki Brochette',
-                         place: 'Tokyo-Chine', begin: '21/02/2016', end: '22/02/2016', assoc_id: 2])
+                         place: 'Tokyo-Chine', begin: '29/07/2016', end: '30/07/2016', assoc_id: 2])
 
 # EventVolunteers
 
@@ -124,3 +124,5 @@ Message.create([chatroom_id: chatroom_two[0][:id], volunteer_id: nicolas[0][:id]
                 content: "Où ça?"])
 Message.create([chatroom_id: chatroom_two[0][:id], volunteer_id: robin[0][:id],
                 content: "Dans mon lit, LOL !"])
+
+# Notifications

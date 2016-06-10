@@ -70,14 +70,14 @@ class AssocsController < ApplicationController
     end
     rights = 'none'
 
-    notif = Notification::InviteMember.where(sender_assoc_id: @assoc.id)
-      .where(receiver_volunteer_id: @volunteer.id).first
+    notif = Notification.where(notif_type: 'InviteMember').where(assoc_id: @assoc.id)
+      .where(receiver_id: @volunteer.id).first
     if notif != nil
       rights = 'invited'
     end
 
-    notif = Notification::JoinAssoc.where(sender_volunteer_id: @volunteer.id)
-      .where(receiver_assoc_id: @assoc.id).first
+    notif = Notification.where(notif_type: 'JoinAssoc').where(sender_id: @volunteer.id)
+      .where(assoc_id: @assoc.id).first
     if notif != nil
       rights = 'waiting'
     end
@@ -102,13 +102,6 @@ class AssocsController < ApplicationController
     rescue => e
       render :json => create_error(400, t("assocs.failure.research")) and return
     end
-  end
-
-  api :GET, '/associations/:id/notifications', 'Get assoc notifications'
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('notifications')
-  def notifications
-    render :json => create_response(@assoc.notifications)
   end
 
   api :GET, '/associations/:id/members', 'Get a list of all members'
@@ -160,8 +153,7 @@ class AssocsController < ApplicationController
   example SampleJson.assocs('delete')
   def delete
     if @link.rights.eql?('owner')
-      Notification::JoinAssoc.where(receiver_assoc_id: @assoc.id).destroy_all
-      Notification::InviteMember.where(sender_assoc_id: @assoc.id).destroy_all
+      Notification.where(assoc_id: @assoc.id).destroy_all
       AvLink.where(assoc_id: @assoc.id).destroy_all
       @assoc.destroy
       render :json => create_response(t("assocs.success.deleted")) and return
@@ -177,9 +169,9 @@ class AssocsController < ApplicationController
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM assocs INNER JOIN notification_invite_members " +
-      "ON notification_invite_members.sender_assoc_id=assocs.id " +
-      "WHERE notification_invite_members.receiver_volunteer_id=#{@volunteer.id}"
+      " FROM assocs INNER JOIN notification " +
+      "ON notification.assoc_id=assocs.id " +
+      "WHERE notification.receiver_id=#{@volunteer.id} AND notification.notif_type='InviteMember'"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end

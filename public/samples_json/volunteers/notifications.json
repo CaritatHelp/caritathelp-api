@@ -2,21 +2,28 @@ SUCCESS =>
 
 localhost:3000/volunteers/2/notifications?token=J2ykGbCW50k924rQeFWmlw
 
+// notif_type possible: 'JoinAssoc', 'JoinEvent', 'InviteMember',
+// 'InviteGuest', 'AddFriend', 'NewGuest', 'NewMember'
+// Les notifications JoinAssoc et JoinEvent (qui represente la demande d'un benevole
+// a rejoindre l'asso ou l'event) sont visibles par tous les owner et admin de l'asso/event
+// si l'un d'eux y répond, le status de la notif change et devient "NewGuest" ou "NewMember"
+// Comme ça si un admin se connecte et voit la notif après qu'un autre admin y ait deja repondu
+// Il verra qu'un nouveau membre a été accepté, plutot qu'une demande d'ajout
+
 {
   "status": 200,
   "message": "ok",
-  "response": {
-    "add_friend": [
-      {
-        "notif_id": 1,
-        "id": 1,
-        "mail": "root@root.com",
-        "firstname": "root",
-        "lastname": "root"
-      }
-    ],
-    "assoc_invite": []
-  }
+  "response": [
+    {
+      "id": "4",
+      "sender_id": "4",
+      "receiver_id": null,
+      "assoc_id": null,
+      "event_id": "1",
+      "notif_type": "NewGuest",
+      "created_at": "2016-06-10 08:41:11.394476"
+    }
+  ]
 }
 
 FAILURE =>
