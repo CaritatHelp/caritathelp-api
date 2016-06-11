@@ -272,7 +272,7 @@ class MessagesController < ApplicationController
 
   def send_msg_to_socket(message, chatroom_id, volunteer_name)
     begin
-      WebSocket::Client::Simple.connect 'ws://0.0.0.0:8080' do |ws|
+      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" + Rails.application.config.port_websocket) do |ws|
         ws.on :open do
           ws.send("#{ENV['SEND_MSG_CARITATHELP']} #{chatroom_id} #{volunteer_name}: #{message[0]['content']}")
           ws.close

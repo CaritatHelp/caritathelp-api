@@ -47,7 +47,7 @@ class ApplicationController < ActionController::Base
 
   def send_notif_to_socket(notification_id)
     begin
-      WebSocket::Client::Simple.connect 'ws://0.0.0.0:8080' do |ws|
+      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" + Rails.application.config.port_websocket) do |ws|
         ws.on :open do
           ws.send("#{ENV['NOTIF_CARITATHELP']} #{notification_id}")
           ws.close
