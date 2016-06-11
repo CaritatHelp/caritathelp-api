@@ -1,11 +1,16 @@
 require 'em-websocket'
 require 'pg'
 
+Daemons.daemonize
+
+sEND_MSG_CARITATHELP = "MCJORR982-ZJHFfe541wxcvbpoizin23231598765185479531dezrjnjhjkae94g41zz4r8g416g5t4eg6io4iop4lkyy4zzefdf"
+nOTIF_CARITATHELP = "JDEje9578efr9zeUPAMD65"
+
 @channels_list = Hash.new
 
 EventMachine.run do
 
-  EventMachine::WebSocket.start(host: "0.0.0.0", port: 8080, debug: true) do |ws|
+  EventMachine::WebSocket.start(host: "172.31.31.97", port: 8080, debug: true) do |ws|
     ws.onopen do      
       begin
         connection = nil
@@ -22,7 +27,8 @@ EventMachine.run do
           # it means the client already connected before
           # next word should be the id of the targeted chatroom
           # after that should be the content of the message
-          if array[0].eql?(ENV['SEND_MSG_CARITATHELP'])
+          # if array[0].eql?(ENV['SEND_MSG_CARITATHELP'])
+          if array[0].eql?(sEND_MSG_CARITATHELP)
             if connection.eql? nil
               connection = PG.connect :dbname => 'pg_test_development',
               :user => 'robin',
@@ -53,7 +59,8 @@ EventMachine.run do
             # the second word should be the type of the notification
             # the third word should be the name from where comes the notification
             # can be Firstname/Lastname, Event name or Assoc name
-          elsif array[0].eql?(ENV['NOTIF_CARITATHELP'])
+          # elsif array[0].eql?(ENV['NOTIF_CARITATHELP'])
+          elsif array[0].eql?(nOTIF_CARITATHELP)
             if connection.eql? nil
               connection = PG.connect :dbname => 'pg_test_development',
               :user => 'robin',
