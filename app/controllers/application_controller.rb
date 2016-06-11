@@ -45,4 +45,16 @@ class ApplicationController < ActionController::Base
     {:status => status, :message => message, :response => nil}
   end
 
+
+  def send_notif_to_socket(notification_id)
+    begin
+      WebSocket::Client::Simple.connect 'ws://0.0.0.0:8080' do |ws|
+        ws.on :open do
+          ws.send("#{ENV['NOTIF_CARITATHELP']} #{notification_id}")
+          ws.close
+        end
+      end
+    rescue
+    end
+  end
 end

@@ -172,6 +172,8 @@ class MessagesController < ApplicationController
       @chatroom.number_messages += 1
       @chatroom.save!
 
+      send_msg_to_socket(message, @chatroom.id, @volunteer.firstname)
+
       render :json => create_response(message)
     rescue => e
       render :json => create_error(400, e.to_s)
@@ -265,6 +267,18 @@ class MessagesController < ApplicationController
       .where(chatroom_id: @chatroom.id).first
     if @link.eql?(nil)
       render :json => create_error(400, t("chatrooms.failure.rights")) and return      
+    end
+  end
+
+  def send_msg_to_socket(message, chatroom_id, volunteer_name)
+    begin
+      WebSocket::Client::Simple.connect 'ws://0.0.0.0:8080' do |ws|
+        ws.on :open do
+          ws.send("#{ENV['SEND_MSG_CARITATHELP']} #{chatroom_id} #{volunteer_name}: #{message[0]['content']}")
+          ws.close
+        end
+      end
+    rescue
     end
   end
 end

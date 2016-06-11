@@ -1,12 +1,16 @@
 source 'https://rubygems.org'
 
+# Websocket handling
+gem 'eventmachine', '~> 1.0', '>= 1.0.7'
+gem 'em-websocket', '~> 0.5.1'
+gem 'websocket-client-simple', '~> 0.3.0'
 # Carrierwave & MiniMagick for handling files upload system
 gem 'carrierwave', '~> 0.10.0'
 gem 'mini_magick', '~> 4.4'
 # Bootstrap
 gem 'twitter-bootstrap-rails', '~> 3.2', '>= 3.2.2'
 # Awesome Print
-gem "awesome_print", require:"ap"
+gem 'awesome_print', '~> 1.6', '>= 1.6.1'
 # Apipie
 gem 'apipie-rails'
 # SecureRandom
