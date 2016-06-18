@@ -1,9 +1,9 @@
 class SheltersController < ApplicationController
-  before_filter :check_token, except: [:index, :show]
-  before_action :set_volunteer, except: [:index, :show]
-  before_action :set_assoc, except: [:index, :show]
+  before_filter :check_token, except: [:index, :show, :search]
+  before_action :set_volunteer, except: [:index, :show, :search]
+  before_action :set_assoc, except: [:index, :show, :search]
   before_action :set_shelter, only: [:show, :update, :delete]
-  before_action :check_rights, except: [:index, :show]
+  before_action :check_rights, except: [:index, :show, :search]
 
   def_param_group :shelter_create do
     param :token, String, "Creator's token", :required => true
@@ -65,7 +65,25 @@ class SheltersController < ApplicationController
   def show    
     render :json => create_response(@shelter)
   end
-  
+
+  api :GET, '/shelters/search', "Search for shelter by its name, returns a list of matching shelters"
+  param :research, String, "Shelter's name", :required => true
+  example SampleJson.shelters('search')
+  def search
+    begin
+      name = params[:research].downcase
+
+      if name.length.eql?(0)
+        render :json => create_error(400, t('shelters.failure.research')) and return        
+      end
+      query = "lower(name) LIKE ?"
+      render :json => create_response(Shelter.select('id, name, city, total_places, free_places')
+                                        .where(query, "#{name}%"))
+    rescue => e
+      render :json => create_error(400, t('shelters.failure.research')) and return
+    end
+  end
+
   api :PUT, '/shelters/:id', "Allow association to update the shelter refered by id"
   param_group :shelter_update
   example SampleJson.shelters('update')

@@ -159,6 +159,7 @@ en:
       exist: "This shelter already exist"
       id: 'Unknown shelter id'
       name: 'This name is not available, a shelter as the same name at the same address'
+      research: 'Research field is missing'
 
     success:
       deleted: "Shelter successfuly deleted"

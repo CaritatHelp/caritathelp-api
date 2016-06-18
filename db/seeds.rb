@@ -125,4 +125,17 @@ Message.create([chatroom_id: chatroom_two[0][:id], volunteer_id: nicolas[0][:id]
 Message.create([chatroom_id: chatroom_two[0][:id], volunteer_id: robin[0][:id],
                 content: "Dans mon lit, LOL !"])
 
+# Shelters
+
+Shelter.create([name: 'Super shelter de la mort', address: 'Rue du swag',
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+Shelter.create([name: 'Shelter de la mort', address: 'Rue du swag',
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+Shelter.create([name: 'Auberge de jeunesse', address: 'Rue du swag',
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+Shelter.create([name: 'Shelter du swag', address: 'Rue du swag',
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+Shelter.create([name: 'Auberge de vieillesse', address: 'Rue du swag',
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+
 # Notifications

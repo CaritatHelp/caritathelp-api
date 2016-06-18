@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   scope '/shelters' do
     post '/', to: 'shelters#create'
     get '/', to: 'shelters#index'
+    get '/search', to: 'shelters#search'
     get '/:id', to: 'shelters#show'
     put '/:id', to: 'shelters#update'
     delete '/:id', to: 'shelters#delete'
