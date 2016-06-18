@@ -17,9 +17,13 @@ localhost:3000/volunteers/2/notifications?token=J2ykGbCW50k924rQeFWmlw
     {
       "id": "4",
       "sender_id": "4",
+      "sender_name": "Jeremy Gros",
       "receiver_id": null,
+      "receiver_name": null,
       "assoc_id": null,
+      "assoc_name": null,
       "event_id": "1",
+      "event_name": "Soignage de gens",
       "notif_type": "NewGuest",
       "created_at": "2016-06-10 08:41:11.394476"
     }

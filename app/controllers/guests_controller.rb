@@ -269,14 +269,19 @@ class GuestsController < ApplicationController
 
   def create_join_event
     [sender_id: @volunteer.id,
+     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
      event_id: @event.id,
+     event_name: @event.title,
      notif_type: 'JoinEvent']
   end
 
   def create_invite_guest
     [event_id: @event.id,
+     event_name: @event.title,
      sender_id: @volunteer.id,
+     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
      receiver_id: @invited_vol.id,
+     receiver_name: @invited_vol.firstname + " " + @invited_vol.lastname,
      notif_type: 'InviteGuest']
   end
 

@@ -139,9 +139,12 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('notifications')
   def notifications  
-    fields = "notifications.id, notifications.sender_id, notifications.receiver_id, " +
-      "notifications.assoc_id, notifications.event_id, notifications.notif_type, " +
-      "notifications.created_at"
+    fields = "notifications.id, notifications.sender_id, notifications.sender_name, " +
+      "notifications.receiver_id, notifications.receiver_name, " +
+      "notifications.assoc_id, notifications.assoc_name, " +
+      "notifications.event_id, notifications.event_name, " +
+      "notifications.notif_type, notifications.created_at"
+
     query = "SELECT #{fields} FROM notifications WHERE " +
       "notifications.receiver_id=#{@volunteer.id} UNION " +
       "SELECT #{fields} FROM notifications INNER JOIN notification_volunteers ON " +

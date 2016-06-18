@@ -244,14 +244,19 @@ class MembershipController < ApplicationController
 
   def create_join_assoc
     [sender_id: @volunteer.id,
+     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
      assoc_id: @assoc.id,
+     assoc_name: @assoc.name,
      notif_type: 'JoinAssoc']
   end
 
   def create_invite_member
     [assoc_id: @assoc.id,
+     assoc_name: @assoc.name,
      sender_id: @volunteer.id,
+     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
      receiver_id: @invited_vol.id,
+     receiver_name: @inviter_vol.firstname + " " + @invited_vol.lastname,
      notif_type: 'InviteMember']
   end
 
