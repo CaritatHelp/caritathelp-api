@@ -1,7 +1,7 @@
 class AssocsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture]
+  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
   def_param_group :assocs_create do
@@ -203,6 +203,15 @@ class AssocsController < ApplicationController
     query = "id, file_size, picture_path"
     pictures = Picture.where(:assoc_id => @assoc.id).where(:is_main => true).select(query).first
     render :json => create_response(pictures)
+  end
+  
+  api :GET, '/associations/:id/news', "Get associations's news"
+  param :token, String, "Your token", :required => true
+  example SampleJson.assocs('news')
+  def news
+    query = "SELECT id, type, assoc_id, title, content " +
+      "FROM new_news WHERE new_news.assoc_id=#{@assoc.id}"
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   private

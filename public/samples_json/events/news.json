@@ -1,0 +1,19 @@
+SUCCESS =>
+
+http://localhost:3000/events/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
+
+{
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: "3",
+	    type: "New::Event::Status",
+	    event_id: "1",
+	    title: null,
+	    content: "coucou"
+	}
+    ]
+}
+
+FAILURE =>

@@ -1,0 +1,26 @@
+SUCCESS =>
+
+http://localhost:3000/volunteers/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
+
+{
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: "1",
+	    type: "New::Volunteer::Status",
+	    volunteer_id: "1",
+	    title: null,
+	    content: "coucou"
+	},
+	{
+	    id: "2",
+	    type: "New::Volunteer::Status",
+	    volunteer_id: "1",
+	    title: null,
+	    content: "coucou"
+	}
+    ]
+}
+
+FAILURE =>

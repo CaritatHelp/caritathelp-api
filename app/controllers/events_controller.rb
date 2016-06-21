@@ -2,7 +2,7 @@ class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
   def_param_group :create_event do
@@ -234,6 +234,15 @@ class EventsController < ApplicationController
     query = "id, file_size, picture_path"
     pictures = Picture.where(:event_id => @event.id).where(:is_main => true).select(query).first
     render :json => create_response(pictures)
+  end
+  
+  api :GET, '/events/:id/news', "Get event's news"
+  param :token, String, "Your token", :required => true
+  example SampleJson.events('news')
+  def news
+    query = "SELECT id, type, event_id, title, content " +
+      "FROM new_news WHERE new_news.event_id=#{@event.id}"
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   private

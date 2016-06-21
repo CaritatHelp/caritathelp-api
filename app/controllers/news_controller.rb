@@ -20,7 +20,7 @@ class NewsController < ApplicationController
       "(SELECT " + fields + " FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id})"
 
     news = New::New.find_by_sql([query, @volunteer.id, @volunteer.id, @volunteer.id]).map(&:complete_description)
-    render :json => create_response({'news' => news})
+    render :json => create_response(news)
   end
 
   api :POST, '/news/volunteer_status', 'Create a new status for the volunteer'

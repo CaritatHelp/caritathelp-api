@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
-  before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture]
+  before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture, :news]
   before_action :set_current_volunteer, only: [:index, :show, :update]
 
   def_param_group :volunteers_creation do
@@ -247,6 +246,15 @@ class VolunteersController < ApplicationController
       .where(:event_id => nil).where(:assoc_id => nil).where(:is_main => true)
       .select(query).first
     render :json => create_response(pictures)
+  end
+
+  api :GET, '/volunteers/:id/news', "Get volunteer's news"
+  param :token, String, "Your token", :required => true
+  example SampleJson.volunteers('news')
+  def news
+    query = "SELECT id, type, volunteer_id, title, content " +
+      "FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id}"
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   private
