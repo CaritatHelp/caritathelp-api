@@ -26,7 +26,7 @@ class LoginController < ApplicationController
     if db_user.password.eql? new_user.password
       db_user.generate_token
       db_user.save
-      render :json => create_response(db_user.complete_description)
+      render :json => create_response(db_user.as_json(:except => [:password]))
       return
     end
 

@@ -14,6 +14,8 @@ localhost:3000/associations/1/events?token=MqxwIe94c0by9--2c0PPbQ
 	    assoc_id: "1",
 	    assoc_name: "Croix verte",
 	    rights: "host",  // null if not member at all
+	    thumb_path: null,
+	    nb_guest: "3",
 	    nb_friends_members: "1"
 	}
     ]

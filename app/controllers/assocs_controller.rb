@@ -28,10 +28,12 @@ class AssocsController < ApplicationController
   api :GET, '/associations', "Get a list of all associations"
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('index')
-  def index
-    query = "SELECT assocs.id, assocs.name, assocs.city, " +
+  def index    
+    query = "SELECT assocs.id, assocs.name, assocs.city, assocs.description, " +
       "(SELECT av_links.rights FROM av_links WHERE av_links.assoc_id=assocs.id " + 
       "AND av_links.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT thumb_path FROM pictures WHERE pictures.assoc_id=assocs.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
@@ -53,7 +55,7 @@ class AssocsController < ApplicationController
       link = AvLink.create!(assoc_id: new_assoc.id,
                             volunteer_id: @volunteer.id, rights: 'owner')
 
-      render :json => create_response(new_assoc.complete_description(link.rights))
+      render :json => create_response(new_assoc.as_json.merge('rights' => 'owner', 'thumb_path' => nil))
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s)
       return
@@ -64,9 +66,13 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('show')
   def show
+    picture = Picture.where(assoc_id: @assoc.id).where(is_main: true).first
+    path = picture.thumb_path unless picture.eql? nil
+
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
     if link != nil
-      render :json => create_response(@assoc.complete_description(link.rights)) and return
+      render :json => create_response(@assoc.as_json.merge('rights' => link.rights,
+                                                           'thumb_path' => path)) and return
     end
     rights = 'none'
 
@@ -82,7 +88,8 @@ class AssocsController < ApplicationController
       rights = 'waiting'
     end
     
-    render :json => create_response(@assoc.complete_description(rights))
+    render :json => create_response(@assoc.as_json.merge('rights' => rights,
+                                                         'thumb_path' => path)) and return
   end
 
   api :GET, '/associations/search', "Search for association by its name, return a list of matching associations"
@@ -121,6 +128,8 @@ class AssocsController < ApplicationController
     query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT thumb_path FROM pictures WHERE pictures.event_id=events.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
@@ -138,7 +147,7 @@ class AssocsController < ApplicationController
                                              @assoc.name)
         render :json => create_error(400, t("assocs.failure.name.unavailable"))
       elsif @assoc.update!(assoc_params)
-        render :json => create_response(@assoc.complete_description(@link.rights))
+        render :json => create_response(@assoc.as_json.merge('rights' => @link.rights))
       else
         render :json => create_error(400, t("assocs.failure.update"))
       end
@@ -166,12 +175,14 @@ class AssocsController < ApplicationController
   example SampleJson.assocs('invited')
   def invited
     query = "SELECT assocs.id, assocs.name, assocs.city, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.assoc_id=assocs.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM assocs INNER JOIN notification " +
-      "ON notification.assoc_id=assocs.id " +
-      "WHERE notification.receiver_id=#{@volunteer.id} AND notification.notif_type='InviteMember'"
+      " FROM assocs INNER JOIN notifications " +
+      "ON notifications.assoc_id=assocs.id " +
+      "WHERE notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteMember'"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end

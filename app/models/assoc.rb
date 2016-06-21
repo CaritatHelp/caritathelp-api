@@ -5,29 +5,6 @@ class Assoc < ActiveRecord::Base
   validates :name, presence: true, :on => :create
   validates :description, presence: true, :on => :create
 
-  def short_description(value = nil, key = "notif_id")
-    if value.eql? nil
-      {'id' => self.id, 'name' => self.name, 'city' => self.city}
-    else
-      {key => value, 'id' => self.id, 'name' => self.name, 'city' => self.city}
-    end
-  end
-
-  def complete_description(rights = 'none')
-    {'id' => self.id, 'name' => self.name, 'description' => self.description,
-      'city' => self.city, 'birthday' => self.birthday,
-      'latitude' => self.latitude, 'longitude' => self.longitude,
-      'rights' => rights}
-  end
-
-  def events
-    events_list = []
-    Event.where(assoc_id: self.id).each do |link|
-      events_list.push link.short_description
-    end
-    events_list
-  end
-
   def self.exist?(name)
     if Assoc.find_by(name: name).eql? nil
       return false

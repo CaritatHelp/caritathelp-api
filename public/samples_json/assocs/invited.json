@@ -10,7 +10,9 @@ localhost:3000/associations/invited?token=pg5xzmf7G2AJ6xN4aHaB6Q
       "id": "2",
       "name": "Les resto de l'estomac",
       "city": "Là-bas",
-      "nb_friends_members": "0"
+      "nb_friends_members": "0",
+      "nb_members": "3",
+      "thumb_path": "/uploads/picture/picture_path/1/thumb_1466502907_yolo.jpg"
     }
   ]
 }

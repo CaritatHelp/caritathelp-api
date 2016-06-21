@@ -77,6 +77,16 @@ class PicturesController < ApplicationController
     
     begin
       @picture = Picture.create!(actual_params[:picture])
+
+      # this part extract the paths to make it easy to query them from anywhere
+      path = @picture.picture_path.file.file
+      thumb_path = @picture.picture_path.versions[:thumb].file.file
+      index = path.index('/uploads')
+      @picture.path = path[index..-1]
+      index = thumb_path.index('/uploads')
+      @picture.thumb_path = thumb_path[index..-1]
+      @picture.save!
+
       render :json => create_response(@picture)
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s), status: 400

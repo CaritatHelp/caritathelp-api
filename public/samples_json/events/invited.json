@@ -13,6 +13,8 @@ localhost:3000/events/invited?token=uiNE0fs4EATfBpvuMHQpWA
       "begin": "2016-07-21 00:00:00",
       "end": "2016-07-22 00:00:00",
       "assoc_id": "2",
+      "thumb_path": "/uploads/picture/picture_path/3/thumb_1466503053_yolo.jpg",
+      "nb_guest": "3",
       "nb_friends_members": "1"
     }
   ]

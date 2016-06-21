@@ -15,6 +15,7 @@ localhost:3000/events?token=MqxwIe94c0by9--2c0PPbQ
 	    assoc_name: "Croix verte",
 	    rights: "host",  // null if not member at all
 	    nb_guests: "3",
+	    thumb_path: "/uploads/picture/picture_path/3/thumb_1466503053_yolo.jpg",
 	    nb_friends_members: "1"
 	}
     ]

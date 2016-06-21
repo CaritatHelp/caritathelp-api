@@ -47,45 +47,6 @@ class Volunteer < ActiveRecord::Base
       write_attribute :password, nil
     end
   end
-
-  def short_description(value = nil, key = "notif_id")
-    if value.eql? nil
-      {'id' => self.id, 'mail' => self.mail, 'firstname' => self.firstname,
-        'lastname' => self.lastname}
-    else
-      {key => value, 'id' => self.id, 'mail' => self.mail,
-        'firstname' => self.firstname, 'lastname' => self.lastname}
-    end
-  end
-
-  def simple_description(friendship)
-    {'id' => self.id, 'mail' => self.mail, 'firstname' => self.firstname,
-      'lastname' => self.lastname, 'birthday' => self.birthday,
-      'gender' => self.gender, 'city' => self.city,
-      'latitude' => self.latitude, 'longitude' => self.longitude,
-      'allowgps' => self.allowgps, 'allow_notifications' => self.allow_notifications,
-      'friendship' => friendship}
-  end
-
-  def complete_description
-    {'id' => self.id, 'mail' => self.mail,
-      'token' => self.token, 'firstname' => self.firstname,
-      'lastname' => self.lastname, 'birthday' => self.birthday,
-      'gender' => self.gender, 'city' => self.city,
-      'latitude' => self.latitude, 'longitude' => self.longitude,
-      'allowgps' => self.allowgps, 'allow_notifications' => self.allow_notifications}
-  end
-
-  # gerer les exception
-  # a modifier
-  def friends
-    friend_list = []
-    VFriend.where(volunteer_id: self.id).each do |link|
-      friend = Volunteer.find_by(id: link.friend_volunteer_id)
-      friend_list.push friend.short_description
-    end
-    friend_list
-  end
   
   def self.exist?(mail)
     if Volunteer.find_by(mail: mail).eql? nil

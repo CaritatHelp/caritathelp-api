@@ -14,6 +14,8 @@ localhost:3000/events/owned?token=uiNE0fs4EATfBpvuMHQpWA
       "end": "2016-12-30 00:00:00",
       "assoc_id": "2",
       "rights": "host",
+      "thumb_path": "/uploads/picture/picture_path/3/thumb_1466503053_yolo.jpg",
+      "nb_guest": "3",
       "nb_friends_members": "0"
     }
   ]

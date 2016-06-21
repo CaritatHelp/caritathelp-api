@@ -6,18 +6,20 @@ localhost:3000/volunteers?mail=root2@root.com&password=root&firstname=root&lastn
   "status": 200,
   "message": "ok",
   "response": {
-    "id": 2,
-    "mail": "root2@root.com",
-    "token": "J2ykGbCW50k924rQeFWmlw",
-    "firstname": "root",
-    "lastname": "root",
+    "id": 7,
+    "mail": "test@root.com",
+    "token": "zLM8uSt5PryO_7yGZxBlAg",
+    "created_at": "2016-06-21T14:50:25.971+02:00",
+    "updated_at": "2016-06-21T14:50:25.971+02:00",
+    "firstname": "lol",
+    "lastname": "lol",
     "birthday": null,
     "gender": null,
     "city": null,
     "latitude": null,
     "longitude": null,
     "allowgps": false,
-    "allow_notifications": false
+    "allow_notifications": null
   }
 }
 

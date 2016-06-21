@@ -40,6 +40,7 @@ class VolunteersController < ApplicationController
   def index
     query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.volunteer_id=volunteers.id AND pictures.is_main='true' AND pictures.event_id IS NULL AND pictures.assoc_id IS NULL) AS thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
       "link.volunteer_id=#{@current_volunteer.id} AND " +
@@ -59,7 +60,7 @@ class VolunteersController < ApplicationController
         return
       end
       new_volunteer = Volunteer.create!(volunteer_params)
-      render :json => create_response(new_volunteer.complete_description)
+      render :json => create_response(new_volunteer.as_json(:except => [:password]))
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s)
       return
@@ -71,19 +72,29 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('show')
   def show
     begin
+      picture = Picture.where(assoc_id: nil).where(event_id: nil).where(volunteer_id: @volunteer.id)
+        .where(is_main: true).first
+      path = picture.thumb_path unless picture.eql? nil
+
       if @current_volunteer.id == @volunteer.id
-        render :json => create_response(@volunteer.simple_description('yourself')) and return
+        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+                                          .merge('friendship' => 'yourself',
+                                                 'thumb_path' => path)) and return
       end
       link = VFriend
         .where(:volunteer_id => @volunteer.id)
         .where(:friend_volunteer_id => @current_volunteer.id).first
       if link.eql?(nil)
-        render :json => create_response(@volunteer.simple_description('false')) and return
+        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+                                          .merge('friendship' => 'false',
+                                                 'thumb_path' => path)) and return
       else
-        render :json => create_response(@volunteer.simple_description('true')) and return
+        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+                                          .merge('friendship' => 'true',
+                                                 'thumb_path' => path)) and return
       end
     rescue => e
-      render :json => create_response(@volunteer.simple_description('failure'))
+      render :json => create_error(400, e.to_s)
     end
   end
 
@@ -125,7 +136,8 @@ class VolunteersController < ApplicationController
       if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @volunteer.mail)
         render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
       elsif @volunteer.update!(volunteer_params)
-        render :json => create_response(@volunteer.simple_description('yourself'))
+        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+                                          .merge('friendship' => 'yourself')) and return
       else
         render :json => create_error(400, t("volunteers.failure.update"))
       end
@@ -159,7 +171,17 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('friends')
   def friends
-    render :json => create_response(@volunteer.friends)
+    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+      "city, latitude, longitude, allowgps, allow_notifications, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.volunteer_id=volunteers.id AND pictures.is_main='true' AND pictures.event_id IS NULL AND pictures.assoc_id IS NULL) AS thumb_path, " +
+      "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
+      "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
+      "link.volunteer_id=#{@volunteer.id} AND " +
+      "v_friends.volunteer_id=volunteers.id AND " +
+      "v_friends.volunteer_id<>#{@volunteer.id}) AS nb_common_friends FROM volunteers " +
+      "INNER JOIN v_friends ON volunteers.id=v_friends.friend_volunteer_id WHERE v_friends.volunteer_id=#{@volunteer.id}"
+    # render :json => create_response(@volunteer.friends)
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :GET, '/volunteers/:id/associations', "Return a list of the volunteer's associations"
@@ -167,6 +189,8 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('associations')
   def associations
     query = "SELECT assocs.id, assocs.name, assocs.city, av_links.rights, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.assoc_id=assocs.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
@@ -183,6 +207,8 @@ class VolunteersController < ApplicationController
   def events
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
       "events.assoc_id, events.assoc_name, event_volunteers.rights, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.event_id=events.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +

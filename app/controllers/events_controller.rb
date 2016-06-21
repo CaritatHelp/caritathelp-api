@@ -32,6 +32,7 @@ class EventsController < ApplicationController
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, events.assoc_id, events.assoc_name, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT thumb_path FROM pictures WHERE pictures.event_id=events.id AND pictures.is_main='true') AS thumb_path, " +
       "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
@@ -74,7 +75,7 @@ class EventsController < ApplicationController
                                           volunteer_id: @volunteer.id,
                                           rights: 'host')
 
-      render :json => create_response(new_event.complete_description(event_link.rights))
+      render :json => create_response(new_event.as_json.merge("rights" => "host", "thumb_path" => nil))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       begin
         new_event.destroy
@@ -88,9 +89,13 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('show')
   def show
+    picture = Picture.where(event_id: @event.id).where(is_main: true).first
+    path = picture.thumb_path unless picture.eql? nil
+
     link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first
     if link != nil
-      render :json => create_response(@event.complete_description(link.rights)) and return
+      render :json => create_response(@event.as_json.merge('rights' => link.rights,
+                                                           'thumb_path' => path)) and return
     end
     rights = 'none'
 
@@ -110,7 +115,8 @@ class EventsController < ApplicationController
       rights = 'waiting'
     end
 
-    render :json => create_response(@event.complete_description(rights))
+    render :json => create_response(@event.as_json.merge('rights' => rights,
+                                                         'thumb_path' => path))
   end
 
   api :GET, '/events/search', "Search for event by its name, return a list of matching events"
@@ -157,7 +163,7 @@ class EventsController < ApplicationController
   def update
     begin
       @event.update!(event_params_update)
-      render :json => create_response(@event.complete_description(@link.rights))
+      render :json => create_response(@event.as_json.merge('rights' => @link.rights))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -183,6 +189,8 @@ class EventsController < ApplicationController
   def owned
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
       "events.assoc_id, event_volunteers.rights, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.event_id=events.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
@@ -198,12 +206,14 @@ class EventsController < ApplicationController
   def invited
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
       "events.assoc_id, " +
+      "(SELECT thumb_path FROM pictures WHERE pictures.event_id=events.id AND pictures.is_main='true') AS thumb_path, " +
+      "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM events INNER JOIN notification " + 
-      "ON notification.event_id=events.id " +
-      "WHERE notification.receiver_id=#{@volunteer.id} AND notification.notif_type='InviteGuest'"
+      " FROM events INNER JOIN notifications " + 
+      "ON notifications.event_id=events.id " +
+      "WHERE notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteGuest'"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))    
   end

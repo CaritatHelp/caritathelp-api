@@ -11,6 +11,8 @@ localhost:3000/associations?token=jw35EAIZFb90bpPpDs_wwQ
 	    name: "Croix rouge",
 	    city: null,
 	    rights: "owner",   // null if not member at all
+	    thumb_path: "/uploads/picture/picture_path/1/thumb_1466502907_yolo.jpg",
+	    nb_members: "6",
 	    nb_friends_members: "1"
 	}
     ]
