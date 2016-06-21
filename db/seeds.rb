@@ -54,17 +54,21 @@ AvLink.create([assoc_id: resto[0][:id], volunteer_id: aude[0][:id], rights: 'adm
 # Events
 
 event_one = Event.create([title: 'Soignage de gens', description: 'On va soigner des gens',
-                         place: 'Zimbabwe', begin: '21/02/2016', end: '22/02/2016', assoc_id: 1])
+                         place: 'Zimbabwe', begin: '21/02/2016', end: '22/02/2016', assoc_id: 1,
+                         assoc_name: croix_rouge[0][:name]])
 event_two = Event.create([title: 'Sauvetage du soldat Ryan',
                           description: 'Pour faire plaisir à sa maman',
-                         place: 'Normandie', begin: '06/06/1970', end: '07/06/1970', assoc_id: 1])
-
+                         place: 'Normandie', begin: '06/06/1970', end: '07/06/1970', assoc_id: 1,
+                         assoc_name: croix_rouge[0][:name]])
 event_three = Event.create([title: 'Donnage de miam miam', description: 'bonap',
-                         place: 'Paris', begin: '21/07/2016', end: '22/07/2016', assoc_id: 2])
+                         place: 'Paris', begin: '21/07/2016', end: '22/07/2016', assoc_id: 2,
+                         assoc_name: resto[0][:name]])
 event_four = Event.create([title: 'Soirée Pizza !', description: "Mais seulement avec de l'ananas",
-                         place: 'Italie', begin: '01/05/2016', end: '30/12/2016', assoc_id: 2])
+                         place: 'Italie', begin: '01/05/2016', end: '30/12/2016', assoc_id: 2,
+                         assoc_name: resto[0][:name]])
 event_five = Event.create([title: 'Buffet à volonté', description: 'Sushi Maki Brochette',
-                         place: 'Tokyo-Chine', begin: '29/07/2016', end: '30/07/2016', assoc_id: 2])
+                         place: 'Tokyo-Chine', begin: '29/07/2016', end: '30/07/2016', assoc_id: 2,
+                         assoc_name: resto[0][:name]])
 
 # EventVolunteers
 

@@ -118,7 +118,7 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('events')
   def events
-    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, " +
+    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +

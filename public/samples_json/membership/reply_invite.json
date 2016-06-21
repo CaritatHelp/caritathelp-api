@@ -14,6 +14,6 @@ localhost:3000/membership/reply_invite?token=J2ykGbCW50k924rQeFWmlw&notif_id=897
 
 {
   "status": 400,
-  "message": "Couldn't find Notification::InviteMember",
+  "message": "Couldn't find Notification",
   "response": null
 }

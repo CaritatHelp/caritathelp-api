@@ -182,7 +182,7 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('events')
   def events
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
-      "events.assoc_id, event_volunteers.rights, " +
+      "events.assoc_id, events.assoc_name, event_volunteers.rights, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +

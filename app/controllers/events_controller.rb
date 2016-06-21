@@ -1,6 +1,7 @@
 class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
+  before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture]
   before_action :check_rights, only: [:update, :delete]
 
@@ -28,9 +29,10 @@ class EventsController < ApplicationController
   param :range, String, "can be 'past', 'current' or 'futur'", :required => true
   example SampleJson.events('index')
   def index
-    query = "SELECT events.id, events.title, events.place, events.begin, events.end, events.assoc_id, " +
+    query = "SELECT events.id, events.title, events.place, events.begin, events.end, events.assoc_id, events.assoc_name, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
@@ -65,7 +67,7 @@ class EventsController < ApplicationController
       if assoc_link == nil || assoc_link.rights.eql?('member')
         render :json => create_error(400, t("events.failure.rights")) and return        
       end
-
+      
       new_event = Event.create!(event_params_creation)
 
       event_link = EventVolunteer.create!(event_id: new_event.id,
@@ -237,8 +239,18 @@ class EventsController < ApplicationController
     end
   end
 
+  def set_assoc
+    begin
+      @assoc = Assoc.find(params[:assoc_id])
+    rescue
+      render :json => create_error(400, t("assocs.failure.id"))
+    end
+  end
+
   def event_params_creation
-    params.permit(:title, :description, :place, :begin, :end, :assoc_id)
+    params_event = params.permit(:title, :description, :place, :begin, :end, :assoc_id)
+    params_event[:assoc_name] = @assoc.name
+    params_event
   end
 
   def event_params_update
