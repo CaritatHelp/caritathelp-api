@@ -11,6 +11,7 @@ localhost:3000/events/1/guests?token=MqxwIe94c0by9--2c0PPbQ
       "mail": "root1@root.com",
       "firstname": "root",
       "lastname": "root",
+      "thumb_path": null,
       "rights": "host"
     }
   ]

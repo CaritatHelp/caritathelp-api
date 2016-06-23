@@ -13,6 +13,7 @@ localhost:3000/associations/1/members?token=bCdmSC5oUxpty11MDU6iFw&name=Test&des
       "mail": "root@root.com",
       "firstname": "root",
       "lastname": "root",
+      "thumb_path": null,
       "rights": "owner"
     }
   ]

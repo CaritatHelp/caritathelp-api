@@ -20,6 +20,7 @@ class Volunteer < ActiveRecord::Base
   VALID_PWD_REGEX = /\A(?=.*[a-zA-Z])(?=.*[0-9]).{6,}\z/
 
   before_create :generate_token
+  before_create :set_default_picture
   
   validates :mail, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
   validates :password, presence: true, format: { with: VALID_PWD_REGEX }, :on => :create
@@ -37,6 +38,14 @@ class Volunteer < ActiveRecord::Base
     generation = loop do
       self.token = SecureRandom.urlsafe_base64
       break self.token unless Volunteer.exists?(token: self.token)
+    end
+  end
+
+  def set_default_picture
+    if self.gender.eql?('f') and self.thumb_path.eql?(nil)
+      self.thumb_path = Rails.application.config.default_thumb_female
+    elsif self.thumb_path.eql?(nil)
+      self.thumb_path = Rails.application.config.default_thumb_male
     end
   end
 

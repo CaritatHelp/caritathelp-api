@@ -29,10 +29,9 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('index')
   def index    
-    query = "SELECT assocs.id, assocs.name, assocs.city, assocs.description, " +
+    query = "SELECT assocs.id, assocs.name, assocs.city, assocs.description, assocs.thumb_path, " +
       "(SELECT av_links.rights FROM av_links WHERE av_links.assoc_id=assocs.id " + 
       "AND av_links.volunteer_id=#{@volunteer.id}) AS rights, " + 
-      "(SELECT thumb_path FROM pictures WHERE pictures.assoc_id=assocs.id AND pictures.is_main='true') AS thumb_path, " +
       "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
@@ -55,7 +54,7 @@ class AssocsController < ApplicationController
       link = AvLink.create!(assoc_id: new_assoc.id,
                             volunteer_id: @volunteer.id, rights: 'owner')
 
-      render :json => create_response(new_assoc.as_json.merge('rights' => 'owner', 'thumb_path' => nil))
+      render :json => create_response(new_assoc.as_json.merge('rights' => 'owner'))
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s)
       return
@@ -66,13 +65,9 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('show')
   def show
-    picture = Picture.where(assoc_id: @assoc.id).where(is_main: true).first
-    path = picture.thumb_path unless picture.eql? nil
-
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
     if link != nil
-      render :json => create_response(@assoc.as_json.merge('rights' => link.rights,
-                                                           'thumb_path' => path)) and return
+      render :json => create_response(@assoc.as_json.merge('rights' => link.rights)) and return
     end
     rights = 'none'
 
@@ -88,8 +83,7 @@ class AssocsController < ApplicationController
       rights = 'waiting'
     end
     
-    render :json => create_response(@assoc.as_json.merge('rights' => rights,
-                                                         'thumb_path' => path)) and return
+    render :json => create_response(@assoc.as_json.merge('rights' => rights)) and return
   end
 
   api :GET, '/associations/search', "Search for association by its name, return a list of matching associations"
@@ -115,7 +109,7 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('members')
   def members
-    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, av_links.rights"
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, volunteers.thumb_path, av_links.rights"
     render :json => create_response(Volunteer.joins(:av_links)
                                       .where(av_links: { assoc_id: @assoc.id })
                                       .select(query).limit(100))
@@ -125,10 +119,9 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('events')
   def events
-    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, " +
+    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, events.thumb_path, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
-      "(SELECT thumb_path FROM pictures WHERE pictures.event_id=events.id AND pictures.is_main='true') AS thumb_path, " +
       "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
@@ -174,8 +167,7 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('invited')
   def invited
-    query = "SELECT assocs.id, assocs.name, assocs.city, " +
-      "(SELECT thumb_path FROM pictures WHERE pictures.assoc_id=assocs.id AND pictures.is_main='true') AS thumb_path, " +
+    query = "SELECT assocs.id, assocs.name, assocs.city, assocs.thumb_path, " +
       "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +

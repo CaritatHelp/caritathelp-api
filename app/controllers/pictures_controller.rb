@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class PicturesController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
@@ -87,6 +88,8 @@ class PicturesController < ApplicationController
       @picture.thumb_path = thumb_path[index..-1]
       @picture.save!
 
+      set_main_picture(@picture)
+
       render :json => create_response(@picture)
     rescue ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s), status: 400
@@ -159,6 +162,8 @@ class PicturesController < ApplicationController
       end
       
       @current_picture.update!({:is_main => true})
+
+      set_main_picture(@current_picture)
       
       render :json => create_response(@current_picture)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
@@ -180,6 +185,28 @@ class PicturesController < ApplicationController
       @current_picture = Picture.find(params[:id])
     rescue
       render :json => create_error(400, t("pictures.failure.id")), status: 400 and return
+    end
+  end
+
+  def set_main_picture(picture)
+    begin
+      p "££££££££££££££££££££££££££££££££££££££££££££££££££££££££££"
+      p picture
+      if picture.is_main.eql?(true)
+        if !@event.eql?(nil)
+          @event.thumb_path = picture.thumb_path
+          @event.save!
+        elsif !@assoc.eql?(nil)
+          @assoc.thumb_path = picture.thumb_path
+          @assoc.save!
+        else
+          p "LAAAAAAAAAAA???????????????????????????"
+          @volunteer.thumb_path = picture.thumb_path
+          @volunteer.save!
+        end
+      end
+    rescue => e
+      render :json => create_error(400, e.to_s), status: 400 and return
     end
   end
 

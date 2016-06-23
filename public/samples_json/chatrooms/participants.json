@@ -9,17 +9,22 @@ localhost:3000/chatrooms/82/volunteers?token=tMb7m0B8cyuWCIHnUQT_cw
     {
       "id": 3,
       "firstname": "Jerem",
-      "lastname": "Gros"
+      "lastname": "Gros",
+      "thumb_path": null
     },
     {
       "id": 2,
       "firstname": "Pierre",
-      "lastname": "Enjalbert"
+      "lastname": "Enjalbert",
+      "thumb_path": null
+
     },
     {
       "id": 1,
       "firstname": "Rob",
-      "lastname": "Vasseur"
+      "lastname": "Vasseur",
+      "thumb_path": null
+
     }
   ]
 }

@@ -98,7 +98,7 @@ class MessagesController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.chatrooms('participants')
   def participants
-    query = "volunteers.id, volunteers.firstname, volunteers.lastname"
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.thumb_path"
     render :json => create_response(Volunteer.joins(:chatroom_volunteers)
                                       .where(chatroom_volunteers: { chatroom_id: @chatroom.id })
                                       .select(query))
