@@ -1,10 +1,15 @@
 require 'em-websocket'
 require 'pg'
+require 'daemons'
 
 Daemons.daemonize
 
 sEND_MSG_CARITATHELP = "MCJORR982-ZJHFfe541wxcvbpoizin23231598765185479531dezrjnjhjkae94g41zz4r8g416g5t4eg6io4iop4lkyy4zzefdf"
 nOTIF_CARITATHELP = "JDEje9578efr9zeUPAMD65"
+
+db_name = "pg_test_development"
+db_user = "robin"
+db_password = "caritathelp1324"
 
 @channels_list = Hash.new
 
@@ -30,9 +35,9 @@ EventMachine.run do
           # if array[0].eql?(ENV['SEND_MSG_CARITATHELP'])
           if array[0].eql?(sEND_MSG_CARITATHELP)
             if connection.eql? nil
-              connection = PG.connect :dbname => 'pg_test_development',
-              :user => 'robin',
-              :password => 'root'
+              connection = PG.connect :dbname => db_name,
+              :user => db_user,
+              :password => db_password
             end
 
             array.shift
@@ -62,9 +67,9 @@ EventMachine.run do
           # elsif array[0].eql?(ENV['NOTIF_CARITATHELP'])
           elsif array[0].eql?(nOTIF_CARITATHELP)
             if connection.eql? nil
-              connection = PG.connect :dbname => 'pg_test_development',
-              :user => 'robin',
-              :password => 'root'
+              connection = PG.connect :dbname => db_name,
+              :user => db_user,
+              :password => db_password
             end
 
             # depop NOTIF_CARITATHELP
@@ -129,9 +134,9 @@ EventMachine.run do
             # and the next word should be the token
           elsif array[0].eql?('token')
             if connection.eql? nil
-              connection = PG.connect :dbname => 'pg_test_development',
-              :user => 'robin',
-              :password => 'root'
+              connection = PG.connect :dbname => db_name,
+              :user => db_user,
+              :password => db_password
             end
             
             # on connection, get the user refered by the provided token
