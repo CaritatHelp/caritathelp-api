@@ -10,6 +10,13 @@
 	<![endif]-->
 </head>
 <body data-spy="scroll" data-target="#scrollspy">
+	<div id="scrollspy" class="top-nav">
+		<ul class="nav list-group">
+			<% @doc[:resources].sort_by(&:first).each do |key, api| %>
+				<li class="list-group-item"><a href="#<%= api[:name].downcase %>"><%= api[:name] %></a></li>
+			<% end %>
+		</ul>
+	</div>
 	<div class='container' id='container'>
 		<div class="row">
 		<div class="logo">

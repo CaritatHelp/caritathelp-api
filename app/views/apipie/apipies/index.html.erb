@@ -8,14 +8,6 @@
 	<% end %>
 </ul>
 
-<div id="scrollspy" class="left-fixed">
-	<ul class="nav nav-stacked list-group">
-		<% @doc[:resources].sort_by(&:first).each do |key, api| %>
-			<li class="list-group-item"><a href="#<%= api[:name].downcase %>"><%= api[:name] %></a></li>
-		<% end %>
-	</ul>
-</div>
-
 <%#<div><%= raw @doc[:info] %/></div> %>
 
 <%#<h1 class='page-header'><%= t('apipie.resources') %/></h1> %>
