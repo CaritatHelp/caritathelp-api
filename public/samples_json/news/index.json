@@ -6,32 +6,30 @@ localhost:3000/news?token=6H5_pvZSf5fkxI5d4ztR-Q
   "status": 200,
   "message": "ok",
   "response": {
-    "news": [
       {
-        "type": "New::Event::Status",
-        "object": {
+         "type": "New::Event::Status",
           "id": 7,
           "event_id": 1,
+          "assoc_id": null,
+          "volunteer_id": null,
           "content": "Status de l'event 2"
-        }
       },
       {
-        "type": "New::Assoc::Status",
-        "object": {
+         "type": "New::Assoc::Status",
           "id": 5,
+          "event_id": null,
           "assoc_id": 1,
+          "volunteer_id": null,
           "content": "Status de l'asso"
-        }
       },
       {
-        "type": "New::Event::Status",
-        "object": {
+         "type": "New::Event::Status",
           "id": 6,
           "event_id": 1,
+          "assoc_id": null,
+          "volunteer_id": null,
           "content": "Status de l'event"
-        }
       }
-    ]
   }
 }
 

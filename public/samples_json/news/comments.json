@@ -1,0 +1,34 @@
+SUCCESS =>
+
+http://localhost:3000/news/3/comments?token=QffPns6Dc7NvmG29nGZtbw
+
+{
+    status: 200,
+    message: "ok",
+    response: [
+	{
+	    id: 1,
+	    volunteer_id: 1,
+	    new_id: 3,
+	    content: "lol"
+	}
+    ]
+}
+
+FAILURE =>
+
+http://localhost:3000/news/999/comments?token=QffPns6Dc7NvmG29nGZtbw
+
+{
+    status: 400,
+    message: "Unknown new id",
+    response: null
+}
+
+http://localhost:3000/news/3/comments?token=zob
+
+{
+    status: 400,
+    message: "Wrong token",
+    response: null
+}

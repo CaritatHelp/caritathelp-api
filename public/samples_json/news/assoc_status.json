@@ -6,12 +6,16 @@ localhost:3000/news/assoc_status?token=6H5_pvZSf5fkxI5d4ztR-Q&content=Status de 
   "status": 200,
   "message": "ok",
   "response": {
-    "type": "New::Assoc::Status",
-    "object": {
-      "id": 7,
-      "assoc_id": 1,
-      "content": "Status de l assoc"
-    }
+    "id": 10,
+    "assoc_id": 1,
+    "event_id": null,
+    "volunteer_id": null,
+    "friend_id": null,
+    "title": null,
+    "content": "lel",
+    "created_at": "2016-06-23T13:13:50.683+02:00",
+    "updated_at": "2016-06-23T13:13:50.683+02:00",
+    "type": "New::Assoc::Status"
   }
 }
 

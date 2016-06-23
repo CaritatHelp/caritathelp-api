@@ -18,6 +18,7 @@ localhost:3000/volunteers/2?token=J2ykGbCW50k924rQeFWmlw
     "allowgps": false,
     "allow_notifications": false
     "friendship": 'true' // can be 'false' if not friend, and 'yourself' if you're on your own profil
+    "thumb_path": "/uploads/picture/picture_path/1/thumb_1466502907_yolo.jpg"
   }
 }
 

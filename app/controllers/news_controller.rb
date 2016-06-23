@@ -14,13 +14,12 @@ class NewsController < ApplicationController
   def index
     fields = "new_news.type, new_news.id, new_news.assoc_id, new_news.event_id, new_news.volunteer_id, new_news.content"
 
-    query = "(SELECT " + fields + " FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = ?) UNION " +
-      "(SELECT " + fields + " FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = ?) UNION " +
-      "(SELECT " + fields + " FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = ?) UNION " +
+    query = "(SELECT " + fields + " FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = #{@volunteer.id}) UNION " +
+      "(SELECT " + fields + " FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = #{@volunteer.id}) UNION " +
+      "(SELECT " + fields + " FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = #{@volunteer.id}) UNION " +
       "(SELECT " + fields + " FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id})"
 
-    news = New::New.find_by_sql([query, @volunteer.id, @volunteer.id, @volunteer.id]).map(&:complete_description)
-    render :json => create_response(news)
+    render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :POST, '/news/volunteer_status', 'Create a new status for the volunteer'
@@ -31,7 +30,7 @@ class NewsController < ApplicationController
     begin
       new_status = New::Volunteer::Status.create!(content: params[:content],
                                                   volunteer_id: @volunteer.id)
-      render :json => create_response(new_status.complete_description)
+      render :json => create_response(new_status.as_json.merge('type' => new_status.type))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -46,7 +45,7 @@ class NewsController < ApplicationController
     begin
       new_status = New::Assoc::Status.create!(content: params[:content],
                                               assoc_id: @assoc.id)
-      render :json => create_response(new_status.complete_description)
+      render :json => create_response(new_status.as_json.merge('type' => new_status.type))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -61,7 +60,7 @@ class NewsController < ApplicationController
     begin
       new_status = New::Event::Status.create!(content: params[:content],
                                               event_id: @event.id)
-      render :json => create_response(new_status.complete_description)
+      render :json => create_response(new_status.as_json.merge('type' => new_status.type))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -71,7 +70,7 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('show')
   def show
-    render :json => create_response(@new.complete_description)
+    render :json => create_response(@new)
   end
 
   api :GET, '/news/:id/comments', 'Get comments of the new'
@@ -83,7 +82,7 @@ class NewsController < ApplicationController
     Comment.where(new_id: @new.id).each do |comment|
       comments.push comment.complete_description
     end
-    render :json => create_response({'comments' => comments})
+    render :json => create_response(comments)
   end
 
   private
