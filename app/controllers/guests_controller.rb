@@ -104,7 +104,7 @@ class GuestsController < ApplicationController
                                       ])
       end
 
-      send_notif_to_socket(notif[0]['id'])
+      send_notif_to_socket(notif[0])
       
       render :json => create_response(nil, 200, t("events.success.join_event"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -136,7 +136,7 @@ class GuestsController < ApplicationController
       if acceptance != nil
         @notif.notif_type = 'NewGuest'
         @notif.save!
-        send_notif_to_socket(@notif.id)
+        send_notif_to_socket(@notif)
       end
       
       if acceptance.eql? 'true'
@@ -179,7 +179,7 @@ class GuestsController < ApplicationController
       # create a notification for volunteer receiving invitation
       notif = Notification.create!(create_invite_guest)
 
-      send_notif_to_socket(notif[0]['id'])
+      send_notif_to_socket(notif[0])
       
       render :json => create_response(nil, 200, t("events.success.invite_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e

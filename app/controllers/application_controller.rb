@@ -45,11 +45,35 @@ class ApplicationController < ActionController::Base
     {:status => status, :message => message, :response => nil}
   end
 
-  def send_notif_to_socket(notification_id)
+  def send_notif_to_socket(notification)
     begin
-      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" + Rails.application.config.port_websocket) do |ws|
+      concerned_volunteers = Volunteer.joins(:notification_volunteers)
+        .where(notification_volunteers: { notification_id: notification.id })
+        .select("volunteers.id, volunteers.token").all
+
+      if concerned_volunteers.empty?
+        concerned_volunteers = Volunteer.where(id: notification.receiver_id)
+          .select("volunteers.id, volunteers.token").all
+      end
+
+      json_msg = {
+        token: ENV['NOTIF_CARITATHELP'],
+        sender_id: notification.sender_id,
+        receiver_id: notification.receiver_id,
+        assoc_id: notification.assoc_id,
+        event_id: notification.event_id,
+        notif_type: notification.notif_type,
+        assoc_name: notification.assoc_name,
+        event_name: notification.event_name,
+        sender_name: notification.sender_name,
+        receiver_name: notification.receiver_name,
+        concerned_volunteers: concerned_volunteers
+      }.to_json
+
+      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" +
+                                        Rails.application.config.port_websocket.to_s) do |ws|
         ws.on :open do
-          ws.send("#{ENV['NOTIF_CARITATHELP']} #{notification_id}")
+          ws.send(json_msg)
           ws.close
         end
       end

@@ -172,7 +172,7 @@ class MessagesController < ApplicationController
       @chatroom.number_messages += 1
       @chatroom.save!
 
-      send_msg_to_socket(message, @chatroom.id, @volunteer.firstname)
+      send_msg_to_socket(message, @chatroom.id, @volunteer)
 
       render :json => create_response(message)
     rescue => e
@@ -270,11 +270,25 @@ class MessagesController < ApplicationController
     end
   end
 
-  def send_msg_to_socket(message, chatroom_id, volunteer_name)
+  def send_msg_to_socket(message, chatroom_id, volunteer)
     begin
-      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" + Rails.application.config.port_websocket) do |ws|
+      concerned_volunteers = Volunteer.joins(:chatroom_volunteers)
+        .where(chatroom_volunteers: { chatroom_id: chatroom_id })
+        .select("volunteers.id, volunteers.token").all
+
+      json_msg = {
+        token: ENV['SEND_MSG_CARITATHELP'],
+        chatroom_id: chatroom_id,
+        sender_firstname: volunteer.firstname,
+        sender_lastname: volunteer.lastname,
+        content: message[0]['content'],
+        concerned_volunteers: concerned_volunteers
+      }.to_json
+
+      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" +
+                                        Rails.application.config.port_websocket.to_s) do |ws|
         ws.on :open do
-          ws.send("#{ENV['SEND_MSG_CARITATHELP']} #{chatroom_id} #{volunteer_name}: #{message[0]['content']}")
+          ws.send(json_msg)
           ws.close
         end
       end

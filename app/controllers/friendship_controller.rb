@@ -34,7 +34,7 @@ class FriendshipController < ApplicationController
       
       notif = Notification.create!(create_add_friend)
 
-      send_notif_to_socket(notif[0]['id'])
+      send_notif_to_socket(notif[0])
 
       render :json => create_response(nil, 200, t("notifications.success.invitefriend"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e

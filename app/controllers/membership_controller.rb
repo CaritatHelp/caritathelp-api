@@ -99,7 +99,7 @@ class MembershipController < ApplicationController
                                       ])
       end
 
-      send_notif_to_socket(notif[0]['id'])
+      send_notif_to_socket(notif[0])
       
       render :json => create_response(nil, 200, t("notifications.success.joinassoc"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -130,7 +130,7 @@ class MembershipController < ApplicationController
       if acceptance != nil
         @notif.notif_type = 'NewMember'
         @notif.save!
-        send_notif_to_socket(@notif.id)
+        send_notif_to_socket(@notif)
       end
       
       if acceptance.eql? 'true'
@@ -173,7 +173,7 @@ class MembershipController < ApplicationController
       # create a notification for volunteer receiving invitation
       notif = Notification.create!(create_invite_member)
       
-      send_notif_to_socket(notif[0]['id'])
+      send_notif_to_socket(notif[0])
 
       render :json => create_response(nil, 200, t("notifications.success.invitemember"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
