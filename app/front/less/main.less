@@ -47,7 +47,24 @@ body {
 			&:hover {background-color: transparent;}
 		}
 	}
+	#toggle-menu {display: none;}
 	&>li>a {&:focus, &:hover {outline: none;}}
+}
+
+@media (max-width: 991px) {
+	.top-nav {
+		width: auto;
+		ul {
+			flex-direction: column;
+			width: auto;
+		}
+		#toggle-menu {
+			display: block;
+			padding: 10px 35px;
+			font-weight: bold;
+			color: #2196f3;
+		}
+	}
 }
 
 .panel-heading {
