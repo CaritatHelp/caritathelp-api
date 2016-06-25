@@ -7,6 +7,14 @@
 	</li>
 	<% end %>
 </ul>
+<div id="scrollspy" class="top-nav">
+	<ul class="nav list-group">
+			<li id="toggle-menu" class="list-group-item">Menu</li>
+		<% @doc[:resources].sort_by(&:first).each do |key, api| %>
+			<li class="list-group-item"><a href="#<%= api[:name].downcase %>"><%= api[:name] %></a></li>
+		<% end %>
+	</ul>
+</div>
 
 <%#<div><%= raw @doc[:info] %/></div> %>
 
