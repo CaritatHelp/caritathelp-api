@@ -5,6 +5,8 @@ class Volunteer < ActiveRecord::Base
   has_many :notifications, through: :notification_volunteers
   has_many :notification_volunteers
 
+  has_many :comments
+
   has_and_belongs_to_many :assocs, join_table: :av_links
   has_many :av_links
 

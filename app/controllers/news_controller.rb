@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 class NewsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
@@ -84,12 +83,10 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('comments')
   def comments
-    # voir à faire des associations
-    comments = []
-    Comment.where(new_id: @new.id).each do |comment|
-      comments.push comment.complete_description
-    end
-    render :json => create_response(comments)
+    render :json => create_response(Comment
+                                      .joins('INNER JOIN volunteers ON comments.volunteer_id=volunteers.id')
+                                      .where(new_id: @new.id)
+                                      .select('comments.*', :firstname, :lastname, :thumb_path))
   end
 
   private
