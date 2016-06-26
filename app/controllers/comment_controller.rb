@@ -79,12 +79,16 @@ class CommentController < ApplicationController
   end
 
   def check_rights
-    if ((!@new.assoc_id.eql?(nil) and AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).first.nil?) or (!@new.event_id.eql?(nil) and EventVolunteer.where(event_id: @new.event_id)
-                                                                                                                                 .where(volunteer_id: @volunteer.id).first.nil?) or (!@new.volunteer_id.eql?(nil) and VFriend.where(friend_volunteer_id: @new.volunteer_id)
-                                                                                                                                                                                       .where(volunteer_id: @volunteer.id).first.nil?))
-      render :json => create_error(400, t("comments.failure.rights"))
-      return false
+    # can't put several conditions on multiples lines? SyntaxError
+    is_assoc_concerned = (!@new.assoc_id.eql?(nil) && AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).present?)
+    is_event_concerned = (!@new.event_id.eql?(nil) && EventVolunteer.where(event_id: @new.event_id).where(volunteer_id: @volunteer.id).present?)
+    is_friend_concerned = (!@new.volunteer_id.eql?(nil) && VFriend.where(friend_volunteer_id: @new.volunteer_id).where(volunteer_id: @volunteer.id).present?)
+    is_himself = @new.volunteer_id.eql?(@volunteer.id)
+    
+    if is_assoc_concerned or is_event_concerned or is_friend_concerned or is_himself
+      return true
     end
-    return true
+    render :json => create_error(400, t("comments.failure.rights"))
+    return false
   end
 end
