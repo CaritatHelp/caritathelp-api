@@ -21,6 +21,7 @@ class Volunteer < ActiveRecord::Base
 
   before_create :generate_token
   before_create :set_default_picture
+  before_create :set_fullname
   
   validates :mail, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
   validates :password, presence: true, format: { with: VALID_PWD_REGEX }, :on => :create
@@ -47,6 +48,10 @@ class Volunteer < ActiveRecord::Base
     elsif self.thumb_path.eql?(nil)
       self.thumb_path = Rails.application.config.default_thumb_male
     end
+  end
+
+  def set_fullname
+    self.fullname = self.firstname + " " + self.lastname
   end
 
   def password= value

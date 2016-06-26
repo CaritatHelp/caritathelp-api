@@ -13,6 +13,7 @@ localhost:3000/news?token=6H5_pvZSf5fkxI5d4ztR-Q
           "assoc_id": null,
           "volunteer_id": null,
           "content": "Status de l'event 2"
+	  "sender_name": "Soignage de gens"
       },
       {
          "type": "New::Assoc::Status",
@@ -21,6 +22,7 @@ localhost:3000/news?token=6H5_pvZSf5fkxI5d4ztR-Q
           "assoc_id": 1,
           "volunteer_id": null,
           "content": "Status de l'asso"
+	  "sender_name": "Croix verte"
       },
       {
          "type": "New::Event::Status",
@@ -29,6 +31,7 @@ localhost:3000/news?token=6H5_pvZSf5fkxI5d4ztR-Q
           "assoc_id": null,
           "volunteer_id": null,
           "content": "Status de l'event"
+	  "sender_name": "Soignage de gens"
       }
   }
 }
