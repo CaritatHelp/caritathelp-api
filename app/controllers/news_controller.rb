@@ -12,7 +12,7 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('index')
   def index
-    fields = "new_news.type, new_news.id, new_news.assoc_id, new_news.event_id, new_news.volunteer_id, new_news.content, "
+    fields = "new_news.type, new_news.id, new_news.assoc_id, new_news.event_id, new_news.volunteer_id, new_news.content, new_news.created_at, new_news.updated_at, "
 
     query = "(SELECT " + fields + "(SELECT title FROM events WHERE events.id=new_news.event_id) AS sender_name " +
       "FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = #{@volunteer.id}) UNION " +
@@ -77,7 +77,7 @@ class NewsController < ApplicationController
     name = Assoc.where(id: @new.assoc_id).select('name').first['name'] unless @new.assoc_id.nil?
     name = Event.where(id: @new.event_id).select('title').first['title'] unless @new.event_id.nil?
     name = Volunteer.where(id: @new.volunteer_id).select('fullname').first['fullname'] unless @new.volunteer_id.nil?
-    render :json => create_response(@new.as_json.merge(sender_name: name))
+    render :json => create_response(@new.as_json.merge(sender_name: name, type: @new.type))
   end
 
   api :GET, '/news/:id/comments', 'Get comments of the new'
