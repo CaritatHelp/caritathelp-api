@@ -1,11 +1,55 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
+  id: 1
   assoc_id: 1
   volunteer_id: 1
-  rights: MyString
+  rights: "owner"
 
 two:
+  id: 2
+  assoc_id: 1
+  volunteer_id: 2
+  rights: "admin"
+
+three:
+  id: 3
+  assoc_id: 1
+  volunteer_id: 3
+  rights: "admin"
+
+four:
+  id: 4
+  assoc_id: 1
+  volunteer_id: 4
+  rights: "member"
+
+five:
+  id: 5
+  assoc_id: 1
+  volunteer_id: 5
+  rights: "member"
+
+six:
+  id: 6
+  assoc_id: 1
+  volunteer_id: 6
+  rights: "member"
+
+seven:
+  id: 7
   assoc_id: 2
   volunteer_id: 1
-  rights: MyString
+  rights: "member"
+
+eight:
+  id: 8
+  assoc_id: 2
+  volunteer_id: 2
+  rights: "owner"
+
+nine:
+  id: 9
+  assoc_id: 2
+  volunteer_id: 3
+  rights: "admin"

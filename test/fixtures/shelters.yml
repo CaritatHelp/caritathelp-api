@@ -1,0 +1,45 @@
+one:
+  id: 1
+  name: "Super shelter de la mort"
+  address: "Rue du swag"
+  zipcode: 75000
+  city: "Paris"
+  total_places: 200
+  free_places: 150
+
+two:
+  id: 2
+  name: "Shelter de la mort"
+  address: "Rue du swag"
+  zipcode: 75000
+  city: "Paris"
+  total_places: 200
+  free_places: 150
+
+three:
+  id: 3
+  name: "Auberge de jeunesse"
+  address: "Rue du swag"
+  zipcode: 75000
+  city: "Paris"
+  total_places: 200
+  free_places: 150
+
+four:
+  id: 4
+  name: "Shelter du swag"
+  address: "Rue du swag"
+  zipcode: 75000
+  city: "Paris"
+  total_places: 200
+  free_places: 150
+
+five:
+  id: 5
+  name: "Auberge de vieillesse"
+  address: "Rue du swag"
+  zipcode: 75000
+  city: "Paris"
+  total_places: 200
+  free_places: 150
+

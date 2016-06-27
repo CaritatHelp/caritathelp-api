@@ -14,8 +14,8 @@ class VFriendTest < ActiveSupport::TestCase
 
   test "vfriend creation with good params" do
     link = VFriend.new
-    link.current_volunteer_id = 1
-    link.friend_volunteer_id = 1
+    link.volunteer_id = 1
+    link.friend_volunteer_id = 6
     assert link.save
   end
 end

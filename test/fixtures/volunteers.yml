@@ -2,40 +2,48 @@
 
 one:
   id: 1
-  firstname: "robin"
-  lastname: "vasseur"
+  firstname: "Robin"
+  lastname: "Vasseur"
   mail: "robin@root.com"
   token: "tokenrobin"
   password: "root"
 
 two:
   id: 2
-  firstname: "nicolas"
-  lastname: "temenides"
+  firstname: "Nicolas"
+  lastname: "Temenides"
   mail: "nicolas@root.com"
   token: "tokennicolas"
   password: "root"
 
 three:
   id: 3
-  firstname: "pierre"
-  lastname: "enjalbert"
+  firstname: "Pierre"
+  lastname: "Enjalbert"
   mail: "pierre@root.com"
   token: "tokenpierre"
   password: "root"
 
 four:
   id: 4
-  firstname: "jeremy"
-  lastname: "gros"
+  firstname: "Jeremy"
+  lastname: "Gros"
   mail: "jeremy@root.com"
   token: "tokenjeremy"
   password: "root"
 
 five:
   id: 5
-  firstname: "aude"
-  lastname: "sikorav"
+  firstname: "Aude"
+  lastname: "Sikorav"
   mail: "aude@root.com"
   token: "tokenaude"
+  password: "root"
+
+six:
+  id: 6
+  firstname: "Jerome"
+  lastname: "Caudoux"
+  mail: "jerome@root.com"
+  token: "tokenjerome"
   password: "root"

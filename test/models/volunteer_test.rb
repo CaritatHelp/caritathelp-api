@@ -56,13 +56,4 @@ class VolunteerTest < ActiveSupport::TestCase
     assert_not volunteer.save
   end
 
-  # test "volunteer creation with invalid password" do
-  #   volunteer = Volunteer.new
-  #   volunteer.mail = "test@test.com"
-  #   volunteer.password = "test"
-  #   volunteer.firstname = "rob"
-  #   volunteer.lastname = "root"
-  #   assert_not volunteer.save, "Password should be invalid"
-  # end
-
 end
