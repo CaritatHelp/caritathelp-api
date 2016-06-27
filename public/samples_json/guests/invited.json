@@ -1,0 +1,44 @@
+SUCCESS =>
+
+localhost:3000/guests/invited?token=v19Zrf9td4KkhFvmD6w6FA&event_id=1
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 4,
+      "mail": "jeremy@root.com",
+      "firstname": "Jeremy",
+      "lastname": "Gros",
+      "birthday": null,
+      "gender": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "allowgps": false,
+      "allow_notifications": null,
+      "thumb_path": "/uploads/picture/default_m.png",
+      "fullname": "Jeremy Gros"
+      "sending_date": "2016-06-26T17:59:21.207+02:00",
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/guests/invited?token=other_token&event_id=1
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/guests/invited?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

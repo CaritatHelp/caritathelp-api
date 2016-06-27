@@ -41,6 +41,9 @@ Rails.application.routes.draw do
   end
 
   scope 'membership' do
+    get '/invited', to: 'membership#invited'
+    get '/waiting', to: 'membership#waiting'
+
     post '/join', to: 'membership#join_assoc'
     post '/reply_member', to: 'membership#reply_member'
     post '/invite', to: 'membership#invite'
@@ -50,6 +53,7 @@ Rails.application.routes.draw do
 
     delete '/kick', to: 'membership#kick'
     delete '/leave', to: 'membership#leave_assoc'
+    delete '/uninvite', to: 'membership#uninvite'
   end
 
   scope '/volunteers' do
@@ -112,6 +116,9 @@ Rails.application.routes.draw do
   end
 
   scope '/guests' do
+    get '/invited', to: 'guests#invited'
+    get '/waiting', to: 'guests#waiting'
+    
     post '/join', to: 'guests#join'
     post '/reply_guest', to: 'guests#reply_guest'
     post '/invite', to: 'guests#invite'
@@ -121,6 +128,7 @@ Rails.application.routes.draw do
 
     delete '/kick', to: 'guests#kick'    
     delete '/leave', to: 'guests#leave_event'
+    delete '/uninvite', to: 'guests#uninvite'
   end
 
   scope '/chatrooms' do

@@ -1,9 +1,9 @@
 class GuestsController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
-  before_action :set_event, except: [:reply_invite, :reply_guest]
   before_action :set_volunteer
-  before_action :check_rights, only: [:kick, :upgrade]
+  before_action :set_event, except: [:reply_invite, :reply_guest]
+  before_action :check_rights, except: [:join, :reply_invite, :leave_event]
 
   api :DELETE, '/guests/kick', "Kick guest from the event"
   param :token, String, "Your token", :required => true
@@ -246,6 +246,59 @@ class GuestsController < ApplicationController
     end
   end
 
+  api :GET, 'guests/invited', "List all invited volunteers"
+  param :token, String, "Your token", :required => true
+  param :event_id, String, "Id of the event", :required => true
+  example SampleJson.guests('invited')
+  def invited
+    invited_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.receiver_id=volunteers.id")
+      .where("notifications.notif_type='InviteGuest'")
+      .where("notifications.event_id=#{@event.id}")
+      .select("volunteers.*, notifications.created_at AS sending_date")
+    render :json => create_response(invited_volunteers
+                                      .as_json(except: [:token, :password,
+                                                       :created_at, :updated_at]))
+  end
+
+  api :DELETE, 'guests/uninvite', "Remove invitation to volunteer"
+  param :token, String, "Your token", :required => true
+  param :event_id, String, "Id of the event", :required => true
+  param :volunteer_id, String, "Id of the volunteer to uninvite", :required => true
+  example SampleJson.guests('uninvite')
+  def uninvite
+    begin
+      @to_uninvite = Volunteer.find_by!(id: params[:volunteer_id])
+      
+      notif = Notification.where(notif_type: "InviteGuest")
+        .where(event_id: @event.id)
+        .where(receiver_id: @to_uninvite.id).first
+      
+      if notif.blank?
+        render :json => create_error(400, t("events.failure.uninvite")) and return
+      end
+
+      notif.destroy 
+      
+      render :json => create_response(t("events.success.uninvited"))
+    rescue => e
+      render :json => create_error(400, e.to_s)
+    end
+  end
+
+  api :GET, 'guests/waiting', "List all volunteers waiting to join the event"
+  param :token, String, "Your token", :required => true
+  param :event_id, String, "Id of the event", :required => true
+  example SampleJson.guests('waiting')
+  def waiting
+    waiting_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
+      .where("notifications.notif_type='JoinEvent'")
+      .where("notifications.event_id=#{@event.id}")
+      .select("volunteers.*, notifications.created_at AS sending_date")
+    render :json => create_response(waiting_volunteers
+                                      .as_json(except: [:token, :password,
+                                                        :created_at, :updated_at]))
+  end
+
   private
   def join_params
     params.permit(:token)
@@ -269,7 +322,7 @@ class GuestsController < ApplicationController
 
   def create_join_event
     [sender_id: @volunteer.id,
-     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
+     sender_name: @volunteer.fullname,
      event_id: @event.id,
      event_name: @event.title,
      notif_type: 'JoinEvent']
@@ -279,9 +332,9 @@ class GuestsController < ApplicationController
     [event_id: @event.id,
      event_name: @event.title,
      sender_id: @volunteer.id,
-     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
+     sender_name: @volunteer.fullname,
      receiver_id: @invited_vol.id,
-     receiver_name: @invited_vol.firstname + " " + @invited_vol.lastname,
+     receiver_name: @invited_vol.fullname,
      notif_type: 'InviteGuest']
   end
 

@@ -1,0 +1,44 @@
+SUCCESS =>
+
+localhost:3000/guests/waiting?token=v19Zrf9td4KkhFvmD6w6FA&event_id=1
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 6,
+      "mail": "jerome@root.com",
+      "firstname": "Jerome",
+      "lastname": "Caudoux",
+      "birthday": null,
+      "gender": null,
+      "city": null,
+      "latitude": null,
+      "longitude": null,
+      "allowgps": false,
+      "allow_notifications": null,
+      "thumb_path": "/uploads/picture/default_m.png",
+      "fullname": "Jerome Caudoux",
+      "sending_date": "2016-06-27T12:09:57.813Z"
+    }
+  ]
+}
+
+FAILURE =>
+
+localhost:3000/guests/waiting?token=other_token&event_id=1
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/guests/waiting?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}

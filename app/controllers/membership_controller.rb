@@ -3,7 +3,7 @@ class MembershipController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_assoc, except: [:reply_member, :reply_invite]
-  before_action :check_rights, only: [:kick, :upgrade]
+  before_action :check_rights, except: [:join_assoc, :reply_invite, :leave_assoc]
 
   api :DELETE, '/membership/kick', "Kick member from the association"
   param :token, String, "Your token", :required => true
@@ -115,13 +115,7 @@ class MembershipController < ApplicationController
   def reply_member
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
-      
-      # Check the rights of the person who's trying to accept a member
-      tmp = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @notif.assoc_id).first
-      if ((tmp.eql? nil) || (tmp.rights.eql? 'member'))
-        render :json => create_error(400, t("notifications.failure.rights")) and return
-      end
-      
+            
       member_id = @notif.sender_id
       assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
@@ -151,13 +145,7 @@ class MembershipController < ApplicationController
   def invite
     begin
       @invited_vol = Volunteer.find_by!(id: params[:volunteer_id])
-      
-      # Check if @volunteer has the permission to invite a member in assoc
-      tmp = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
-      if ((tmp.eql? nil) || (tmp.rights.eql? 'member'))
-        render :json => create_error(400, t("notifications.failure.rights")) and return
-      end      
-      
+            
       # Check if invited_member is already member or if already applied
       if ((AvLink.where(volunteer_id: @invited_vol.id)
              .where(assoc_id: @assoc.id).first != nil) ||
@@ -237,6 +225,59 @@ class MembershipController < ApplicationController
     end
   end
 
+  api :GET, 'membership/invited', "List all invited volunteers"
+  param :token, String, "Your token", :required => true
+  param :assoc_id, String, "Id of the association", :required => true
+  example SampleJson.membership('invited')
+  def invited
+    invited_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.receiver_id=volunteers.id")
+      .where("notifications.notif_type='InviteMember'")
+      .where("notifications.assoc_id=#{@assoc.id}")
+      .select("volunteers.*, notifications.created_at AS sending_date")
+    render :json => create_response(invited_volunteers
+                                      .as_json(except: [:token, :password,
+                                                       :created_at, :updated_at]))
+  end
+
+  api :DELETE, 'membership/uninvite', "Remove invitation to volunteer"
+  param :token, String, "Your token", :required => true
+  param :assoc_id, String, "Id of the association", :required => true
+  param :volunteer_id, String, "Id of the volunteer to uninvite", :required => true
+  example SampleJson.membership('uninvite')
+  def uninvite
+    begin
+      @to_uninvite = Volunteer.find_by!(id: params[:volunteer_id])
+      
+      notif = Notification.where(notif_type: "InviteMember")
+        .where(assoc_id: @assoc.id)
+        .where(receiver_id: @to_uninvite.id).first
+      
+      if notif.blank?
+        render :json => create_error(400, t("assocs.failure.uninvite")) and return
+      end
+
+      notif.destroy 
+      
+      render :json => create_response(t("assocs.success.uninvited"))
+    rescue => e
+      render :json => create_error(400, e.to_s)
+    end
+  end
+
+  api :GET, 'membership/waiting', "List all volunteers waiting to join the assoc"
+  param :token, String, "Your token", :required => true
+  param :assoc_id, String, "Id of the association", :required => true
+  example SampleJson.membership('waiting')
+  def waiting
+    waiting_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
+      .where("notifications.notif_type='JoinAssoc'")
+      .where("notifications.assoc_id=#{@assoc.id}")
+      .select("volunteers.*, notifications.created_at AS sending_date")
+    render :json => create_response(waiting_volunteers
+                                      .as_json(except: [:token, :password,
+                                                        :created_at, :updated_at]))
+  end
+
   private
   def join_params
     params.permit(:token)
@@ -244,7 +285,7 @@ class MembershipController < ApplicationController
 
   def create_join_assoc
     [sender_id: @volunteer.id,
-     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
+     sender_name: @volunteer.fullname,
      assoc_id: @assoc.id,
      assoc_name: @assoc.name,
      notif_type: 'JoinAssoc']
@@ -254,9 +295,9 @@ class MembershipController < ApplicationController
     [assoc_id: @assoc.id,
      assoc_name: @assoc.name,
      sender_id: @volunteer.id,
-     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
+     sender_name: @volunteer.fullname,
      receiver_id: @invited_vol.id,
-     receiver_name: @inviter_vol.firstname + " " + @invited_vol.lastname,
+     receiver_name: @invited_vol.fullname,
      notif_type: 'InviteMember']
   end
 

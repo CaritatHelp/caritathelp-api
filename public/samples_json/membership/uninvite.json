@@ -1,0 +1,50 @@
+SUCCESS =>
+
+localhost:3000/membership/uninvite?token=gwxQnT63cNrrZHE5VTUqMg&assoc_id=2&volunteer_id=4
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": "Volunteer successfuly uninvited"
+}
+
+FAILURE =>
+
+localhost:3000/membership/uninvite?token=gwxQnT63cNrrZHE5VTUqMg&assoc_id=2&volunteer_id=4
+
+{
+  "status": 400,
+  "message": "No such invitation",
+  "response": null
+}
+
+localhost:3000/membership/uninvite?token=gwxQnT63cNrrZHE5VTUqMg&assoc_id=2
+
+{
+  "status": 400,
+  "message": "Couldn't find Volunteer",
+  "response": null
+}
+
+localhost:3000/membership/uninvite?token=gwxQnT63cNrrZHE5VTUqMg
+{
+  "status": 400,
+  "message": "Unknown assoc id",
+  "response": null
+}
+
+localhost:3000/membership/uninvite?token=other_token
+
+{
+  "status": 400,
+  "message": "Permission denied",
+  "response": null
+}
+
+localhost:3000/membership/uninvite?token=zob
+
+{
+  "status": 400,
+  "message": "Wrong token",
+  "response": null
+}
