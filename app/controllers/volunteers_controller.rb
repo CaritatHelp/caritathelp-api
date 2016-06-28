@@ -241,9 +241,12 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('news')
   def news
-    query = "SELECT id, type, volunteer_id, title, content " +
-      "FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id}"
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    news = New::New
+      .where(volunteer_id: @volunteer.id)
+      .select(:id, :type, :volunteer_id, :title, :content)
+      .joins("INNER JOIN volunteers ON volunteers.id=new_news.volunteer_id")
+      .select("volunteers.firstname, volunteers.lastname, volunteers.thumb_path")
+    render :json => create_response(news)
   end
 
   private

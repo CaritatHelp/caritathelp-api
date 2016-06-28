@@ -12,6 +12,9 @@ http://localhost:3000/volunteers/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
 	    volunteer_id: "1",
 	    title: null,
 	    content: "coucou"
+	    firstname: "Robin",
+	    lastname: "Vasseur",
+	    thumb_path: null
 	},
 	{
 	    id: "2",
@@ -19,6 +22,9 @@ http://localhost:3000/volunteers/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
 	    volunteer_id: "1",
 	    title: null,
 	    content: "coucou"
+	    firstname: "Robin",
+	    lastname: "Vasseur",
+	    thumb_path: null
 	}
     ]
 }

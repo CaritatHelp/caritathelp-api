@@ -201,9 +201,12 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('news')
   def news
-    query = "SELECT id, type, assoc_id, title, content " +
-      "FROM new_news WHERE new_news.assoc_id=#{@assoc.id}"
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    news = New::New
+      .where(assoc_id: @assoc.id)
+      .select(:id, :type, :assoc_id, :title, :content)
+      .joins("INNER JOIN assocs ON assocs.id=new_news.assoc_id")
+      .select("assocs.name, assocs.thumb_path")
+    render :json => create_response(news)
   end
 
   private

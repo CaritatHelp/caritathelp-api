@@ -11,18 +11,30 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('index')
   def index
-    fields = "new_news.type, new_news.id, new_news.assoc_id, new_news.event_id, new_news.volunteer_id, new_news.content, new_news.created_at, new_news.updated_at, "
+    news = New::New.select("new_news.*, new_news.type AS notif_type")
+      .select("(SELECT title FROM events WHERE events.id=new_news.event_id) AS event_name")
+      .select("(SELECT thumb_path FROM events WHERE events.id=new_news.event_id) AS event_thumb_path")
+      .select("(SELECT name FROM assocs WHERE assocs.id=new_news.assoc_id) AS assoc_name")
+      .select("(SELECT thumb_path FROM assocs WHERE assocs.id=new_news.assoc_id) AS assoc_thumb_path")
+      .select("(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_name")
+      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path")
+      .joins("LEFT JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id")
+      .joins("LEFT JOIN av_links ON new_news.assoc_id=av_links.assoc_id")
+      .joins("LEFT JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id AND new_news.volunteer_id<>#{@volunteer.id}")
+      .where("event_volunteers.volunteer_id=#{@volunteer.id} OR av_links.volunteer_id=#{@volunteer.id} OR v_friends.friend_volunteer_id=#{@volunteer.id} OR new_news.volunteer_id=#{@volunteer.id}")
+    
+    
+    render :json => create_response(news)
+    # query = "(SELECT new_news.*, (SELECT title FROM events WHERE events.id=new_news.event_id) AS sender_name " +
+    #   "FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = #{@volunteer.id}) UNION " +
+    #   "(SELECT new_news.*, (SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS sender_name " +
+    #   "FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = #{@volunteer.id}) UNION " +
+    #   "(SELECT new_news.*, (SELECT name FROM assocs WHERE assocs.id=new_news.assoc_id) AS sender_name " +
+    #   "FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = #{@volunteer.id}) UNION " +
+    #   "(SELECT new_news.*, (SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS sender_name " +
+    #   "FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id})"
 
-    query = "(SELECT " + fields + "(SELECT title FROM events WHERE events.id=new_news.event_id) AS sender_name " +
-      "FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = #{@volunteer.id}) UNION " +
-      "(SELECT " + fields + "(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS sender_name " +
-      "FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = #{@volunteer.id}) UNION " +
-      "(SELECT " + fields + "(SELECT name FROM assocs WHERE assocs.id=new_news.assoc_id) AS sender_name " +
-      "FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = #{@volunteer.id}) UNION " +
-      "(SELECT " + fields + "(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS sender_name " +
-      "FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id})"
-
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    # render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   api :POST, '/news/volunteer_status', 'Create a new status for the volunteer'

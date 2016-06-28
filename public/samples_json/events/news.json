@@ -12,6 +12,8 @@ http://localhost:3000/events/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
 	    event_id: "1",
 	    title: null,
 	    content: "coucou"
+	    name: "Soignage de gens",
+	    thumb_path: null
 	}
     ]
 }

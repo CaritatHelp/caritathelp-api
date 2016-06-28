@@ -12,6 +12,8 @@ http://localhost:3000/associations/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
 	    assoc_id: "1",
 	    title: null,
 	    content: "coucou"
+	    name: "Croix verte",
+	    thumb_path: null
 	}
     ]
 }
