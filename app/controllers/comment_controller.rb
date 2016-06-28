@@ -13,8 +13,7 @@ class CommentController < ApplicationController
   def create
     begin
       new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
-                                     content: params[:content]])
-      #voir pourquoi je peux pas passer new_comment.complete_description
+                                     content: params[:content]]).first
       render :json => create_response(new_comment)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
