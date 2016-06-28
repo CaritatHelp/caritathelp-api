@@ -21,7 +21,7 @@ class NewsController < ApplicationController
       .joins("LEFT JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id")
       .joins("LEFT JOIN av_links ON new_news.assoc_id=av_links.assoc_id")
       .joins("LEFT JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id AND new_news.volunteer_id<>#{@volunteer.id}")
-      .where("event_volunteers.volunteer_id=#{@volunteer.id} OR av_links.volunteer_id=#{@volunteer.id} OR v_friends.friend_volunteer_id=#{@volunteer.id} OR new_news.volunteer_id=#{@volunteer.id}")
+      .where("event_volunteers.volunteer_id=#{@volunteer.id} OR av_links.volunteer_id=#{@volunteer.id} OR v_friends.friend_volunteer_id=#{@volunteer.id} OR new_news.volunteer_id=#{@volunteer.id}").order(updated_at: :desc)
     
     
     render :json => create_response(news)
