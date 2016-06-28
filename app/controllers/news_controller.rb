@@ -85,10 +85,13 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('show')
   def show
-    name = Assoc.where(id: @new.assoc_id).select('name').first['name'] unless @new.assoc_id.nil?
-    name = Event.where(id: @new.event_id).select('title').first['title'] unless @new.event_id.nil?
-    name = Volunteer.where(id: @new.volunteer_id).select('fullname').first['fullname'] unless @new.volunteer_id.nil?
-    render :json => create_response(@new.as_json.merge(sender_name: name, type: @new.type))
+    infos = Assoc.where(id: @new.assoc_id).select('name, thumb_path').first unless @new.assoc_id.nil?
+    infos = Event.where(id: @new.event_id).select('title, thumb_path').first unless @new.event_id.nil?
+    infos = Volunteer.where(id: @new.volunteer_id).select('fullname, thumb_path').first unless @new.volunteer_id.nil?
+    name = infos['name'] unless @new.assoc_id.nil?
+    name = infos['title'] unless @new.event_id.nil?
+    name = infos['fullname'] unless @new.volunteer_id.nil?
+    render :json => create_response(@new.as_json.merge(sender_name: name, thumb_path: infos['thumb_path'], type: @new.type))
   end
 
   api :GET, '/news/:id/comments', 'Get comments of the new'
