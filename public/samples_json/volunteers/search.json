@@ -2,6 +2,20 @@ SUCCESS => (3 matches for "root root")
 
 localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=de
 
+/*
+  INDICATION VALEURS RIGHTS
+
+  si result_type == Volunteer
+    rights: 0 -> pas ami
+    rights: 1 -> ami
+  si result_type == Assoc
+    rights: "owner"/"admin"/"member"
+    rights: null -> pas du tout dans l'asso
+  si result_type == Event
+    rights: "host"/"admin"/"member"
+    rights: null -> pas du tout dans l'event
+*/
+
 {
   "status": 200,
   "message": "ok",
