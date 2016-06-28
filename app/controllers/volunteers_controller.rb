@@ -75,16 +75,35 @@ class VolunteersController < ApplicationController
         render :json => create_response(@volunteer.as_json(:except => [:password, :token])
                                           .merge('friendship' => 'yourself')) and return
       end
+
+      friendship = 'none'
+
       link = VFriend
         .where(:volunteer_id => @volunteer.id)
         .where(:friend_volunteer_id => @current_volunteer.id).first
+
       if link.eql?(nil)
-        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
-                                          .merge('friendship' => 'false')) and return
+        link = Notification.where(notif_type: 'AddFriend')
+          .where(sender_id: @current_volunteer.id)
+          .where(receiver_id: @volunteer.id)
+          .first
+        if link.eql?(nil)
+          link = Notification.where(notif_type: 'AddFriend')
+            .where(receiver_id: @current_volunteer.id)
+            .where(sender_id: @volunteer.id)
+            .first
+          if !link.eql?(nil)
+            friendship = 'invitation received'
+          end
+        else
+          friendship = 'invitation sent'
+        end
       else
-        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
-                                          .merge('friendship' => 'true')) and return
+        friendship = 'friend'
       end
+      
+      render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+                                        .merge('friendship' => friendship)) and return
     rescue => e
       render :json => create_error(400, e.to_s)
     end

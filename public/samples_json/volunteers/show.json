@@ -2,6 +2,14 @@ SUCCESS =>
 
 localhost:3000/volunteers/2?token=J2ykGbCW50k924rQeFWmlw
 
+/*
+  INFORMATION FRIENDSHIP FIELD
+  - "none" -> pas ami
+  - "friend" -> ami
+  - "invitation sent" -> l'invitation a été envoyée a l'user geté
+  - "invitation received" -> a reçu une invitation de l'user geté
+*/
+
 {
   "status": 200,
   "message": "ok",
@@ -17,7 +25,7 @@ localhost:3000/volunteers/2?token=J2ykGbCW50k924rQeFWmlw
     "longitude": null,
     "allowgps": false,
     "allow_notifications": false
-    "friendship": 'true' // can be 'false' if not friend, and 'yourself' if you're on your own profil
+    "friendship": 'friend'
     "thumb_path": "/uploads/picture/picture_path/1/thumb_1466502907_yolo.jpg"
   }
 }
