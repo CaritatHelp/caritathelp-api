@@ -15,8 +15,9 @@ http://localhost:3000/news/3?token=QffPns6Dc7NvmG29nGZtbw
 	content: "coucou",
 	created_at: "2016-06-21T16:45:44.841+02:00",
 	updated_at: "2016-06-21T16:45:44.841+02:00"
-	sender_name: "Soignage de gens"
-        type: "New::Event::Status",
+	sender_name: "Soignage de gens",
+	thumb_path: null,
+        type: "New::Event::Status"
     }
 }
 
