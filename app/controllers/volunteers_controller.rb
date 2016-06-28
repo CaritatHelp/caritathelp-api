@@ -2,7 +2,7 @@ class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update]
+  before_action :set_current_volunteer, only: [:index, :show, :update, :search]
 
   def_param_group :volunteers_creation do
     param :mail, String, "Your mail address", :required => true
@@ -96,22 +96,39 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('search')
   def search
     begin
-      words = params[:research].split(/\W+/)
-      if words.size > 1
-        condition = "(lower(firstname) LIKE ? AND lower(lastname) LIKE ?) OR (lower(firstname) LIKE ? AND lower(lastname) LIKE ?)"
-        render :json => create_response(Volunteer.select('id, mail, firstname, lastname, birthday, gender, city')
-                                          .where(condition,
-                                                 "#{words[0].downcase}%",
-                                                 "#{words[1].downcase}%",
-                                                 "#{words[1].downcase}%",
-                                                 "#{words[0].downcase}%").limit(10))
-      else
-        condition = "lower(firstname) LIKE ? OR lower(lastname) LIKE ?"
-        render :json => create_response(Volunteer.select('id, mail, firstname, lastname, birthday, gender, city')
-                                          .where(condition,
-                                                 "#{words[0].downcase}%",
-                                                 "#{words[0].downcase}%").limit(10))
+      words = params[:research].downcase.split(/\W+/)
+
+      if words.size > 0
+        condition = "lower(name) LIKE '%#{words[0]}%'"
+
+        words.drop(1).each do |word|
+          condition += " AND lower(name) LIKE '%#{word}%'"
+        end
+
+        assocs = Assoc
+          .select(:id, :name, :thumb_path,
+                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{@current_volunteer.id}) AS rights", "'Assoc' AS result_type")
+          .where(condition)
+        
+        condition = condition.gsub "name", "title"
+        events = Event
+          .select(:id, 'title AS name', :thumb_path,
+                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@current_volunteer.id}) AS rights", "'Event' AS result_type")
+          .where(condition)
+        
+
+        condition = condition.gsub "title", "fullname"
+        volunteers = Volunteer
+          .select(:id, 'fullname AS name', :thumb_path,
+                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{@current_volunteer.id}) AS rights", "'Volunteer' AS result_type")
+          .where(condition)
+
+        result = (assocs + events + volunteers).sort {|a,b| a['name']<=>b['name']}
+        
+        render :json => create_response(result) and return
       end
+
+      render :json => create_error(400, t("volunteers.failure.research"))
     rescue => e
       render :json => create_error(400, t("volunteers.failure.research"))
     end

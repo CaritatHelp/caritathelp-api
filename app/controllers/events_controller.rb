@@ -98,34 +98,6 @@ class EventsController < ApplicationController
     render :json => create_response(@event.as_json.merge('rights' => rights))
   end
 
-  api :GET, '/events/search', "Search for event by its name, return a list of matching events"
-  param :token, String, "Your token", :required => true
-  param :research, String, "Event's name", :required => true
-  param :assoc_id, String, "Assoc's id to get only its events"
-  example SampleJson.events('search')
-  def search
-    begin
-      name = params[:research].downcase
-      assoc_id = params[:assoc_id]
-      if name.length.eql?(0)
-        render :json => create_error(400, t("events.failure.research")) and return
-      end
-      
-      if assoc_id.eql?(nil)
-        query = "lower(title) LIKE ?"
-        render :json => create_response(Event.select('id, title, description, place, begin')
-                                          .where(query, "#{name}%"))
-      else
-        query = "lower(title) LIKE ?"
-        render :json => create_response(Event.select('id, title, description, place, begin')
-                                          .where(:assoc_id => assoc_id)
-                                          .where(query, "#{name}%"))
-      end
-    rescue => e
-      render :json => create_error(400, t("events.failure.research")) and return
-    end
-  end
-
   api :GET, '/events/:id/guests', 'Get a list of all guests'
   param :token, String, "Your token", :required => true
   example SampleJson.events('guests')

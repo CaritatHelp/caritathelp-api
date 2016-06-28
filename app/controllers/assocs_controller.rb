@@ -86,25 +86,6 @@ class AssocsController < ApplicationController
     render :json => create_response(@assoc.as_json.merge('rights' => rights)) and return
   end
 
-  api :GET, '/associations/search', "Search for association by its name, return a list of matching associations"
-  param :token, String, "Your token", :required => true
-  param :research, String, "Association's name", :required => true
-  example SampleJson.assocs('search')
-  def search
-    begin
-      name = params[:research].downcase
-
-      if name.length.eql?(0)
-        render :json => create_error(400, t("assocs.failure.research")) and return
-      end
-      query = "lower(name) LIKE ?"
-      render :json => create_response(Assoc.select('id, name, description, city')
-                                        .where(query, "#{name}%"))
-    rescue => e
-      render :json => create_error(400, t("assocs.failure.research")) and return
-    end
-  end
-
   api :GET, '/associations/:id/members', 'Get a list of all members'
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('members')

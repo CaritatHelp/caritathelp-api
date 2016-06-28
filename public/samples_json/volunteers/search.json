@@ -1,39 +1,47 @@
 SUCCESS => (3 matches for "root root")
 
-localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=root%20root
+localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=de
 
 {
-    status: 200,
-    message: "ok",
-    response: [
-	{
-	    id: 2,
-	    mail: "first@root.com",
-	    firstname: "root",
-	    lastname: "root",
-	    birthday: null,
-	    gender: null,
-	    city: null
-	},
-	{
-	    id: 14,
-	    mail: "robin@root.com",
-	    firstname: "root",
-	    lastname: "root",
-	    birthday: null,
-	    gender: "m",
-	    city: null
-	},
-	{
-	    id: 1,
-	    mail: "root@root.com",
-	    firstname: "root",
-	    lastname: "root",
-	    birthday: null,
-	    gender: null,
-	    city: null
-	}
-    ]
+  "status": 200,
+  "message": "ok",
+  "response": [
+    {
+      "id": 3,
+      "thumb_path": "/uploads/picture/default_m.png",
+      "name": "Aude Sikorav",
+      "rights": 0,
+      "result_type": "Volunteer"
+    },
+    {
+      "id": 3,
+      "thumb_path": null,
+      "name": "Donnage de miam miam",
+      "rights": "host",
+      "result_type": "Event"
+    },
+    {
+      "id": 2,
+      "name": "Les resto de l'estomac",
+      "thumb_path": null,
+      "rights": "member",
+      "result_type": "Assoc"
+    },
+    {
+      "id": 5,
+      "thumb_path": "/uploads/picture/default_m.png",
+      "name": "Nicolas Temenides",
+      "rights": 1,
+      "result_type": "Volunteer"
+    },
+    {
+      "id": 1,
+      "thumb_path": null,
+      "name": "Soignage de gens",
+      "rights": "host",
+      "result_type": "Event"
+    }
+  ]
 }
 
 SUCCESS => (No match)
