@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   scope '/volunteers' do
     get '/', to: 'volunteers#index'
     get '/search', to: 'volunteers#search'
+    get '/friend_requests', to: 'volunteers#friend_requests'
     get '/:id', to: 'volunteers#show'
     get '/:id/friends', to: 'volunteers#friends'
     get '/:id/notifications', to: 'volunteers#notifications'

@@ -2,7 +2,7 @@ class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search]
+  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests]
 
   def_param_group :volunteers_creation do
     param :mail, String, "Your mail address", :required => true
@@ -243,6 +243,26 @@ class VolunteersController < ApplicationController
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
+  api :GET, '/volunteers/friend_requests', "Return a list of the pending friends' invitations"
+  param :token, String, "Your token", :required => true
+  param :sent, String, "default: received invitations, true: invitations sent"
+  example SampleJson.volunteers('friend_requests')
+  def friend_requests
+    current_id_field = "receiver_id"
+    friend_id_field = "sender_id"
+    if params[:sent].eql?("true")
+      current_id_field = "sender_id"
+      friend_id_field = "receiver_id"
+    end
+
+    volunteers = Volunteer
+      .joins("INNER JOIN notifications ON notifications.#{friend_id_field}=volunteers.id")
+      .where("notifications.#{current_id_field}=#{@current_volunteer.id}")
+      .select(:id, :thumb_path, :firstname, :lastname, 'notifications.id AS notif_id')
+    
+    render :json => create_response(volunteers)
+  end
+  
   api :GET, '/volunteers/:id/pictures', "Return a list of all volunteer's pictures path"
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('pictures')
