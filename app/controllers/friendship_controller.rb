@@ -104,9 +104,10 @@ class FriendshipController < ApplicationController
   private
   def create_add_friend
     [sender_id: @volunteer.id,
-     sender_name: @volunteer.firstname + " " + @volunteer.lastname,
+     sender_name: @volunteer.fullname,
+     thumb_path: @volunteer.thumb_path,
      receiver_id: @friend.id,
-     receiver_name: @friend.firstname + " " + @friend.lastname,
+     receiver_name: @friend.fullname,
      notif_type: 'AddFriend']
   end
 

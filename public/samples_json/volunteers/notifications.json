@@ -15,17 +15,52 @@ localhost:3000/volunteers/2/notifications?token=J2ykGbCW50k924rQeFWmlw
   "message": "ok",
   "response": [
     {
-      "id": "4",
-      "sender_id": "4",
-      "sender_name": "Jeremy Gros",
+      "id": 3,
+      "sender_id": 4,
       "receiver_id": null,
-      "receiver_name": null,
       "assoc_id": null,
+      "event_id": 1,
+      "read": null,
+      "notif_type": "JoinEvent",
+      "created_at": "2016-06-30T14:16:38.192+02:00",
+      "updated_at": "2016-06-30T14:16:38.192+02:00",
       "assoc_name": null,
-      "event_id": "1",
       "event_name": "Soignage de gens",
-      "notif_type": "NewGuest",
-      "created_at": "2016-06-10 08:41:11.394476"
+      "sender_name": "Jeremy Gros",
+      "receiver_name": null,
+      "thumb_path": "/uploads/picture/default_m.png"
+    },
+    {
+      "id": 2,
+      "sender_id": 2,
+      "receiver_id": 1,
+      "assoc_id": null,
+      "event_id": 2,
+      "read": null,
+      "notif_type": "InviteGuest",
+      "created_at": "2016-06-30T13:54:24.980+02:00",
+      "updated_at": "2016-06-30T13:54:24.980+02:00",
+      "assoc_name": null,
+      "event_name": "Sauvetage du soldat Ryan",
+      "sender_name": "Pierre Enjalbert",
+      "receiver_name": "Robin Vasseur",
+      "thumb_path": null
+    },
+    {
+      "id": 1,
+      "sender_id": 3,
+      "receiver_id": 1,
+      "assoc_id": null,
+      "event_id": null,
+      "read": null,
+      "notif_type": "AddFriend",
+      "created_at": "2016-06-30T13:51:48.094+02:00",
+      "updated_at": "2016-06-30T13:51:48.094+02:00",
+      "assoc_name": null,
+      "event_name": null,
+      "sender_name": "Aude Sikorav",
+      "receiver_name": "Robin Vasseur",
+      "thumb_path": null
     }
   ]
 }

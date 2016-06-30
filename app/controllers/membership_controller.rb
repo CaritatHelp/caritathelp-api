@@ -286,6 +286,7 @@ class MembershipController < ApplicationController
   def create_join_assoc
     [sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
+     thumb_path: @volunteer.thumb_path,
      assoc_id: @assoc.id,
      assoc_name: @assoc.name,
      notif_type: 'JoinAssoc']
@@ -294,6 +295,7 @@ class MembershipController < ApplicationController
   def create_invite_member
     [assoc_id: @assoc.id,
      assoc_name: @assoc.name,
+     thumb_path: @assoc.thumb_path,
      sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
      receiver_id: @invited_vol.id,

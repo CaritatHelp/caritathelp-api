@@ -323,6 +323,7 @@ class GuestsController < ApplicationController
   def create_join_event
     [sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
+     thumb_path: @volunteer.thumb_path,
      event_id: @event.id,
      event_name: @event.title,
      notif_type: 'JoinEvent']
@@ -331,6 +332,7 @@ class GuestsController < ApplicationController
   def create_invite_guest
     [event_id: @event.id,
      event_name: @event.title,
+     thumb_path: @event.thumb_path,
      sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
      receiver_id: @invited_vol.id,

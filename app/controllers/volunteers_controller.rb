@@ -179,20 +179,11 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('notifications')
   def notifications  
-    fields = "notifications.id, notifications.sender_id, notifications.sender_name, " +
-      "notifications.receiver_id, notifications.receiver_name, " +
-      "notifications.assoc_id, notifications.assoc_name, " +
-      "notifications.event_id, notifications.event_name, " +
-      "notifications.notif_type, notifications.created_at"
+    notifs = Notification.select("notifications.*")
+      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{@volunteer.id}")
+      .where("notifications.receiver_id=#{@volunteer.id} OR notification_volunteers.volunteer_id=#{@volunteer.id}").order(created_at: :desc)
 
-    query = "SELECT #{fields} FROM notifications WHERE " +
-      "notifications.receiver_id=#{@volunteer.id} UNION " +
-      "SELECT #{fields} FROM notifications INNER JOIN notification_volunteers ON " +
-      "notification_volunteers.notification_id=notifications.id " +
-      "WHERE notification_volunteers.volunteer_id=#{@volunteer.id} " +
-      "ORDER BY created_at DESC"
-
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    render :json => create_response(notifs)    
   end
 
   api :GET, '/volunteers/:id/friends', 'Return a list of the friends of the volunteer referred by id'
