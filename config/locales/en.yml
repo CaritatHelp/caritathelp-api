@@ -89,6 +89,8 @@ en:
       rights: 'Permission denied'
       addfriend:
         self: 'Cannot add yourself as friend'
+        exist: "Already friend"
+        pending_invitation: "An invitation already is pending"
         error: 'You cannot do that'
       joinassoc:
         exist: 'You have already applied in this association or you received an invitation'

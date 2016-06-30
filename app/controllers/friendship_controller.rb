@@ -18,12 +18,13 @@ class FriendshipController < ApplicationController
       @friend = Volunteer.find_by!(id: params[:volunteer_id])
       
       if ((VFriend.where(volunteer_id: @volunteer.id)
-             .where(friend_volunteer_id: @friend.id).first != nil) ||
-          (Notification.where(notif_type: 'AddFriend').where(sender_id: @volunteer.id)
+             .where(friend_volunteer_id: @friend.id).first != nil))
+        render :json => create_error(400, t("notifications.failure.addfriend.exist")) and return
+      elsif ((Notification.where(notif_type: 'AddFriend').where(sender_id: @volunteer.id)
              .where(receiver_id: @friend.id).first != nil) ||
           (Notification.where(notif_type: 'AddFriend').where(sender_id: @friend.id)
              .where(receiver_id: @volunteer.id).first != nil))
-        render :json => create_error(400, t("notifications.failure.addfriend.error"))
+        render :json => create_error(400, t("notifications.failure.addfriend.pending_invitation"))
         return
       end
       
