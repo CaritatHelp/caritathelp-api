@@ -17,3 +17,19 @@ localhost:3000/friendship/add?token=dZ0hIb9tDSuJV9DObMagMw&volunteer_id=1548945
   "message": "Couldn't find Volunteer",
   "response": null
 }
+
+localhost:3000/friendship/add?token=dZ0hIb9tDSuJV9DObMagMw&volunteer_id=3
+
+{
+  "status": 400,
+  "message": "Already friend",
+  "response": null
+}
+
+localhost:3000/friendship/add?token=dZ0hIb9tDSuJV9DObMagMw&volunteer_id=3
+
+{
+  "status": 400,
+  "message": "An invitation is already pending",
+  "response": null
+}

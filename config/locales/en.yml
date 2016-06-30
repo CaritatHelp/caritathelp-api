@@ -90,7 +90,7 @@ en:
       addfriend:
         self: 'Cannot add yourself as friend'
         exist: "Already friend"
-        pending_invitation: "An invitation already is pending"
+        pending_invitation: "An invitation is already pending"
         error: 'You cannot do that'
       joinassoc:
         exist: 'You have already applied in this association or you received an invitation'
