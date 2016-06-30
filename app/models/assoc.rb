@@ -2,8 +2,14 @@ class Assoc < ActiveRecord::Base
   has_and_belongs_to_many :volunteers, join_table: :av_links
   has_many :av_links
 
+  before_create :set_default_picture
+
   validates :name, presence: true, :on => :create
   validates :description, presence: true, :on => :create
+
+  def set_default_picture
+    self.thumb_path = Rails.application.config.logo
+  end
 
   def self.exist?(name)
     if Assoc.find_by(name: name).eql? nil
