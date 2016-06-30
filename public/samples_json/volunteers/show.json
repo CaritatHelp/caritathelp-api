@@ -26,6 +26,7 @@ localhost:3000/volunteers/2?token=J2ykGbCW50k924rQeFWmlw
     "allowgps": false,
     "allow_notifications": false
     "friendship": 'friend'
+    "notif_id": null,
     "thumb_path": "/uploads/picture/picture_path/1/thumb_1466502907_yolo.jpg"
   }
 }

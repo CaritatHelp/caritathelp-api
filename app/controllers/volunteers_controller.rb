@@ -77,6 +77,7 @@ class VolunteersController < ApplicationController
       end
 
       friendship = 'none'
+      notif_id = nil
 
       link = VFriend
         .where(:volunteer_id => @volunteer.id)
@@ -94,16 +95,19 @@ class VolunteersController < ApplicationController
             .first
           if !link.eql?(nil)
             friendship = 'invitation received'
+            notif_id = link.id
           end
         else
           friendship = 'invitation sent'
+          notif_id = link.id
         end
       else
         friendship = 'friend'
       end
       
       render :json => create_response(@volunteer.as_json(:except => [:password, :token])
-                                        .merge('friendship' => friendship)) and return
+                                        .merge(friendship: friendship,
+                                               notif_id: notif_id)) and return
     rescue => e
       render :json => create_error(400, e.to_s)
     end
