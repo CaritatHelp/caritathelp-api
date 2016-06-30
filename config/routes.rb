@@ -8,6 +8,13 @@ Rails.application.routes.draw do
 
   apipie
 
+  scope '/' do
+    get '/search', to: 'volunteers#search'
+    get '/friend_requests', to: 'volunteers#friend_requests'
+    get '/notifications', to: 'volunteers#notifications'
+    
+  end
+
   scope '/news' do
     post '/volunteer_status', to: 'news#volunteer_status'
     post '/assoc_status', to: 'news#assoc_status'
@@ -58,11 +65,8 @@ Rails.application.routes.draw do
 
   scope '/volunteers' do
     get '/', to: 'volunteers#index'
-    get '/search', to: 'volunteers#search'
-    get '/friend_requests', to: 'volunteers#friend_requests'
     get '/:id', to: 'volunteers#show'
     get '/:id/friends', to: 'volunteers#friends'
-    get '/:id/notifications', to: 'volunteers#notifications'
     get '/:id/associations', to: 'volunteers#associations'
     get '/:id/events', to: 'volunteers#events'
     get '/:id/pictures', to: 'volunteers#pictures'
@@ -71,7 +75,7 @@ Rails.application.routes.draw do
 
     post '/', to: 'volunteers#create'
 
-    put '/:id', to: 'volunteers#update' 
+    put '/', to: 'volunteers#update' 
 
     delete '/:id', to: 'volunteers#destroy'
     match '/', to: 'doc#index', via: :all
@@ -79,7 +83,6 @@ Rails.application.routes.draw do
 
   scope '/associations' do
     get '/', to: 'assocs#index'
-    get '/search', to: 'assocs#search'
     get '/invited', to: 'assocs#invited'
     get '/:id', to: 'assocs#show'
     get '/:id/members', to: 'assocs#members'
@@ -99,7 +102,6 @@ Rails.application.routes.draw do
 
   scope '/events' do
     get '/', to: 'events#index'
-    get '/search', to: 'events#search'
     get '/owned', to: 'events#owned'
     get '/invited', to: 'events#invited'
     get '/:id', to: 'events#show'

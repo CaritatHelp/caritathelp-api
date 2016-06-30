@@ -1,8 +1,8 @@
 class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
-  before_action :set_volunteer, only: [:show, :edit, :update, :destroy, :friends, :notifications, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests]
+  before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
+  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
 
   def_param_group :volunteers_creation do
     param :mail, String, "Your mail address", :required => true
@@ -113,7 +113,7 @@ class VolunteersController < ApplicationController
     end
   end
 
-  api :GET, '/volunteers/search', "Search for volunteer by its firstname and/or lastname, return a list of matching volunteers"
+  api :GET, '/search', "Search for volunteer by its firstname and/or lastname, return a list of matching volunteers"
   param :token, String, "Your token", :required => true
   param :research, String, "Volunteer firtname and/or lastname", :required => true
   example SampleJson.volunteers('search')
@@ -157,18 +157,15 @@ class VolunteersController < ApplicationController
     end
   end
   
-  api :PUT, '/volunteers/:id', "Update volunteer"
+  api :PUT, '/volunteers', "Update volunteer"
   param_group :volunteers_update
   example SampleJson.volunteers('update')
   def update
     begin
-      if @current_volunteer.id != @volunteer.id
-        render :json => create_error(400, t("volunteers.failure.rights")) and return        
-      end
-      if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @volunteer.mail)
+      if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @current_volunteer.mail)
         render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
-      elsif @volunteer.update!(volunteer_params)
-        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+      elsif @current_volunteer.update!(volunteer_params)
+        render :json => create_response(@current_volunteer.as_json(:except => [:password, :token])
                                           .merge('friendship' => 'yourself')) and return
       else
         render :json => create_error(400, t("volunteers.failure.update"))
@@ -179,13 +176,13 @@ class VolunteersController < ApplicationController
     end
   end
 
-  api :GET, '/volunteers/:id/notifications', "Get notifications of volunteer"
+  api :GET, '/notifications', "Get notifications of volunteer"
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('notifications')
   def notifications  
     notifs = Notification.select("notifications.*")
-      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{@volunteer.id}")
-      .where("notifications.receiver_id=#{@volunteer.id} OR notification_volunteers.volunteer_id=#{@volunteer.id}").order(created_at: :desc)
+      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{@current_volunteer.id}")
+      .where("notifications.receiver_id=#{@current_volunteer.id} OR notification_volunteers.volunteer_id=#{@current_volunteer.id}").order(created_at: :desc)
 
     render :json => create_response(notifs)    
   end
@@ -247,7 +244,7 @@ class VolunteersController < ApplicationController
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
-  api :GET, '/volunteers/friend_requests', "Return a list of the pending friends' invitations"
+  api :GET, '/friend_requests', "Return a list of the pending friends' invitations"
   param :token, String, "Your token", :required => true
   param :sent, String, "default: received invitations, true: invitations sent"
   example SampleJson.volunteers('friend_requests')
