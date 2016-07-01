@@ -130,20 +130,20 @@ class VolunteersController < ApplicationController
 
         assocs = Assoc
           .select(:id, :name, :thumb_path,
-                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{@current_volunteer.id}) AS rights", "'Assoc' AS result_type")
+                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{@current_volunteer.id}) AS rights", "'assoc' AS result_type")
           .where(condition)
         
         condition = condition.gsub "name", "title"
         events = Event
           .select(:id, 'title AS name', :thumb_path,
-                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@current_volunteer.id}) AS rights", "'Event' AS result_type")
+                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@current_volunteer.id}) AS rights", "'event' AS result_type")
           .where(condition)
         
 
         condition = condition.gsub "title", "fullname"
         volunteers = Volunteer
           .select(:id, 'fullname AS name', :thumb_path,
-                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{@current_volunteer.id}) AS rights", "'Volunteer' AS result_type")
+                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{@current_volunteer.id}) AS rights", "'volunteer' AS result_type")
           .where(condition)
 
         result = (assocs + events + volunteers).sort {|a,b| a['name']<=>b['name']}
