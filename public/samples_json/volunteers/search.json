@@ -5,13 +5,13 @@ localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=de
 /*
   INDICATION VALEURS RIGHTS
 
-  si result_type == Volunteer
+  si result_type == volunteer
     rights: 0 -> pas ami
     rights: 1 -> ami
-  si result_type == Assoc
+  si result_type == assoc
     rights: "owner"/"admin"/"member"
     rights: null -> pas du tout dans l'asso
-  si result_type == Event
+  si result_type == event
     rights: "host"/"admin"/"member"
     rights: null -> pas du tout dans l'event
 */
@@ -25,35 +25,35 @@ localhost:3000/volunteers/search?token=x5QI0L2wfFoZ5O5CUTUMlQ&research=de
       "thumb_path": "/uploads/picture/default_m.png",
       "name": "Aude Sikorav",
       "rights": 0,
-      "result_type": "Volunteer"
+      "result_type": "volunteer"
     },
     {
       "id": 3,
       "thumb_path": null,
       "name": "Donnage de miam miam",
       "rights": "host",
-      "result_type": "Event"
+      "result_type": "event"
     },
     {
       "id": 2,
       "name": "Les resto de l'estomac",
       "thumb_path": null,
       "rights": "member",
-      "result_type": "Assoc"
+      "result_type": "assoc"
     },
     {
       "id": 5,
       "thumb_path": "/uploads/picture/default_m.png",
       "name": "Nicolas Temenides",
       "rights": 1,
-      "result_type": "Volunteer"
+      "result_type": "volunteer"
     },
     {
       "id": 1,
       "thumb_path": null,
       "name": "Soignage de gens",
       "rights": "host",
-      "result_type": "Event"
+      "result_type": "event"
     }
   ]
 }
