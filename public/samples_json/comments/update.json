@@ -1,0 +1,19 @@
+SUCCESS =>
+
+localhost:3000/comments/3?token=a413J1UL2V60DnltJhzaiw&content=zefzef
+
+{
+  "status": 200,
+  "message": "ok",
+  "response": {
+    "id": 3,
+    "new_id": 21,
+    "volunteer_id": 1,
+    "content": "zefzef",
+    "created_at": "2016-07-04T13:22:01.811+02:00",
+    "updated_at": "2016-07-04T13:22:01.811+02:00",
+    "thumb_path": "/uploads/picture/default_m.png"
+  }
+}
+
+FAILURE =>

@@ -14,7 +14,7 @@ class CommentController < ApplicationController
     begin
       new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
                                      content: params[:content]]).first
-      render :json => create_response(new_comment)
+      render :json => create_response(new_comment.as_json.merge(thumb_path: @volunteer.thumb_path))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -31,7 +31,7 @@ class CommentController < ApplicationController
       end
       # changer le permit
       @comment.update!(params.permit(:content))
-      render :json => create_response(@comment.complete_description)
+      render :json => create_response(@comment.as_json.merge(thumb_path: @volunteer.thumb_path))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -41,7 +41,7 @@ class CommentController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.comments('show')
   def show
-    render :json => create_response(@comment.complete_description)
+    render :json => create_response(@comment)
   end
 
   api :DELETE, '/comments/:id', 'Get the comment'
