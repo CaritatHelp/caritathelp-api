@@ -148,16 +148,13 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('invited')
   def invited
-    query = "SELECT assocs.id, assocs.name, assocs.city, assocs.thumb_path, " +
-      "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
-      "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
-      "av_links.volunteer_id=v_friends.friend_volunteer_id " +
-      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM assocs INNER JOIN notifications " +
-      "ON notifications.assoc_id=assocs.id " +
-      "WHERE notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteMember'"
-
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    assocs = Assoc.select(:id, :name, :city, :thumb_path)
+      .select("(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members")
+      .select("(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON av_links.volunteer_id=v_friends.friend_volunteer_id WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .joins("INNER JOIN notifications ON notifications.assoc_id=assocs.id")
+      .select("notifications.id AS notif_id")
+      .where("notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteMember'")
+    render :json => create_response(assocs)
   end
 
   api :GET, '/associations/:id/pictures', "Return a list of all assoc's pictures path"

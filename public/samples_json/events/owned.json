@@ -7,16 +7,16 @@ localhost:3000/events/owned?token=uiNE0fs4EATfBpvuMHQpWA
   "message": "ok",
   "response": [
     {
-      "id": "4",
+      "id": 4,
       "title": "Soirée Pizza !",
       "place": "Italie",
-      "begin": "2016-05-01 00:00:00",
-      "end": "2016-12-30 00:00:00",
-      "assoc_id": "2",
+      "begin": "2016-05-01T00:00:00.000+02:00",
+      "end": "2016-12-30T00:00:00.000+01:00",
+      "assoc_id": 2,
       "rights": "host",
       "thumb_path": "/uploads/picture/picture_path/3/thumb_1466503053_yolo.jpg",
-      "nb_guest": "3",
-      "nb_friends_members": "0"
+      "nb_guest": 3,
+      "nb_friends_members": 0
     }
   ]
 }

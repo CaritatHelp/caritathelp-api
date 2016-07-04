@@ -7,15 +7,16 @@ localhost:3000/events/invited?token=uiNE0fs4EATfBpvuMHQpWA
   "message": "ok",
   "response": [
     {
-      "id": "3",
+      "id": 3,
       "title": "Donnage de miam miam",
       "place": "Paris",
-      "begin": "2016-07-21 00:00:00",
-      "end": "2016-07-22 00:00:00",
-      "assoc_id": "2",
+      "begin": "1970-06-06T00:00:00.000+01:00",
+      "end": "1970-06-07T00:00:00.000+01:00",
+      "assoc_id": 2,
       "thumb_path": "/uploads/picture/picture_path/3/thumb_1466503053_yolo.jpg",
-      "nb_guest": "3",
-      "nb_friends_members": "1"
+      "nb_guest": 3,
+      "nb_friends_members": 1,
+      "notif_id": 1
     }
   ]
 }
