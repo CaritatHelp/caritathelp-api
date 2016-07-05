@@ -29,6 +29,8 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   param :content, String, "Content of status", :required => true
   param :friend_id, String, "Id of the friend you want to write on the wall"
+  param :assoc_id, String, "Id of the association you want to write on the wall"
+  param :event_id, String, "Id of the event you want to write on the wall"
   example SampleJson.news('wall_message')
   def wall_message
     begin
