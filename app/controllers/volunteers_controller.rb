@@ -290,8 +290,8 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('news')
   def news
     news = New::New
-      .where(volunteer_id: @volunteer.id)
-      .select(:id, :type, :volunteer_id, :title, :content)
+      .where("volunteer_id=#{@volunteer.id} OR friend_id=#{@volunteer.id}")
+      .select("new_news.*, new_news.type AS news_type")
       .joins("INNER JOIN volunteers ON volunteers.id=new_news.volunteer_id")
       .select("volunteers.firstname, volunteers.lastname, volunteers.thumb_path")
     render :json => create_response(news)

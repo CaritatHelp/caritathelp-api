@@ -1,19 +1,26 @@
 SUCCESS =>
 
-http://localhost:3000/events/1/news?token=qjIFeZD0wtADy0Xl8w0GJg
+http://localhost:3000/events/1/news?token=4Z31FX6Zolthz2LTcSD7iA
 
 {
     status: 200,
     message: "ok",
     response: [
 	{
-	    id: "3",
-	    type: "New::Event::Status",
-	    event_id: "1",
+	    id: 6,
+	    assoc_id: null,
+	    event_id: 1,
+	    volunteer_id: null,
+	    friend_id: null,
 	    title: null,
-	    content: "coucou"
+	    content: "Qui veut se faire soigner?",
+	    created_at: "2016-07-05T16:14:10.760+02:00",
+	    updated_at: "2016-07-05T16:14:10.760+02:00",
+	    news_type: "New::Event::Status",
 	    name: "Soignage de gens",
-	    thumb_path: null
+	    thumb_path: "/uploads/picture/logo_caritathelp.png",
+	    volunteer_fullname: null,
+	    volunteer_thumb_path: null
 	}
     ]
 }

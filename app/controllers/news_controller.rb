@@ -11,7 +11,7 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('index')
   def index
-    news = New::New.select("new_news.*, new_news.type AS notif_type")
+    news = New::New.select("new_news.*, new_news.type AS news_type")
       .select("(SELECT title FROM events WHERE events.id=new_news.event_id) AS event_name")
       .select("(SELECT thumb_path FROM events WHERE events.id=new_news.event_id) AS event_thumb_path")
       .select("(SELECT name FROM assocs WHERE assocs.id=new_news.assoc_id) AS assoc_name")
@@ -21,31 +21,57 @@ class NewsController < ApplicationController
       .joins("LEFT JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id")
       .joins("LEFT JOIN av_links ON new_news.assoc_id=av_links.assoc_id")
       .joins("LEFT JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id AND new_news.volunteer_id<>#{@volunteer.id}")
-      .where("event_volunteers.volunteer_id=#{@volunteer.id} OR av_links.volunteer_id=#{@volunteer.id} OR v_friends.friend_volunteer_id=#{@volunteer.id} OR new_news.volunteer_id=#{@volunteer.id}").order(updated_at: :desc)
-    
-    
+      .where("(event_volunteers.volunteer_id=#{@volunteer.id} AND new_news.type='New::Event::Status') OR (av_links.volunteer_id=#{@volunteer.id} AND new_news.type='New::Assoc::Status') OR (v_friends.friend_volunteer_id=#{@volunteer.id} AND ((new_news.friend_id IS NULL OR new_news.friend_id=#{@volunteer.id}) AND new_news.assoc_id IS NULL AND new_news.event_id IS NULL)) OR new_news.volunteer_id=#{@volunteer.id}").order(updated_at: :desc)
     render :json => create_response(news)
-    # query = "(SELECT new_news.*, (SELECT title FROM events WHERE events.id=new_news.event_id) AS sender_name " +
-    #   "FROM new_news INNER JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id WHERE event_volunteers.volunteer_id = #{@volunteer.id}) UNION " +
-    #   "(SELECT new_news.*, (SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS sender_name " +
-    #   "FROM new_news INNER JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id WHERE v_friends.friend_volunteer_id = #{@volunteer.id}) UNION " +
-    #   "(SELECT new_news.*, (SELECT name FROM assocs WHERE assocs.id=new_news.assoc_id) AS sender_name " +
-    #   "FROM new_news INNER JOIN av_links ON new_news.assoc_id=av_links.assoc_id WHERE av_links.volunteer_id = #{@volunteer.id}) UNION " +
-    #   "(SELECT new_news.*, (SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS sender_name " +
-    #   "FROM new_news WHERE new_news.volunteer_id=#{@volunteer.id})"
-
-    # render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
-  api :POST, '/news/volunteer_status', 'Create a new status for the volunteer'
+  api :POST, '/news/wall_message', "Create a wall message for the volunteer or on a friend's wall"
   param :token, String, "Your token", :required => true
   param :content, String, "Content of status", :required => true
-  example SampleJson.news('volunteer_status')
-  def volunteer_status
+  param :friend_id, String, "Id of the friend you want to write on the wall"
+  example SampleJson.news('wall_message')
+  def wall_message
     begin
-      new_status = New::Volunteer::Status.create!(content: params[:content],
-                                                  volunteer_id: @volunteer.id)
-      render :json => create_response(new_status.as_json.merge('type' => new_status.type))
+      a = params.has_key?(:friend_id)
+      b = params.has_key?(:assoc_id)
+      c = params.has_key?(:event_id)
+
+      if !((a and !b and !c) or (!a and b and !c) or (!a and !b and c) or (!a and !b and !c))
+          render :json => create_error(400, t("news.failure.args")) and return
+      end
+
+      if params.has_key?(:friend_id) and params[:friend_id].to_i != @volunteer.id
+        friend = Volunteer.find(params[:friend_id])
+        link = VFriend.where(volunteer_id: @volunteer.id).where(friend_volunteer_id: friend.id).first
+        if link.eql?(nil)
+          render :json => create_error(400, t("news.failure.rights")) and return
+        end
+        wall_message = New::Volunteer::WallMessage.create!(content: params[:content],
+                                                           volunteer_id: @volunteer.id,
+                                                           friend_id: friend.id)
+      elsif params.has_key?(:assoc_id)
+        assoc = Assoc.find(params[:assoc_id])
+        link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: assoc.id).first
+        if link.eql?(nil)
+          render :json => create_error(400, t("news.failure.rights")) and return
+        end
+        wall_message = New::Assoc::WallMessage.create!(content: params[:content],
+                                                          volunteer_id: @volunteer.id,
+                                                          assoc_id: assoc.id)
+      elsif params.has_key?(:event_id)
+        event = Event.find(params[:event_id])
+        link = EventVolunteer.where(volunteer_id: @volunteer.id).where(event_id: event.id).first
+        if link.eql?(nil)
+          render :json => create_error(400, t("news.failure.rights")) and return
+        end
+        wall_message = New::Event::WallMessage.create!(content: params[:content],
+                                                          volunteer_id: @volunteer.id,
+                                                          event_id: event.id)
+      else
+        wall_message = New::Volunteer::Status.create!(content: params[:content],
+                                                      volunteer_id: @volunteer.id)
+      end
+      render :json => create_response(wall_message.as_json.merge('type' => wall_message.type))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end

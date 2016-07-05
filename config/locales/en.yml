@@ -108,6 +108,8 @@ en:
   news:
     failure:
       id: 'Unknown new id'
+      rights: 'Permission denied'
+      args: 'Please specify only friend_id OR assoc_id OR event_id'
 
   comments:
     failure:

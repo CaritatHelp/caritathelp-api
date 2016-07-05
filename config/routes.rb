@@ -16,7 +16,7 @@ Rails.application.routes.draw do
   end
 
   scope '/news' do
-    post '/volunteer_status', to: 'news#volunteer_status'
+    post '/wall_message', to: 'news#wall_message'
     post '/assoc_status', to: 'news#assoc_status'
     post '/event_status', to: 'news#event_status'
 

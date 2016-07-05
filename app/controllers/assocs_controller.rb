@@ -181,9 +181,11 @@ class AssocsController < ApplicationController
   def news
     news = New::New
       .where(assoc_id: @assoc.id)
-      .select(:id, :type, :assoc_id, :title, :content)
+      .select('new_news.*, new_news.type AS news_type')
       .joins("INNER JOIN assocs ON assocs.id=new_news.assoc_id")
       .select("assocs.name, assocs.thumb_path")
+      .select("(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_fullname")
+      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path")
     render :json => create_response(news)
   end
 
