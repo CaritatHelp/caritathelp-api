@@ -1,5 +1,7 @@
 class Shelter < ActiveRecord::Base
   serialize :tags, Array
+
+  before_create :set_default_picture
   
   validates :name, presence: true, :on => :create
   validates :address, presence: true, :on => :create
@@ -10,6 +12,10 @@ class Shelter < ActiveRecord::Base
   validates :free_places, :numericality => { :greater_than_or_equal_to => 0},
   presence: true, :on => :create
   validate :if_free_correct
+
+  def set_default_picture
+    self.thumb_path = Rails.application.config.default_shelter
+  end
 
   private 
 

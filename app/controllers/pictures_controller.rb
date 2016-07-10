@@ -11,6 +11,7 @@ class PicturesController < ApplicationController
     param :filename, String, "Name to give to the file", :required => true
     param :original_filename, String, "Original name of the file", :required => true
     param :assoc_id, Integer, "Id of the assoc, if the picture is about an assoc"
+    param :shelter_id, Integer, "Id of the shelter, if the picture is about a shelter"
     param :event_id, Integer, "Id of the event, if the picture is about an event"
     param :is_main, String, "True to make it the main picture of your profile/event. Will be automatically set to true if it's the first picture to be upload, and to false otherwise"
   end
@@ -29,6 +30,7 @@ class PicturesController < ApplicationController
     actual_params[:picture][:is_main] = picture_params[:is_main]
     actual_params[:picture][:event_id] = picture_params[:event_id]
     actual_params[:picture][:assoc_id] = picture_params[:assoc_id]
+    actual_params[:picture][:shelter_id] = picture_params[:shelter_id]
 
     if actual_params[:picture][:picture_path][:file]
       picture_path_params = actual_params[:picture][:picture_path]
@@ -54,6 +56,11 @@ class PicturesController < ApplicationController
       current_main_picture = nil
       if @event != nil
         current_main_picture = Picture.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id)
+          .where(:is_main => true).first
+      elsif @assoc != nil and @shelter != nil
+        current_main_picture = Picture.where(:volunteer_id => @volunteer.id)
+          .where(:assoc_id => @assoc.id)
+          .where(:shelter_id => @shelter.id)
           .where(:is_main => true).first
       elsif @assoc != nil
         current_main_picture = Picture.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id)
@@ -149,6 +156,10 @@ class PicturesController < ApplicationController
       if @current_picture.event_id != nil
         current_main_picture = Picture.where(:event_id => @current_picture.event_id)
           .where(:is_main => true).first
+      elsif @current_picture.assoc_id != nil and @current_picture.shelter_id != nil
+        current_main_picture = Picture.where(:assoc_id => @current_picture.assoc_id)
+          .where(:shelter_id => @current_picture.shelter_id)
+          .where(:is_main => true).first
       elsif @current_picture.assoc_id != nil
         current_main_picture = Picture.where(:assoc_id => @current_picture.assoc_id)
           .where(:is_main => true).first
@@ -173,7 +184,7 @@ class PicturesController < ApplicationController
 
   private
   def picture_params
-    params.permit(:is_main, :event_id, :assoc_id, :file, :filename, :original_filename)
+    params.permit(:is_main, :event_id, :assoc_id, :shelter_id, :file, :filename, :original_filename)
   end
 
   def set_volunteer
@@ -190,17 +201,17 @@ class PicturesController < ApplicationController
 
   def set_main_picture(picture)
     begin
-      p "££££££££££££££££££££££££££££££££££££££££££££££££££££££££££"
-      p picture
       if picture.is_main.eql?(true)
         if !@event.eql?(nil)
           @event.thumb_path = picture.thumb_path
           @event.save!
+        elsif !@assoc.eql?(nil) and !@shelter.eql?(nil)
+          @shelter.thumb_path = picture.thumb_path
+          @shelter.save!
         elsif !@assoc.eql?(nil)
           @assoc.thumb_path = picture.thumb_path
           @assoc.save!
         else
-          p "LAAAAAAAAAAA???????????????????????????"
           @volunteer.thumb_path = picture.thumb_path
           @volunteer.save!
         end
@@ -211,9 +222,9 @@ class PicturesController < ApplicationController
   end
 
   def check_rights
-    if params[:event_id] == nil and params[:assoc_id] == nil
+    if params[:event_id] == nil and params[:assoc_id] == nil and params[:shelter_id] == nil
       return true
-    elsif params[:event_id] != nil and params[:assoc_id] != nil
+    elsif params[:event_id] != nil and (params[:assoc_id] != nil or params[:shelter_id] != nil)
       render :json => create_error(400, t("pictures.failure.specify")), status: 400
       return false
     elsif params[:event_id] != nil
@@ -222,7 +233,7 @@ class PicturesController < ApplicationController
         @link = EventVolunteer.where(:volunteer_id => @volunteer.id)
           .where(:event_id => @event.id).first
         
-        if @link.eql?(nil) or @link.rights.eql?('guest')
+        if @link.eql?(nil) or @link.level < EventVolunteer.levels["admin"]
           render :json => create_error(400, t("events.failure.rights")), status: 400
           return false
         end
@@ -230,19 +241,34 @@ class PicturesController < ApplicationController
       rescue
         render :json => create_error(400, t("events.failure.id")), status: 400
       end
+    elsif params[:shelter_id] != nil
+      begin
+        @shelter = Shelter.find(params[:shelter_id])
+        @assoc = Assoc.find(@shelter.assoc_id)
+        @link = AvLink.where(:volunteer_id => @volunteer.id)
+          .where(:assoc_id => @assoc.id).first
+        
+        if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
+          render :json => create_error(400, t("assocs.failure.rights")), status: 400
+          return false
+        end
+        return true
+      rescue
+        render :json => create_error(400, t("shelters.failure.id")), status: 400
+      end
     elsif params[:assoc_id] != nil
       begin
         @assoc = Assoc.find(params[:assoc_id])
         @link = AvLink.where(:volunteer_id => @volunteer.id)
           .where(:assoc_id => @assoc.id).first
         
-        if @link.eql?(nil) or @link.rights.eql?('member')
+        if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
           render :json => create_error(400, t("assocs.failure.rights")), status: 400
           return false
         end
         return true
-      rescue
-        render :json => create_error(400, t("assocs.failure.id")), status: 400
+      rescue => e
+        render :json => create_error(400, e.to_s), status: 400
       end      
     end
   end

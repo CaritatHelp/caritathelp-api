@@ -1,9 +1,9 @@
 class SheltersController < ApplicationController
   before_filter :check_token, except: [:index, :show, :search]
   before_action :set_volunteer, except: [:index, :show, :search]
-  before_action :set_assoc, except: [:index, :show, :search]
-  before_action :set_shelter, only: [:show, :update, :delete]
-  before_action :check_rights, except: [:index, :show, :search]
+  before_action :set_assoc, except: [:index, :show, :search, :pictures, :main_picture]
+  before_action :set_shelter, only: [:show, :update, :delete, :pictures, :main_picture]
+  before_action :check_rights, except: [:index, :show, :search, :pictures, :main_picture]
 
   def_param_group :shelter_create do
     param :token, String, "Creator's token", :required => true
@@ -36,7 +36,7 @@ class SheltersController < ApplicationController
   api :GET, '/shelters', "Get a list of all existing shelters"
   example SampleJson.shelters('index')
   def index
-    query = "id, name, address, zipcode, city, total_places, free_places, latitude, longitude, tags"
+    query = "id, name, address, zipcode, city, total_places, free_places, latitude, longitude, tags, thumb_path"
     render :json => create_response(Shelter.select(query).all)
   end
   
@@ -77,7 +77,7 @@ class SheltersController < ApplicationController
         render :json => create_error(400, t('shelters.failure.research')) and return        
       end
       query = "lower(name) LIKE ?"
-      render :json => create_response(Shelter.select('id, name, city, total_places, free_places')
+      render :json => create_response(Shelter.select('id, name, city, total_places, free_places, thumb_path')
                                         .where(query, "#{name}%"))
     rescue => e
       render :json => create_error(400, t('shelters.failure.research')) and return
@@ -112,12 +112,32 @@ class SheltersController < ApplicationController
     @shelter.destroy
     render :json => create_response(t("shelters.success.deleted"))
   end
-  
+
+  api :GET, '/shelters/:id/pictures', "Return a list of all shelter's pictures path"
+  param :token, String, "Your token", :required => true
+  example SampleJson.shelters('pictures')
+  def pictures
+    query = "id, file_size, picture_path, is_main"
+    pictures = Picture.where(:shelter_id => @shelter.id).select(query).limit(100)
+    render :json => create_response(pictures)
+  end
+
+  api :GET, '/shelters/:id/main_picture', "Return path of main picture"
+  param :token, String, "Your token", :required => true
+  example SampleJson.shelters('main_picture')
+  def main_picture
+    query = "id, file_size, picture_path"
+    pictures = Picture.where(:shelter_id => @shelter.id).where(:is_main => true).select(query).first
+    render :json => create_response(pictures)
+  end
+ 
   private
   
   def shelter_params
-    params.permit(:name, :address, :zipcode, :city, :total_places,
-                  :free_places, :tags, :latitude, :longitude, :tags => [])
+    params = params.permit(:name, :address, :zipcode, :city, :total_places, :description,
+                           :free_places, :tags, :latitude, :longitude, :tags => [])
+    params[:assoc_id] = @assoc.id
+    params
   end
   
   def set_volunteer

@@ -13,12 +13,17 @@ Rails.application.routes.draw do
     get '/friend_requests', to: 'volunteers#friend_requests'
     get '/notifications', to: 'volunteers#notifications'
     
+    # followers routes
+    # post '/follow', to: 'followers#follow'
+
+    # delete '/unfollow', to: 'followers#unfollow'
+
+    # put '/block', to: 'followers#block'
   end
+
 
   scope '/news' do
     post '/wall_message', to: 'news#wall_message'
-    post '/assoc_status', to: 'news#assoc_status'
-    post '/event_status', to: 'news#event_status'
 
     get '/', to: 'news#index'
     get '/:id', to: 'news#show'
@@ -37,6 +42,8 @@ Rails.application.routes.draw do
     get '/', to: 'shelters#index'
     get '/search', to: 'shelters#search'
     get '/:id', to: 'shelters#show'
+    get '/:id/pictures', to: 'shelters#pictures'
+    get '/:id/main_picture', to: 'shelters#main_picture'
     put '/:id', to: 'shelters#update'
     delete '/:id', to: 'shelters#delete'
   end

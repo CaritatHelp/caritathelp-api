@@ -16,6 +16,7 @@ localhost:3000/shelters
       "longitude": null,
       "total_places": 95,
       "free_places": 85,
+      "thumb_path": "/uploads/picture/default_shelter.jpg",
       "tags": [
         "coucou",
         "yolo"
@@ -31,6 +32,7 @@ localhost:3000/shelters
       "longitude": null,
       "total_places": 95,
       "free_places": 85,
+      "thumb_path": "/uploads/picture/default_shelter.jpg",
       "tags": [
         "coucou",
         "yolo"
@@ -46,6 +48,7 @@ localhost:3000/shelters
       "longitude": null,
       "total_places": 95,
       "free_places": 85,
+      "thumb_path": "/uploads/picture/default_shelter.jpg",
       "tags": [
         "coucou",
         "yolo"
