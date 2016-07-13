@@ -293,7 +293,7 @@ class GuestsController < ApplicationController
     waiting_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
       .where("notifications.notif_type='JoinEvent'")
       .where("notifications.event_id=#{@event.id}")
-      .select("volunteers.*, notifications.created_at AS sending_date")
+      .select("volunteers.*, notifications.created_at AS sending_date, notifications.id AS notif_id")
     render :json => create_response(waiting_volunteers
                                       .as_json(except: [:token, :password,
                                                         :created_at, :updated_at]))
