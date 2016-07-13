@@ -20,7 +20,8 @@ localhost:3000/guests/waiting?token=v19Zrf9td4KkhFvmD6w6FA&event_id=1
       "allow_notifications": null,
       "thumb_path": "/uploads/picture/default_m.png",
       "fullname": "Jerome Caudoux",
-      "sending_date": "2016-06-27T12:09:57.813Z"
+      "sending_date": "2016-06-27T12:09:57.813Z",
+      "notif_id": 1
     }
   ]
 }
