@@ -2,7 +2,7 @@ class MembershipController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, except: [:reply_member, :reply_invite]
+  before_action :set_assoc, except: [:reply_invite]
   before_action :check_rights, except: [:join_assoc, :reply_invite, :leave_assoc]
 
   api :DELETE, '/membership/kick', "Kick member from the association"
