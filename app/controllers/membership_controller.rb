@@ -2,8 +2,8 @@ class MembershipController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, except: [:reply_invite]
-  before_action :check_rights, except: [:join_assoc, :reply_invite, :leave_assoc]
+  before_action :set_assoc, except: [:reply_invite, :reply_member]
+  before_action :check_rights, except: [:join_assoc, :reply_invite, :leave_assoc, :reply_member]
 
   api :DELETE, '/membership/kick', "Kick member from the association"
   param :token, String, "Your token", :required => true
@@ -115,6 +115,13 @@ class MembershipController < ApplicationController
   def reply_member
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
+      
+      # Check the rights of the person who's trying to accept a member
+      link = AvLink.where(volunteer_id: @volunteer.id)
+             .where(assoc_id: @notif.assoc_id).first
+      if ((link.eql? nil) || (link.rights.eql? 'member'))
+        render :json => create_error(400, t("assocs.failure.rights")) and return
+      end
             
       member_id = @notif.sender_id
       assoc_id = @notif.assoc_id

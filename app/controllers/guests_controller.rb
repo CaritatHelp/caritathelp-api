@@ -2,8 +2,8 @@ class GuestsController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_event, except: [:reply_invite]
-  before_action :check_rights, except: [:join, :reply_invite, :leave_event]
+  before_action :set_event, except: [:reply_invite, :reply_guest]
+  before_action :check_rights, except: [:join, :reply_invite, :leave_event, :reply_guest]
 
   api :DELETE, '/guests/kick', "Kick guest from the event"
   param :token, String, "Your token", :required => true
