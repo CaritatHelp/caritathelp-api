@@ -134,10 +134,10 @@ class SheltersController < ApplicationController
   private
   
   def shelter_params
-    params = params.permit(:name, :address, :zipcode, :city, :total_places, :description,
-                           :free_places, :tags, :latitude, :longitude, :tags => [])
-    params[:assoc_id] = @assoc.id
-    params
+    params_shelter = params.permit(:name, :address, :zipcode, :city, :total_places, :description,
+                                   :free_places, :tags, :latitude, :longitude, :tags => [])
+    params_shelter[:assoc_id] = @assoc.id
+    params_shelter
   end
   
   def set_volunteer

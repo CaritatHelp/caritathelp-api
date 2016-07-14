@@ -233,7 +233,8 @@ class PicturesController < ApplicationController
         @link = EventVolunteer.where(:volunteer_id => @volunteer.id)
           .where(:event_id => @event.id).first
         
-        if @link.eql?(nil) or @link.level < EventVolunteer.levels["admin"]
+        # if @link.eql?(nil) or @link.level < EventVolunteer.levels["admin"]
+        if @link.eql?(nil) or @link.rights.eql?("member")
           render :json => create_error(400, t("events.failure.rights")), status: 400
           return false
         end
@@ -248,7 +249,8 @@ class PicturesController < ApplicationController
         @link = AvLink.where(:volunteer_id => @volunteer.id)
           .where(:assoc_id => @assoc.id).first
         
-        if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
+        # if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
+        if @link.eql?(nil) or @link.rights.eql?("member")
           render :json => create_error(400, t("assocs.failure.rights")), status: 400
           return false
         end
@@ -262,7 +264,8 @@ class PicturesController < ApplicationController
         @link = AvLink.where(:volunteer_id => @volunteer.id)
           .where(:assoc_id => @assoc.id).first
         
-        if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
+        # if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
+        if @link.eql?(nil) or @link.rights.eql?("member")
           render :json => create_error(400, t("assocs.failure.rights")), status: 400
           return false
         end
