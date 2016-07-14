@@ -14,6 +14,7 @@ class SheltersController < ApplicationController
     param :city, String, "Shelter's city", :required => true
     param :total_places, Integer, "Shelter's total places", :required => true
     param :free_places, Integer, "Shelter's free places", :required => true
+    param :description, String, "Shelter's description"
     param :latitude, Float, "Shelter's latitude"
     param :longitude, Float, "Shelter's longitude"
     param :tags, String, "Shelter's tags"
@@ -28,6 +29,7 @@ class SheltersController < ApplicationController
     param :city, String, "Shelter's city"
     param :total_places, Integer, "Shelter's total places"
     param :free_places, Integer, "Shelter's free places"
+    param :description, String, "Shelter's description"
     param :latitude, Float, "Shelter's latitude"
     param :longitude, Float, "Shelter's longitude"
     param :tags, String, "Shelter's tags"

@@ -5,7 +5,7 @@ localhost:3000/chatrooms/79/new_message?token=MR3WxyZ-d6IDYYs5BkKcAw&content=oua
 {
   "status": 200,
   "message": "ok",
-  "response": [
+  "response":
     {
       "id": 3,
       "chatroom_id": 79,
@@ -14,7 +14,6 @@ localhost:3000/chatrooms/79/new_message?token=MR3WxyZ-d6IDYYs5BkKcAw&content=oua
       "created_at": "2016-04-14T06:39:57.485Z",
       "updated_at": "2016-04-14T06:39:57.485Z"
     }
-  ]
 }
 
 FAILURE =>

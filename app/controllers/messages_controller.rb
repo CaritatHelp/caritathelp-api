@@ -164,11 +164,9 @@ class MessagesController < ApplicationController
   example SampleJson.chatrooms('new_message')
   def new_message
     begin
-      message = Message.create!([
-                                 :content => params[:content],
-                                 :volunteer_id => @volunteer.id,
-                                 :chatroom_id => @chatroom.id
-                                ])
+      message = Message.create!(:content => params[:content],
+                                :volunteer_id => @volunteer.id,
+                                :chatroom_id => @chatroom.id)
       @chatroom.number_messages += 1
       @chatroom.save!
 
