@@ -102,6 +102,20 @@ class FriendshipController < ApplicationController
     end
   end
 
+  api :GET, '/friendship/received_invitations', "List all pending friends' invitations"
+  param :token, String, "Your token", :required => true
+  example SampleJson.friendship('received_invitations')
+  def received_invitations
+    @volunteer = Volunteer.find_by!(token: params[:token])
+
+    volunteers = Volunteer
+                 .select(:id, :firstname, :lastname, :city, :thumb_path)
+                 .joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
+                 .select("notifications.id AS notif_id")
+                 .where("notifications.receiver_id=#{@volunteer.id}")
+    render :json => create_response(volunteers)
+  end
+  
   private
   def create_add_friend
     [sender_id: @volunteer.id,

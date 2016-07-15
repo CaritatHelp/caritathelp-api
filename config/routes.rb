@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     post '/add', to: 'friendship#add'
     post '/reply', to: 'friendship#reply'
     delete '/remove', to: 'friendship#remove'
+    get '/received_invitations', to: 'friendship#received_invitations'
   end
 
   scope 'membership' do
