@@ -23,7 +23,7 @@ class Volunteer < ActiveRecord::Base
 
   before_create :generate_token
   before_create :set_default_picture
-  before_create :set_fullname
+  before_save :set_fullname
   
   validates :mail, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
   validates :password, presence: true, format: { with: VALID_PWD_REGEX }, :on => :create
