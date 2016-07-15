@@ -12,7 +12,9 @@ localhost:3000/chatrooms/79?token=tMb7m0B8cyuWCIHnUQT_cw
       "volunteer_id": 1,
       "content": "coucou",
       "created_at": "2016-04-14T06:39:22.433Z",
-      "updated_at": "2016-04-14T06:39:22.433Z"
+      "updated_at": "2016-04-14T06:39:22.433Z",
+      "fullname": "Robin Vasseur",
+      "thumb_path": "/uploads/picture/default_m.png"
     },
     {
       "id": 2,
@@ -20,7 +22,9 @@ localhost:3000/chatrooms/79?token=tMb7m0B8cyuWCIHnUQT_cw
       "volunteer_id": 1,
       "content": "ça va?",
       "created_at": "2016-04-14T06:39:37.877Z",
-      "updated_at": "2016-04-14T06:39:37.877Z"
+      "updated_at": "2016-04-14T06:39:37.877Z",
+      "fullname": "Robin Vasseur",
+      "thumb_path": "/uploads/picture/default_m.png"
     },
     {
       "id": 3,
@@ -28,7 +32,9 @@ localhost:3000/chatrooms/79?token=tMb7m0B8cyuWCIHnUQT_cw
       "volunteer_id": 3,
       "content": "ouais et toi?",
       "created_at": "2016-04-14T06:39:57.485Z",
-      "updated_at": "2016-04-14T06:39:57.485Z"
+      "updated_at": "2016-04-14T06:39:57.485Z",
+      "fullname": "Nicolas Temenides",
+      "thumb_path": "/uploads/picture/default_m.png"
     }
   ]
 }

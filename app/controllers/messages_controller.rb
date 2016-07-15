@@ -108,9 +108,14 @@ class MessagesController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.chatrooms('show')
   def show
-    # modifier pour renvoyer le nom et l'id de l'envoyeur pour chaque message
-    render :json => create_response(Message.where(:chatroom_id => @chatroom.id)
-                                      .order(created_at: :asc))
+    messages = Message
+               .select("messages.*")
+               .select("(SELECT volunteers.fullname FROM volunteers WHERE volunteers.id=messages.volunteer_id)")
+               .select("(SELECT volunteers.thumb_path thumb_path FROM volunteers WHERE volunteers.id=messages.volunteer_id)")
+               .where(chatroom_id: @chatroom.id)
+               .order(created_at: :asc)
+
+    render :json => create_response(messages)
   end
 
   api :PUT, '/chatrooms/:id/set_name', "Set the name of the chatroom"
