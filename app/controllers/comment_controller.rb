@@ -14,7 +14,10 @@ class CommentController < ApplicationController
     begin
       new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
                                      content: params[:content]]).first
-      render :json => create_response(new_comment.as_json.merge(thumb_path: @volunteer.thumb_path))
+      render :json => create_response(new_comment.as_json.merge(
+                                       thumb_path: @volunteer.thumb_path,
+                                       firstname: @volunteer.firstname,
+                                       lastname: @volunteer.lastname))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
