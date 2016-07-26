@@ -142,10 +142,10 @@ Shelter.create([name: 'Auberge de jeunesse', address: 'Rue du swag',
                description: "Yolo", assoc_id: 1])
 Shelter.create([name: 'Shelter du swag', address: 'Rue du swag',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 2])
+               description: "Yolo", assoc_id: 1])
 Shelter.create([name: 'Auberge de vieillesse', address: 'Rue du swag',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 2])
+               description: "Yolo", assoc_id: 1])
 
 # Notifications
 

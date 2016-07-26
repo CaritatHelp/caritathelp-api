@@ -17,8 +17,8 @@ nOTIF_CARITATHELP = "JDEje9578efr9zeUPAMD65"
 
 EventMachine.run do
 
-  EventMachine::WebSocket.start(host: "0.0.0.0", port: 8080, debug: true) do |ws|
-    ws.onopen do      
+  EventMachine::WebSocket.start(host: "172.31.31.97", port: 8080, debug: true) do |ws|
+    ws.onopen do
       begin
         current_user_token = nil
         @channel = EM::Channel.new
@@ -26,6 +26,7 @@ EventMachine.run do
         sid = @channel.subscribe { |msg|
           begin
             ws.send(msg)
+            p "On subscribe: " + msg
           rescue => e
             p "On subscribe: " + e.message.to_s
           end
@@ -38,12 +39,14 @@ EventMachine.run do
             if json_msg['token'].eql?('token')
               if current_user_token.eql?(nil)
                 current_user_token = json_msg['token_user']
+                p "Connection of user with token: " + current_user_token
                 @channels_list[current_user_token] = @channel
               end
               
             elsif @tokens_types.key?(json_msg['token'])
               json_msg['type'] = @tokens_types[json_msg['token']]
-              
+
+              p "type: " + @tokens_types[json_msg['token']]
               concerned_volunteers = json_msg['concerned_volunteers']            
               json_msg.delete('concerned_volunteers')
               json_msg.delete('token')
@@ -51,13 +54,14 @@ EventMachine.run do
               if concerned_volunteers != nil and concerned_volunteers.count > 0
                 concerned_volunteers.each do |volunteer|
                   if @channels_list[volunteer['token']] != nil
+                    p "send to volunteer with token: " + volunteer['token']
                     @channels_list[volunteer['token']]
                       .push(json_msg.to_json)
                   end
                 end
               end
             end
-          rescue => e
+          rescue => e            
             p "On send: " + e.message.to_s
           end
         }
@@ -73,7 +77,7 @@ EventMachine.run do
         }
       rescue => e
         p e.message.to_s
-      end      
+      end
     end
   end
 end
