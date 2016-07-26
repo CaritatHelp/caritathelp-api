@@ -36,6 +36,8 @@ en:
       owner: "You can't leave this association because you are the owner"
       research: 'Research field is missing'
       uninvite: "No such invitation"
+      follower: "You can't do that with a follower"
+      blocked: "A blocked volunteer can't join the blocking association"
 
     success:
       deleted: 'Successfuly deleted assoc'
@@ -76,7 +78,8 @@ en:
     success:
       kicked: 'Guest has been kicked'
       upgraded: 'Guest successfuly upgraded'
-      join_event: 'You successfuly applied to this event'
+      join_event: 'You successfuly joined this event'
+      apply_event: 'You successfuly applied to this event'
       reply_guest: 'You successfuly replied to this guest request'
       invite_guest: 'You successfuly invited this guest to join your event'
       reply_invite: 'You successfuly replied to this invitation'
@@ -118,6 +121,22 @@ en:
 
     success:
       deleted: 'Successfuly deleted comment'
+
+  follower:
+    success:
+      following: "You're now following this association"
+      unfollowing: "You're not following this association anymore"
+      blocked: "You successfuly blocked this volunteer"
+
+    failure:
+      blocked: "This association blocked you"
+      target_blocked: "This volunteer is already blocked"
+      exists: "You're already following this association"
+      nil: "You're not following this association"
+      target_nil: "This volunteer is not following the association"
+      high_level: "You're a member, please leave the association instead of unfollowing it"
+      target_high_level: "This volunteer is a member, please kick him from the association instead of blocking him"
+      rights: "Permission denied"
 
   messages:
     failure:

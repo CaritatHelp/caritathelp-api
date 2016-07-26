@@ -17,7 +17,7 @@ nOTIF_CARITATHELP = "JDEje9578efr9zeUPAMD65"
 
 EventMachine.run do
 
-  EventMachine::WebSocket.start(host: "172.31.31.97", port: 8080, debug: true) do |ws|
+  EventMachine::WebSocket.start(host: "0.0.0.0", port: 8080, debug: true) do |ws|
     ws.onopen do      
       begin
         current_user_token = nil

@@ -1,7 +1,9 @@
 class AssocsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
+  before_action :set_link, only: [:update, :delete, :events]
   before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
+  before_action :check_block, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
   def_param_group :assocs_create do
@@ -100,6 +102,11 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('events')
   def events
+    privacy = ""
+    if @link.eql?(nil)
+      privacy = " AND events.private=false"
+    end
+
     query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, events.thumb_path, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
       "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
@@ -107,7 +114,7 @@ class AssocsController < ApplicationController
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM events WHERE events.assoc_id=#{@assoc.id}"
+      " FROM events WHERE events.assoc_id=#{@assoc.id}" + privacy
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
@@ -179,8 +186,13 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('news')
   def news
+    privacy = ""
+    link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
+    if link.eql?(nil)
+      privacy = " AND new_news.type<>'New::Assoc::AdminPrivateWallMessage'"
+    end
     news = New::New
-      .where(assoc_id: @assoc.id)
+      .where("new_news.assoc_id=#{@assoc.id}" + privacy)
       .select('new_news.*, new_news.type AS news_type')
       .joins("INNER JOIN assocs ON assocs.id=new_news.assoc_id")
       .select("assocs.name, assocs.thumb_path")
@@ -202,13 +214,22 @@ class AssocsController < ApplicationController
     @volunteer = Volunteer.find_by(token: params[:token])
   end
 
+  def set_link
+    @link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id).first
+  end
+
   def assoc_params
     params.permit(:name, :description, :birthday, :city, :latitude, :longitude)
   end
 
+  def check_block
+    link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
+    if !link.eql?(nil) and link.level.eql?(AvLink.levels["block"])
+      render :json => create_error(400, t("follower.failure.blocked"))      
+    end
+  end
+
   def check_rights
-    @link = AvLink.where(:volunteer_id => @volunteer.id)
-      .where(:assoc_id => @assoc.id).first
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("assocs.failure.rights"))
       return false

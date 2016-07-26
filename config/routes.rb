@@ -14,11 +14,11 @@ Rails.application.routes.draw do
     get '/notifications', to: 'volunteers#notifications'
     
     # followers routes
-    # post '/follow', to: 'followers#follow'
+    post '/follow', to: 'followers#follow'
 
-    # delete '/unfollow', to: 'followers#unfollow'
+    delete '/unfollow', to: 'followers#unfollow'
 
-    # put '/block', to: 'followers#block'
+    put '/block', to: 'followers#block'
   end
 
 

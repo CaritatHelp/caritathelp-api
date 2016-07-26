@@ -1,4 +1,4 @@
-class New::Volunteer::WallMessage < New::New
+class New::Volunteer::FriendWallMessage < New::New
   validates :volunteer_id, presence: true, :on => :create
   validates :friend_id, presence: true, :on => :create
   validates :content, presence: true, :on => :create

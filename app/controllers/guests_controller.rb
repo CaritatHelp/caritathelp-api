@@ -3,7 +3,8 @@ class GuestsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_event, except: [:reply_invite, :reply_guest]
-  before_action :check_rights, except: [:join, :reply_invite, :leave_event, :reply_guest]
+  before_action :set_link, except: [:reply_invite, :leave_event]
+  before_action :check_rights, except: [:join, :reply_invite, :leave_event]
 
   api :DELETE, '/guests/kick', "Kick guest from the event"
   param :token, String, "Your token", :required => true
@@ -12,20 +13,17 @@ class GuestsController < ApplicationController
   example SampleJson.guests('kick')
   def kick
     begin
-      @to_kick = Volunteer.find_by!(id: params[:volunteer_id])
-
-      volunteer_link = EventVolunteer.where(event_id: @event.id)
-        .where(volunteer_id: @volunteer.id).first
-      if (volunteer_link == nil)
+      if (@link == nil)
         render :json => create_error(400, t("events.failure.rights")) and return
       end
 
-      to_kick_link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @to_kick.id).first
+      to_kick_link = EventVolunteer.where(event_id: @event.id)
+        .where(volunteer_id: @target_volunteer.id).first
       if (to_kick_link == nil)
         render :json => create_error(400, t("events.failure.not_guest")) and return
       end
 
-      if volunteer_link.level <= to_kick_link.level
+      if @link.level <= to_kick_link.level
         render :json => create_error(400, t("events.failure.rights")) and return
       end
 
@@ -44,20 +42,17 @@ class GuestsController < ApplicationController
   example SampleJson.guests('upgrade')
   def upgrade
     begin
-      @to_up = Volunteer.find_by!(id: params[:volunteer_id])
-      
-      volunteer_link = EventVolunteer.where(event_id: @event.id)
-        .where(volunteer_id: @volunteer.id).first
-      if (volunteer_link == nil)
+      if (@link == nil)
         render :json => create_error(400, t("events.failure.rights")) and return
       end
       
-      to_up_link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @to_up.id).first
+      to_up_link = EventVolunteer.where(event_id: @event.id)
+        .where(volunteer_id: @target_volunteer.id).first
       if (to_up_link == nil)
         render :json => create_error(400, t("events.failure.not_guest")) and return
       end
 
-      if volunteer_link.level <= to_up_link.level
+      if @link.level <= to_up_link.level
         render :json => create_error(400, t("events.failure.rights")) and return        
       end
 
@@ -88,25 +83,35 @@ class GuestsController < ApplicationController
         render :json => create_error(400, t("events.failure.join_link_exist"))
         return
       end
-      
-      # create a notification for the event receiving the request
-      notif = Notification.create!(create_join_event)
 
-      # create a link between the notification and each admin of the event
-      Volunteer.joins(:event_volunteers)
-        .where(event_volunteers: { event_id: @event.id })
-        .where("event_volunteers.level > ?", 1)
-        .select("volunteers.id").all.each do |volunteer|
-        NotificationVolunteer.create!([
-                                       volunteer_id: volunteer['id'],
-                                       notification_id: notif[0].id,
-                                       read: false
-                                      ])
+      if @event.private.eql?(false)
+        EventVolunteer.create!(volunteer_id: @volunteer.id,
+                               event_id: @event.id,
+                               rights: 'member')
+        render :json => create_response(t("events.success.join_event"))
+        return
+      elsif @link != nil
+        # create a notification for the event receiving the request
+        notif = Notification.create!(create_join_event)
+        
+        # create a link between the notification and each admin of the event
+        Volunteer.joins(:event_volunteers)
+          .where(event_volunteers: { event_id: @event.id })
+          .where("event_volunteers.level > ?", 1)
+          .select("volunteers.id").all.each do |volunteer|
+          NotificationVolunteer.create!([
+                                         volunteer_id: volunteer['id'],
+                                         notification_id: notif[0].id,
+                                         read: false
+                                        ])
+        end
+        
+        send_notif_to_socket(notif[0])
+        
+        render :json => create_response(nil, 200, t("events.success.apply_event"))
       end
 
-      send_notif_to_socket(notif[0])
-      
-      render :json => create_response(nil, 200, t("events.success.join_event"))
+      render :json => create_error(400, t("events.failure.rights")) and return
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -122,9 +127,7 @@ class GuestsController < ApplicationController
       @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the rights of the person who's trying to accept a guest
-      link = EventVolunteer.where(volunteer_id: @volunteer.id)
-        .where(event_id: @notif.event_id).first
-      if ((link.eql? nil) || (link.rights.eql? 'member'))
+      if ((@link.eql? nil) || (@link.level < EventVolunteer.levels["member"]))
         render :json => create_error(400, t("events.failure.rights")) and return
       end
       
@@ -156,23 +159,20 @@ class GuestsController < ApplicationController
   example SampleJson.guests('invite')
   def invite
     begin
-      @invited_vol = Volunteer.find_by!(id: params[:volunteer_id])
-      
       # Check if volunteer has the permission to invite a guest in event
-      link = EventVolunteer.where(volunteer_id: @volunteer.id).where(event_id: @event.id).first
-      if ((link.eql? nil) || (link.rights.eql? 'member'))
+      if ((@link.eql? nil) || (@link.level < EventVolunteer.levels["member"]))
         render :json => create_error(400, t("events.failure.rights")) and return
       end      
       
-      # Check if invited_vol is already guest or if already applied
-      if ((EventVolunteer.where(volunteer_id: @invited_vol.id)
+      # Check if target_volunteer is already guest or if already applied
+      if ((EventVolunteer.where(volunteer_id: @target_volunteer.id)
              .where(event_id: @event.id).first != nil) ||
           (Notification.where(notif_type: 'JoinEvent')
-             .where(sender_id: @invited_vol.id)
+             .where(sender_id: @target_volunteer.id)
              .where(event_id: @event.id).first != nil) ||
           (Notification.where(notif_type: 'InviteGuest')
              .where(event_id: @event.id)
-             .where(receiver_id: @invited_vol.id).first != nil))
+             .where(receiver_id: @target_volunteer.id).first != nil))
         render :json => create_error(400, t("events.failure.invite_link_exist")) and return
       end
       
@@ -181,7 +181,7 @@ class GuestsController < ApplicationController
 
       send_notif_to_socket(notif[0])
       
-      render :json => create_response(nil, 200, t("events.success.invite_guest"))
+      render :json => create_response(t("events.success.invite_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -267,11 +267,9 @@ class GuestsController < ApplicationController
   example SampleJson.guests('uninvite')
   def uninvite
     begin
-      @to_uninvite = Volunteer.find_by!(id: params[:volunteer_id])
-      
       notif = Notification.where(notif_type: "InviteGuest")
         .where(event_id: @event.id)
-        .where(receiver_id: @to_uninvite.id).first
+        .where(receiver_id: @target_volunteer.id).first
       
       if notif.blank?
         render :json => create_error(400, t("events.failure.uninvite")) and return
@@ -320,6 +318,10 @@ class GuestsController < ApplicationController
     end
   end
 
+  def set_link
+    @link = EventVolunteer.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id).first
+  end
+
   def create_join_event
     [sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
@@ -335,11 +337,19 @@ class GuestsController < ApplicationController
      thumb_path: @event.thumb_path,
      sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
-     receiver_id: @invited_vol.id,
-     receiver_name: @invited_vol.fullname,
+     receiver_id: @target_volunteer.id,
+     receiver_name: @target_volunteer.fullname,
      notif_type: 'InviteGuest']
   end
 
+  def set_target_volunteer
+    begin
+      @target_volunteer = Volunteer.find_by!(id: params[:volunteer_id])
+    rescue
+      render :json => create_error(400, t("volunteers.failure.id")) and return
+    end
+  end
+  
   def create_guest_link(guest_id, event_id)
     begin
       EventVolunteer.create!([event_id: event_id, volunteer_id: guest_id, rights: 'member'])
@@ -350,8 +360,6 @@ class GuestsController < ApplicationController
   end
 
   def check_rights
-    @link = EventVolunteer.where(:volunteer_id => @volunteer.id)
-      .where(:event_id => @event.id).first
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("events.failure.rights"))
       return false

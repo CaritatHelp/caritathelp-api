@@ -2,10 +2,7 @@ class NewsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_new, only: [:show, :comments]
-  before_action :set_assoc, only: [:assoc_status]
-  before_action :set_event, only: [:event_status]
-  before_action :check_assoc_rights, only: [:assoc_status]
-  before_action :check_event_rights, only: [:event_status]
+  before_action :check_news_rights, only: [:show, :comments]
 
   api :GET, '/news', 'Get all news concerning the volunteer refered by the token'
   param :token, String, "Your token", :required => true
@@ -20,23 +17,30 @@ class NewsController < ApplicationController
       .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path")
       .joins("LEFT JOIN event_volunteers ON new_news.event_id=event_volunteers.event_id")
       .joins("LEFT JOIN av_links ON new_news.assoc_id=av_links.assoc_id")
-      .joins("LEFT JOIN v_friends ON new_news.volunteer_id=v_friends.volunteer_id AND new_news.volunteer_id<>#{@volunteer.id}")
-      .where("(event_volunteers.volunteer_id=#{@volunteer.id} AND new_news.type='New::Event::Status') OR (av_links.volunteer_id=#{@volunteer.id} AND new_news.type='New::Assoc::Status') OR (v_friends.friend_volunteer_id=#{@volunteer.id} AND ((new_news.friend_id IS NULL OR new_news.friend_id=#{@volunteer.id}) AND new_news.assoc_id IS NULL AND new_news.event_id IS NULL)) OR new_news.volunteer_id=#{@volunteer.id}").order(updated_at: :desc)
+      .joins("LEFT JOIN v_friends ON new_news.volunteer_id=v_friends.friend_volunteer_id AND new_news.volunteer_id<>#{@volunteer.id} AND new_news.type='New::Volunteer::SelfWallMessage'")
+      .where("(event_volunteers.volunteer_id=#{@volunteer.id} AND new_news.type<>'New::Event::MemberPublicWallMessage' AND event_volunteers.level>=#{EventVolunteer.levels['member']}) OR (av_links.volunteer_id=#{@volunteer.id} AND new_news.type<>'New::Assoc::MemberPublicWallMessage') OR (new_news.type='New::Volunteer::FriendWallMessage' AND new_news.friend_id=#{@volunteer.id}) OR (new_news.type='New::Volunteer::SelfWallMessage' AND (new_news.volunteer_id=#{@volunteer.id} OR v_friends.volunteer_id=#{@volunteer.id}))").order(updated_at: :desc)
     render :json => create_response(news)
   end
 
-  api :POST, '/news/wall_message', "Create a wall message for the volunteer or on a friend's wall"
+  api :POST, '/news/wall_message', "Create a wall message for yourself, friend, assoc or event"
   param :token, String, "Your token", :required => true
   param :content, String, "Content of status", :required => true
   param :friend_id, String, "Id of the friend you want to write on the wall"
   param :assoc_id, String, "Id of the association you want to write on the wall"
   param :event_id, String, "Id of the event you want to write on the wall"
+  param :public, String, "Default: true. Set to false if you want the news to be visible only by members. (only for an event or association wall message)"
   example SampleJson.news('wall_message')
   def wall_message
     begin
       a = params.has_key?(:friend_id)
       b = params.has_key?(:assoc_id)
       c = params.has_key?(:event_id)
+      is_public = true
+      admin = false
+
+      if params.has_key?(:private) and params[:private].eql?('true')
+        is_public = false
+      end
 
       if !((a and !b and !c) or (!a and b and !c) or (!a and !b and c) or (!a and !b and !c))
           render :json => create_error(400, t("news.failure.args")) and return
@@ -48,62 +52,56 @@ class NewsController < ApplicationController
         if link.eql?(nil)
           render :json => create_error(400, t("news.failure.rights")) and return
         end
-        wall_message = New::Volunteer::WallMessage.create!(content: params[:content],
-                                                           volunteer_id: @volunteer.id,
-                                                           friend_id: friend.id)
+        wall_message = New::Volunteer::FriendWallMessage.create!(content: params[:content],
+                                                                 volunteer_id: @volunteer.id,
+                                                                 friend_id: friend.id)
       elsif params.has_key?(:assoc_id)
         assoc = Assoc.find(params[:assoc_id])
         link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: assoc.id).first
         if link.eql?(nil)
           render :json => create_error(400, t("news.failure.rights")) and return
         end
-        wall_message = New::Assoc::WallMessage.create!(content: params[:content],
-                                                          volunteer_id: @volunteer.id,
-                                                          assoc_id: assoc.id)
+        admin = true unless link.level < AvLink.levels["admin"]
+        if !admin
+          wall_message = New::Assoc::MemberPublicWallMessage.create!(content: params[:content],
+                                                                     volunteer_id: @volunteer.id,
+                                                                     assoc_id: assoc.id)
+        elsif admin and is_public
+          wall_message = New::Assoc::AdminPublicWallMessage.create!(content: params[:content],
+                                                                    volunteer_id: @volunteer.id,
+                                                                    assoc_id: assoc.id)
+        else
+          wall_message = New::Assoc::AdminPrivateWallMessage.create!(content: params[:content],
+                                                                     volunteer_id: @volunteer.id,
+                                                                     assoc_id: assoc.id,
+                                                                     private: true)
+        end
       elsif params.has_key?(:event_id)
         event = Event.find(params[:event_id])
         link = EventVolunteer.where(volunteer_id: @volunteer.id).where(event_id: event.id).first
         if link.eql?(nil)
           render :json => create_error(400, t("news.failure.rights")) and return
         end
-        wall_message = New::Event::WallMessage.create!(content: params[:content],
-                                                          volunteer_id: @volunteer.id,
-                                                          event_id: event.id)
+        admin = true unless link.level < EventVolunteer.levels["admin"]
+        if !admin
+          wall_message = New::Event::MemberPublicWallMessage.create!(content: params[:content],
+                                                                     volunteer_id: @volunteer.id,
+                                                                     event_id: event.id)
+        elsif admin and is_public
+          wall_message = New::Event::AdminPublicWallMessage.create!(content: params[:content],
+                                                                    volunteer_id: @volunteer.id,
+                                                                    event_id: event.id)
+        else
+          wall_message = New::Event::AdminPrivateWallMessage.create!(content: params[:content],
+                                                                     volunteer_id: @volunteer.id,
+                                                                     event_id: event.id,
+                                                                     private: true)
+        end
       else
-        wall_message = New::Volunteer::Status.create!(content: params[:content],
-                                                      volunteer_id: @volunteer.id)
+        wall_message = New::Volunteer::SelfWallMessage.create!(content: params[:content],
+                                                               volunteer_id: @volunteer.id)
       end
       render :json => create_response(wall_message.as_json.merge('type' => wall_message.type))
-    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-      render :json => create_error(400, e.to_s) and return
-    end
-  end
-
-  api :POST, '/news/assoc_status', 'Create a new status for the assoc'
-  param :token, String, "Your token", :required => true
-  param :content, String, "Content of status", :required => true
-  param :assoc_id, String, "Id of the assoc writing the new status", :required => true
-  example SampleJson.news('assoc_status')
-  def assoc_status
-    begin
-      new_status = New::Assoc::Status.create!(content: params[:content],
-                                              assoc_id: @assoc.id)
-      render :json => create_response(new_status.as_json.merge('type' => new_status.type))
-    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-      render :json => create_error(400, e.to_s) and return
-    end
-  end
-
-  api :POST, '/news/event_status', 'Create a new status for the event'
-  param :token, String, "Your token", :required => true
-  param :content, String, "Content of status", :required => true
-  param :event_id, String, "Id of the event writing the new status", :required => true
-  example SampleJson.news('event_status')
-  def event_status
-    begin
-      new_status = New::Event::Status.create!(content: params[:content],
-                                              event_id: @event.id)
-      render :json => create_response(new_status.as_json.merge('type' => new_status.type))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -133,22 +131,6 @@ class NewsController < ApplicationController
   end
 
   private
-  def set_event
-    begin
-      @event = Event.find(params[:event_id])
-    rescue
-      render :json => create_error(400, t("events.failure.id"))
-    end
-  end
-
-  def set_assoc
-    begin
-      @assoc = Assoc.find(params[:assoc_id])
-    rescue
-      render :json => create_error(400, t("assocs.failure.id"))
-    end
-  end
-
   def set_new
     begin
       @new = New::New.find(params[:id])
@@ -169,6 +151,62 @@ class NewsController < ApplicationController
       return false
     end
     return true
+  end
+
+  def check_news_rights
+    begin
+      if @new.volunteer_id.eql?(@volunteer.id)
+        return true
+      end
+      
+      if @new.private # Checking rights for a private news
+        if @new.assoc_id != nil # private assoc news
+          link = AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).first
+          if !link.eql?(nil) and link.level >= AvLink.levels["member"]
+            return true
+          end
+        elsif @new.event_id != nil # private event news
+          link = EventVolunteer.where(event_id: @new.event_id)
+            .where(volunteer_id: @volunteer.id).first
+          if !link.eql?(nil) and link.level >= EventVolunteer.levels["member"]
+            return true
+          end
+        else # private friend news
+          link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
+            .where(volunteer_id: @new.volunteer_id).first
+          if !link.eql?(nil)
+            return true
+          end
+        end
+      else # Checking rights for a public news
+        if @new.assoc_id != nil # public assoc news
+          return true
+        elsif @new.event_id != nil # public event news
+          event = Event.find(@new.event_id)
+          event_link = EventVolunteer.where(event_id: @new.event_id)
+            .where(volunteer_id: @volunteer.id).first
+
+          if event.private # public news of a private event
+            assoc_link = AvLink.where(assoc_id: event.assoc_id)
+              .where(volunteer_id: @volunteer.id).first
+            if !assoc_link.eql?(nil) and assoc_link.level >= AvLink.levels["member"]
+              return true
+            end
+          else # public news of a public event
+            return true
+          end
+        else # public friend news
+          link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
+            .where(volunteer_id: @new.volunteer_id).first
+          if !link.eql?(nil)
+            return true
+          end
+        end
+      end
+      render :json => create_error(400, t("news.failure.rights"))
+    rescue => e
+      render :json => create_error(400, e.to_s)
+    end
   end
   
   def check_assoc_rights

@@ -3,6 +3,8 @@ class EventsController < ApplicationController
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]
+  before_action :set_link, only: [:update, :delete, :show]
+  before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
   def_param_group :create_event do
@@ -33,6 +35,7 @@ class EventsController < ApplicationController
       .select("(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights")
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
       .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .where(private: false)
     render :json => create_response(events)
   end
 
@@ -49,7 +52,7 @@ class EventsController < ApplicationController
 
       assoc_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
 
-      if assoc_link == nil || assoc_link.rights.eql?('member')
+      if assoc_link == nil or assoc_link.level < AvLink.levels["admin"]
         render :json => create_error(400, t("events.failure.rights")) and return        
       end
       
@@ -73,9 +76,8 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('show')
   def show
-    link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first
-    if link != nil
-      render :json => create_response(@event.as_json.merge('rights' => link.rights)) and return
+    if @link != nil
+      render :json => create_response(@event.as_json.merge('rights' => @link.rights)) and return
     end
     rights = 'none'
 
@@ -182,8 +184,13 @@ class EventsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.events('news')
   def news
+    privacy = ""
+    link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first
+    if link.eql?(nil)
+      privacy = " AND new_news.type<>'New::Event::AdminPrivateWallMessage'"
+    end
     news = New::New
-      .where(event_id: @event.id)
+      .where("new_news.event_id=#{@event.id}" + privacy)
       .select("new_news.*, new_news.type AS news_type")
       .joins("INNER JOIN events ON events.id=new_news.event_id")
       .select("events.title AS name, events.thumb_path")
@@ -214,18 +221,27 @@ class EventsController < ApplicationController
   end
 
   def event_params_creation
-    params_event = params.permit(:title, :description, :place, :begin, :end, :assoc_id)
+    params_event = params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private)
     params_event[:assoc_name] = @assoc.name
     params_event
   end
 
   def event_params_update
-    params.permit(:title, :description, :place, :begin, :end)
+    params.permit(:title, :description, :place, :begin, :end, :private)
+  end
+
+  def set_link
+    @link = EventVolunteer.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id).first
+  end
+
+  def check_privacy
+    assoc_link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @event.assoc_id).first
+    if @event.private.eql?(true) and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
+      render :json => create_error(400, t("events.failure.rights")) and return      
+    end
   end
 
   def check_rights
-    @link = EventVolunteer.where(:volunteer_id => @volunteer.id)
-      .where(:event_id => @event.id).first
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("events.failure.rights"))
       return false

@@ -18,7 +18,9 @@ module PgTest
         
     config.default_thumb_male = "/uploads/picture/default_m.png"
     config.default_thumb_female = "/uploads/picture/default_f.png"
-    config.ip = "172.31.31.97"
+    config.default_shelter = "/uploads/picture/default_shelter.jpg"
+    config.logo = "/uploads/picture/logo_caritathelp.png"
+    config.ip = "0.0.0.0"
     config.port_websocket = 8080
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]

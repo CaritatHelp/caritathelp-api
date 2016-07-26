@@ -3,7 +3,7 @@ class CommentController < ApplicationController
   before_action :set_volunteer
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
-  before_action :check_rights, only: [:create]
+  before_action :check_rights
 
   api :POST, '/comments', 'Create a comment linked to the new'
   param :token, String, "Your token", :required => true
@@ -67,6 +67,7 @@ class CommentController < ApplicationController
   def set_comment
     begin
       @comment = Comment.find(params[:id])
+      @new = New::New.find(@comment.new_id)
     rescue
       render :json => create_error(400, t("comments.failure.id"))
     end
@@ -81,16 +82,58 @@ class CommentController < ApplicationController
   end
 
   def check_rights
-    # can't put several conditions on multiples lines? SyntaxError
-    is_assoc_concerned = (!@new.assoc_id.eql?(nil) && AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).present?)
-    is_event_concerned = (!@new.event_id.eql?(nil) && EventVolunteer.where(event_id: @new.event_id).where(volunteer_id: @volunteer.id).present?)
-    is_friend_concerned = (!@new.volunteer_id.eql?(nil) && VFriend.where(friend_volunteer_id: @new.volunteer_id).where(volunteer_id: @volunteer.id).present?)
-    is_himself = @new.volunteer_id.eql?(@volunteer.id)
-    
-    if is_assoc_concerned or is_event_concerned or is_friend_concerned or is_himself
-      return true
-    end
-    render :json => create_error(400, t("comments.failure.rights"))
-    return false
+    begin
+      if @new.volunteer_id.eql?(@volunteer.id)
+        return true
+      end
+      
+      if @new.private # Checking rights for a private news
+        if @new.assoc_id != nil # private assoc news
+          link = AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).first
+          if !link.eql?(nil) and link.level >= AvLink.levels["member"]
+            return true
+          end
+        elsif @new.event_id != nil # private event news
+          link = EventVolunteer.where(event_id: @new.event_id)
+            .where(volunteer_id: @volunteer.id).first
+          if !link.eql?(nil) and link.level >= EventVolunteer.levels["member"]
+            return true
+          end
+        else # private friend news
+          link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
+            .where(volunteer_id: @new.volunteer_id).first
+          if !link.eql?(nil)
+            return true
+          end
+        end
+      else # Checking rights for a public news
+        if @new.assoc_id != nil # public assoc news
+          return true
+        elsif @new.event_id != nil # public event news
+          event = Event.find(@new.event_id)
+          event_link = EventVolunteer.where(event_id: @new.event_id)
+            .where(volunteer_id: @volunteer.id).first
+
+          if event.private # public news of a private event
+            assoc_link = AvLink.where(assoc_id: event.assoc_id)
+              .where(volunteer_id: @volunteer.id).first
+            if !assoc_link.eql?(nil) and assoc_link.level >= AvLink.levels["member"]
+              return true
+            end
+          else # public news of a public event
+            return true
+          end
+        else # public friend news
+          link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
+            .where(volunteer_id: @new.volunteer_id).first
+          if !link.eql?(nil)
+            return true
+          end
+        end
+      end
+      render :json => create_error(400, t("comments.failure.rights"))
+    rescue => e
+      render :json => create_error(400, e.to_s)
+    end    
   end
 end

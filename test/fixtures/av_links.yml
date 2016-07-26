@@ -5,51 +5,74 @@ one:
   assoc_id: 1
   volunteer_id: 1
   rights: "owner"
+  level: <%= AvLink.levels['owner'] %>
 
 two:
   id: 2
   assoc_id: 1
   volunteer_id: 2
   rights: "admin"
+  level: <%= AvLink.levels["admin"] %>
 
 three:
   id: 3
   assoc_id: 1
   volunteer_id: 3
   rights: "admin"
+  level: <%= AvLink.levels["admin"] %>
 
 four:
   id: 4
   assoc_id: 1
   volunteer_id: 4
   rights: "member"
+  level: <%= AvLink.levels["member"] %>
 
 five:
   id: 5
   assoc_id: 1
   volunteer_id: 5
   rights: "member"
+  level: <%= AvLink.levels["member"] %>
 
 six:
   id: 6
   assoc_id: 1
   volunteer_id: 6
   rights: "member"
+  level: <%= AvLink.levels["member"] %>
 
 seven:
   id: 7
   assoc_id: 2
   volunteer_id: 1
   rights: "member"
+  level: <%= AvLink.levels["member"] %>
 
 eight:
   id: 8
   assoc_id: 2
   volunteer_id: 2
   rights: "owner"
+  level: <%= AvLink.levels["owner"] %>
 
 nine:
   id: 9
   assoc_id: 2
   volunteer_id: 3
   rights: "admin"
+  level: <%= AvLink.levels["admin"] %>
+
+ten:
+  id: 10
+  assoc_id: 2
+  volunteer_id: 4
+  rights: "follower"
+  level: <%= AvLink.levels["follower"] %>
+
+eleven:
+  id: 11
+  assoc_id: 2
+  volunteer_id: 5
+  rights: "follower"
+  level: <%= AvLink.levels["follower"] %>

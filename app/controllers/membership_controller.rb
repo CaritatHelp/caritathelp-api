@@ -2,8 +2,10 @@ class MembershipController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, except: [:reply_invite, :reply_member]
-  before_action :check_rights, except: [:join_assoc, :reply_invite, :leave_assoc, :reply_member]
+  before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
+  before_action :set_assoc, except: [:reply_member, :reply_invite]
+  before_action :check_target_follower, only: [:kick, :upgrade]
+  before_action :check_rights, except: [:join_assoc, :reply_invite]
 
   api :DELETE, '/membership/kick', "Kick member from the association"
   param :token, String, "Your token", :required => true
@@ -12,14 +14,12 @@ class MembershipController < ApplicationController
   example SampleJson.membership('kick')
   def kick
     begin
-      @to_kick = Volunteer.find_by!(id: params[:volunteer_id])
-
       volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
       if (volunteer_link == nil)
         render :json => create_error(400, t("assocs.failure.rights")) and return
       end
 
-      to_kick_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @to_kick.id).first
+      to_kick_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @target_volunteer.id).first
       if (to_kick_link == nil)
         render :json => create_error(400, t("assocs.failure.notmember")) and return
       end
@@ -43,14 +43,12 @@ class MembershipController < ApplicationController
   example SampleJson.membership('upgrade')
   def upgrade
     begin
-      @to_up = Volunteer.find_by!(id: params[:volunteer_id])
-      
       volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
       if (volunteer_link == nil)
         render :json => create_error(400, t("assocs.failure.rights")) and return
       end
       
-      to_up_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @to_up.id).first
+      to_up_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @target_volunteer.id).first
       if (to_up_link == nil)
         render :json => create_error(400, t("assocs.failure.notmember")) and return
       end
@@ -71,10 +69,10 @@ class MembershipController < ApplicationController
   param :assoc_id, String, "Association concerned", :required => true
   example SampleJson.membership('join')
   def join_assoc
-    begin      
+    begin
       # Check if already member or if already applied
-      if ((AvLink.where(volunteer_id: @volunteer.id)
-             .where(assoc_id: @assoc.id).first != nil) ||
+      link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
+      if ((link != nil and !link.level.eql?(AvLink.levels['follower'])) ||
           (Notification.where(notif_type: 'JoinAssoc')
              .where(sender_id: @volunteer.id)
              .where(assoc_id: @assoc.id).first != nil) ||
@@ -84,7 +82,7 @@ class MembershipController < ApplicationController
         render :json => create_error(400, t("notifications.failure.joinassoc.exist"))
         return
       end
-      
+
       # create a notification for the association receiving the request
       notif = Notification.create!(create_join_assoc)
 
@@ -151,17 +149,15 @@ class MembershipController < ApplicationController
   example SampleJson.membership('invite')
   def invite
     begin
-      @invited_vol = Volunteer.find_by!(id: params[:volunteer_id])
-            
       # Check if invited_member is already member or if already applied
-      if ((AvLink.where(volunteer_id: @invited_vol.id)
+      if ((AvLink.where(volunteer_id: @target_volunteer.id)
              .where(assoc_id: @assoc.id).first != nil) ||
           (Notification.where(notif_type: 'JoinAssoc')
-             .where(sender_id: @invited_vol.id)
+             .where(sender_id: @target_volunteer.id)
              .where(assoc_id: @assoc.id).first != nil) ||
           (Notification.where(notif_type: 'InviteMember')
              .where(assoc_id: @assoc.id)
-             .where(receiver_id: @invited_vol.id).first != nil))
+             .where(receiver_id: @target_volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.invitemember.exist")) and return
       end
       
@@ -237,11 +233,11 @@ class MembershipController < ApplicationController
   param :assoc_id, String, "Id of the association", :required => true
   example SampleJson.membership('invited')
   def invited
-    invited_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.receiver_id=volunteers.id")
+    target_volunteerunteers = Volunteer.joins("INNER JOIN notifications ON notifications.receiver_id=volunteers.id")
       .where("notifications.notif_type='InviteMember'")
       .where("notifications.assoc_id=#{@assoc.id}")
       .select("volunteers.*, notifications.created_at AS sending_date")
-    render :json => create_response(invited_volunteers
+    render :json => create_response(target_volunteerunteers
                                       .as_json(except: [:token, :password,
                                                        :created_at, :updated_at]))
   end
@@ -253,11 +249,9 @@ class MembershipController < ApplicationController
   example SampleJson.membership('uninvite')
   def uninvite
     begin
-      @to_uninvite = Volunteer.find_by!(id: params[:volunteer_id])
-      
       notif = Notification.where(notif_type: "InviteMember")
         .where(assoc_id: @assoc.id)
-        .where(receiver_id: @to_uninvite.id).first
+        .where(receiver_id: @target_volunteer.id).first
       
       if notif.blank?
         render :json => create_error(400, t("assocs.failure.uninvite")) and return
@@ -305,14 +299,23 @@ class MembershipController < ApplicationController
      thumb_path: @assoc.thumb_path,
      sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
-     receiver_id: @invited_vol.id,
-     receiver_name: @invited_vol.fullname,
+     receiver_id: @target_volunteer.id,
+     receiver_name: @target_volunteer.fullname,
      notif_type: 'InviteMember']
   end
 
   def create_member_link(member_id, assoc_id)
     begin
-      AvLink.create!([assoc_id: assoc_id, volunteer_id: member_id, rights: 'member'])
+      link = AvLink.where(assoc_id: assoc_id).where(volunteer_id: member_id).first
+      
+      if link.eql?(nil)
+        AvLink.create!([assoc_id: assoc_id, volunteer_id: member_id, rights: 'member'])
+      elsif link.rights.eql?('follower')
+        link.rights = 'member'
+        link.save!
+      elsif link.rights.eql?('block')
+        render :json => create_error(400, t("assocs.failure.blocked")) and return        
+      end
       return true
     rescue ActiveRecord::RecordInvalid => e
       return false
@@ -323,6 +326,14 @@ class MembershipController < ApplicationController
     @volunteer = Volunteer.find_by!(token: params[:token])
   end
 
+  def set_target_volunteer
+    begin
+      @target_volunteer = Volunteer.find_by!(id: params[:volunteer_id])
+    rescue
+      render :json => create_error(400, t("volunteers.failure.id")) and return
+    end
+  end
+
   def set_assoc
     begin
       @assoc = Assoc.find_by!(id: params[:assoc_id])
@@ -331,10 +342,17 @@ class MembershipController < ApplicationController
     end
   end
 
+  def check_target_follower
+    link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @target_volunteer.id).first
+    if link.eql?(nil) or link.rights.eql?('follower')
+      render :json => create_error(400, t("assocs.failure.follower"))
+    end
+  end
+
   def check_rights
     @link = AvLink.where(:volunteer_id => @volunteer.id)
       .where(:assoc_id => @assoc.id).first
-    if @link.eql?(nil) || @link.rights.eql?('member')
+    if @link.eql?(nil) || @link.rights.eql?('member') || @link.rights.eql?('follower')
       render :json => create_error(400, t("assocs.failure.rights"))
       return false
     end

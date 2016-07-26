@@ -132,41 +132,70 @@ Message.create([chatroom_id: chatroom_two[:id], volunteer_id: robin[:id],
 # Shelters
 
 Shelter.create([name: 'Super shelter de la mort', address: 'Rue du swag',
-               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
+               description: "Yolo", assoc_id: 1])
 Shelter.create([name: 'Shelter de la mort', address: 'Rue du swag',
-               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
+               description: "Yolo", assoc_id: 1])
 Shelter.create([name: 'Auberge de jeunesse', address: 'Rue du swag',
-               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
+               description: "Yolo", assoc_id: 1])
 Shelter.create([name: 'Shelter du swag', address: 'Rue du swag',
-               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
+               description: "Yolo", assoc_id: 2])
 Shelter.create([name: 'Auberge de vieillesse', address: 'Rue du swag',
-               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150])
+               zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
+               description: "Yolo", assoc_id: 2])
 
 # Notifications
 
 # News
 
-New::Assoc::Status.create([content: "Donnez des sous à la croix verte et vous deviendrez riche", assoc_id: croix_rouge.id])
-New::Assoc::Status.create([content: "Que Dieu vous protège wala", assoc_id: croix_rouge.id])
-New::Assoc::Status.create([content: "Et donnez nous de la thune encore", assoc_id: croix_rouge.id])
-New::Assoc::Status.create([content: "Nous on aime manger", assoc_id: resto.id])
-New::Assoc::Status.create([content: "Et faire des batailles de bouffe", assoc_id: resto.id])
+New::Assoc::AdminPublicWallMessage.create(content: "Donnez des sous à la croix verte et vous deviendrez riche",
+                                          assoc_id: croix_rouge.id,
+                                          volunteer_id: robin.id)
+New::Assoc::AdminPrivateWallMessage.create(content: "Que Dieu vous protège wala",
+                                          assoc_id: croix_rouge.id,
+                                          volunteer_id: robin.id)
+New::Assoc::AdminPublicWallMessage.create(content: "Et donnez nous de la thune encore",
+                                          assoc_id: croix_rouge.id,
+                                          volunteer_id: robin.id)
+New::Assoc::AdminPublicWallMessage.create(content: "Nous on aime manger",
+                                          assoc_id: resto.id,
+                                          volunteer_id: pierre.id)
+New::Assoc::AdminPublicWallMessage.create(content: "Et faire des batailles de bouffe",
+                                          assoc_id: resto.id,
+                                          volunteer_id: pierre.id)
 
-New::Event::Status.create([content: "Qui veut se faire soigner?", event_id: event_one.id])
-New::Event::Status.create([content: "Pourquoi on doit tous risquer sa peau pour un seul soldat?", event_id: event_two.id])
-New::Event::Status.create([content: "PARCE QUE VIVE L'AMERIQUE", event_id: event_two.id])
-New::Event::Status.create([content: "On vous donne à manger mais laissez nous en quand même please", event_id: event_three.id])
-New::Event::Status.create([content: "Va fencu*** ti amo viva italia sisi", event_id: event_four.id])
-New::Event::Status.create([content: "Ah bondou fou foulé dé makihein?", event_id: event_five.id])
-New::Event::Status.create([content: "Sushi maki pas cher", event_id: event_five.id])
+New::Event::AdminPublicWallMessage.create(content: "Qui veut se faire soigner?",
+                                          event_id: event_one.id,
+                                          volunteer_id: robin.id)
+New::Event::AdminPrivateWallMessage.create(content: "Pourquoi on doit tous risquer sa peau pour un seul soldat?",
+                                           event_id: event_two.id,
+                                           volunteer_id: nicolas.id)
+New::Event::MemberPublicWallMessage.create(content: "PARCE QUE VIVE L'AMERIQUE",
+                                           event_id: event_two.id,
+                                           volunteer_id: jeremy.id)
+New::Event::AdminPublicWallMessage.create(content: "On vous donne à manger mais laissez nous en quand même please",
+                                          event_id: event_three.id,
+                                          volunteer_id: robin.id)
+New::Event::AdminPublicWallMessage.create(content: "Va fencu*** ti amo viva italia sisi",
+                                          event_id: event_four.id,
+                                          volunteer_id: pierre.id)
+New::Event::AdminPublicWallMessage.create(content: "Ah bondou fou foulé dé makihein?",
+                                          event_id: event_five.id,
+                                          volunteer_id: aude.id)
+New::Event::AdminPrivateWallMessage.create(content: "Sushi maki pas cher",
+                                           event_id: event_five.id,
+                                           volunteer_id: aude.id)
 
-New::Volunteer::Status.create([content: "Je m'appelle Robin et j'aime les pommes", volunteer_id: robin.id])
-New::Volunteer::Status.create([content: "Cool non?", volunteer_id: robin.id])
-New::Volunteer::Status.create([content: "Je m'apelle Nicolas et je suis moche", volunteer_id: nicolas.id])
-New::Volunteer::Status.create([content: "League of Legend c'est trop bien", volunteer_id: nicolas.id])
-New::Volunteer::Status.create([content: "J'suis lvl 351 sur overwatch lol", volunteer_id: aude.id])
-New::Volunteer::Status.create([content: "Je suis secretement amoureux de Jeremy", volunteer_id: pierre.id])
-New::Volunteer::Status.create([content: "Je suis secretement amoureux de Pierre", volunteer_id: jeremy.id])
-New::Volunteer::Status.create([content: "J'ai posé une google map sur un site et bim 30 crédits OKLM !", volunteer_id: jerome.id])
-New::Volunteer::Status.create([content: "Moi aussi je t'aime Jeremy", volunteer_id: pierre.id])
-New::Volunteer::Status.create([content: "Haha je rigolais t'es moche Pierre", volunteer_id: jeremy.id])
+New::Volunteer::SelfWallMessage.create(content: "Je m'appelle Robin et j'aime les pommes", volunteer_id: robin.id)
+New::Volunteer::SelfWallMessage.create(content: "Cool non?", volunteer_id: robin.id)
+New::Volunteer::SelfWallMessage.create(content: "Je m'apelle Nicolas et je suis moche", volunteer_id: nicolas.id)
+New::Volunteer::SelfWallMessage.create(content: "League of Legend c'est trop bien", volunteer_id: nicolas.id)
+New::Volunteer::SelfWallMessage.create(content: "J'suis lvl 351 sur overwatch lol", volunteer_id: aude.id)
+New::Volunteer::SelfWallMessage.create(content: "Je suis secretement amoureux de Jeremy", volunteer_id: pierre.id)
+New::Volunteer::SelfWallMessage.create(content: "Je suis secretement amoureux de Pierre", volunteer_id: jeremy.id)
+New::Volunteer::SelfWallMessage.create(content: "J'ai posé une google map sur un site et bim 30 crédits OKLM !", volunteer_id: jerome.id)
+New::Volunteer::SelfWallMessage.create(content: "Moi aussi je t'aime Jeremy", volunteer_id: pierre.id)
+New::Volunteer::SelfWallMessage.create(content: "Haha je rigolais t'es moche Pierre", volunteer_id: jeremy.id)

@@ -1,4 +1,5 @@
 class EventVolunteer < ActiveRecord::Base
+  enum levels: { host: 10, admin: 8, member: 5} 
   before_save :check_nil
   before_save :set_level
 
@@ -14,11 +15,11 @@ class EventVolunteer < ActiveRecord::Base
 
   def set_level
     if self.rights.eql? 'host'
-      self.level = 3
+      self.level = EventVolunteer.levels["host"]
     elsif self.rights.eql? 'admin'
-      self.level = 2
+      self.level = EventVolunteer.levels["admin"]
     else
-      self.level = 1
+      self.level = EventVolunteer.levels["member"]
     end
   end
 end

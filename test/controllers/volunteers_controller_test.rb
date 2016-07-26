@@ -25,13 +25,6 @@ class VolunteersControllerTest < ActionController::TestCase
     assert body['response']['mail'].eql? 'nicolas@root.com'
   end
 
-  test "should get a list of matching volunteers" do
-    get :search, :token => 'tokenrobin', :research => 'vasseur'
-    assert_response :success
-    body = JSON.parse(response.body)
-    assert body['response'][0]['mail'].eql? 'robin@root.com'
-  end
-
   test "should update volunteer" do
     put :update, :id => 1, :token => 'tokenrobin',
     :firstname => 'toto', :password => 'efzef5484zef'
