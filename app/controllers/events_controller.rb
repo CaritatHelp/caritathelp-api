@@ -195,7 +195,7 @@ class EventsController < ApplicationController
       .joins("INNER JOIN events ON events.id=new_news.event_id")
       .select("events.title AS name, events.thumb_path")
       .select("(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_fullname")
-      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path")
+      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path").order(updated_at: :desc)
     render :json => create_response(news)
   end
 

@@ -294,6 +294,7 @@ class VolunteersController < ApplicationController
       .select("new_news.*, new_news.type AS news_type")
       .joins("INNER JOIN volunteers ON volunteers.id=new_news.volunteer_id")
       .select("volunteers.firstname, volunteers.lastname, volunteers.thumb_path")
+      .order(updated_at: :desc)
     render :json => create_response(news)
   end
 

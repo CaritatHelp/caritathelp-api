@@ -197,7 +197,7 @@ class AssocsController < ApplicationController
       .joins("INNER JOIN assocs ON assocs.id=new_news.assoc_id")
       .select("assocs.name, assocs.thumb_path")
       .select("(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_fullname")
-      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path")
+      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path").order(updated_at: :desc)
     render :json => create_response(news)
   end
 
