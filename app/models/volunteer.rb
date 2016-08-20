@@ -1,4 +1,9 @@
 class Volunteer < ActiveRecord::Base
+  # Include default devise modules.
+  devise :database_authenticatable, :registerable,
+          :recoverable, :rememberable, :trackable, :validatable,
+          :confirmable, :omniauthable
+  include DeviseTokenAuth::Concerns::User
   has_many :chatrooms, through: :chatroom_volunteers
   has_many :chatroom_volunteers
 
@@ -27,12 +32,12 @@ class Volunteer < ActiveRecord::Base
   before_create :set_default_picture
   before_save :set_fullname
   
-  validates :mail, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
+  validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
   validates :password, presence: true, format: { with: VALID_PWD_REGEX }, :on => :create
   validates :firstname, presence: true, :on => :create
   validates :lastname, presence: true, :on => :create
 
-  validates :mail, format: { with: VALID_EMAIL_REGEX }, :on => :update
+  validates :email, format: { with: VALID_EMAIL_REGEX }, :on => :update
   validates :password, format: { with: VALID_PWD_REGEX }, :on => :update
 
   validates_inclusion_of :gender, :in => ['m', 'f'], :allow_nil => true
@@ -66,15 +71,15 @@ class Volunteer < ActiveRecord::Base
     end
   end
   
-  def self.exist?(mail)
-    if Volunteer.find_by(mail: mail).eql? nil
+  def self.exist?(email)
+    if Volunteer.find_by(email: email).eql? nil
       return false
     end
     return true
   end
 
-  def self.is_new_mail_available?(new_mail, old_mail)
-    if new_mail.eql?(old_mail) || !Volunteer.exist?(new_mail)
+  def self.is_new_email_available?(new_email, old_email)
+    if new_email.eql?(old_email) || !Volunteer.exist?(new_email)
       return true
     end
     return false

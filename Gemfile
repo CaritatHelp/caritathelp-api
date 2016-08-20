@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
+# Devise
+gem 'devise_token_auth'
+gem 'omniauth', '~> 1.3', '>= 1.3.1'
 # Websocket handling
 gem 'eventmachine', '~> 1.0', '>= 1.0.7'
 gem 'em-websocket', '~> 0.5.1'

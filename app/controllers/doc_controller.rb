@@ -25,9 +25,9 @@ class DocController < ApplicationController
 
 #   volunteers:
 #     failure:
-#       mail:
-#         unavailable: 'Unavailable mail'
-#         invalid: 'Invalid mail'
+#       email:
+#         unavailable: 'Unavailable email'
+#         invalid: 'Invalid email'
 
 #       update: 'Could not update profil'
 #       id: 'Unknown volunteer id'
@@ -79,9 +79,9 @@ class DocController < ApplicationController
 #         password:
 #           wrong: 'Wrong password'
 #           missing: 'Password is missing'
-#         mail:
-#           wrong: 'Unknown mail'
-#           missing: 'Mail is missing'
+#         email:
+#           wrong: 'Unknown email'
+#           missing: 'Email is missing'
 
 #   logout:
 #     success: 'User logged out'

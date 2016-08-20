@@ -12,7 +12,7 @@ class VolunteersController < ApplicationController
     response :ok
   end
   def index
-    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+    query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
@@ -40,8 +40,8 @@ class VolunteersController < ApplicationController
   end
   def create
     begin
-      if Volunteer.exist? volunteer_params[:mail]
-        render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
+      if Volunteer.exist? volunteer_params[:email]
+        render :json => create_error(400, t("volunteers.failure.email.unavailable"))
         return
       end
       new_volunteer = Volunteer.create!(volunteer_params)
@@ -168,8 +168,8 @@ class VolunteersController < ApplicationController
   end
   def update
     begin
-      if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @current_volunteer.mail)
-        render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
+      if !Volunteer.is_new_email_available?(volunteer_params[:email], @current_volunteer.email)
+        render :json => create_error(400, t("volunteers.failure.email.unavailable"))
       elsif @current_volunteer.update!(volunteer_params)
         render :json => create_response(@current_volunteer.as_json(:except => [:password, :token])
                                           .merge('friendship' => 'yourself')) and return
@@ -202,7 +202,7 @@ class VolunteersController < ApplicationController
     response :ok
   end
   def friends
-    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+    query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
@@ -335,7 +335,7 @@ class VolunteersController < ApplicationController
   end
   
   def volunteer_params
-    params.permit(:mail, :password, :firstname, :lastname,
+    params.permit(:email, :password, :firstname, :lastname,
                   :birthday, :gender, :city, :latitude, :longitude,
                   :allowgps)
   end
