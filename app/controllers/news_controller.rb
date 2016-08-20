@@ -173,7 +173,7 @@ class NewsController < ApplicationController
           end
         else # private friend news
           link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @new.volunteer_id).first
+            .where(volunteer_id: @volunteer.id).first
           if !link.eql?(nil)
             return true
           end
@@ -182,6 +182,7 @@ class NewsController < ApplicationController
         if @new.assoc_id != nil # public assoc news
           return true
         elsif @new.event_id != nil # public event news
+          p "LA??"
           event = Event.find(@new.event_id)
           event_link = EventVolunteer.where(event_id: @new.event_id)
             .where(volunteer_id: @volunteer.id).first
@@ -197,7 +198,7 @@ class NewsController < ApplicationController
           end
         else # public friend news
           link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @new.volunteer_id).first
+            .where(volunteer_id: @volunteer.id).first
           if !link.eql?(nil)
             return true
           end

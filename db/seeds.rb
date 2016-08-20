@@ -156,7 +156,8 @@ New::Assoc::AdminPublicWallMessage.create(content: "Donnez des sous à la croix 
                                           volunteer_id: robin.id)
 New::Assoc::AdminPrivateWallMessage.create(content: "Que Dieu vous protège wala",
                                           assoc_id: croix_rouge.id,
-                                          volunteer_id: robin.id)
+                                          volunteer_id: robin.id,
+                                          private: true)
 New::Assoc::AdminPublicWallMessage.create(content: "Et donnez nous de la thune encore",
                                           assoc_id: croix_rouge.id,
                                           volunteer_id: robin.id)
@@ -172,7 +173,8 @@ New::Event::AdminPublicWallMessage.create(content: "Qui veut se faire soigner?",
                                           volunteer_id: robin.id)
 New::Event::AdminPrivateWallMessage.create(content: "Pourquoi on doit tous risquer sa peau pour un seul soldat?",
                                            event_id: event_two.id,
-                                           volunteer_id: nicolas.id)
+                                           volunteer_id: nicolas.id,
+                                           private: true)
 New::Event::MemberPublicWallMessage.create(content: "PARCE QUE VIVE L'AMERIQUE",
                                            event_id: event_two.id,
                                            volunteer_id: jeremy.id)
@@ -187,7 +189,8 @@ New::Event::AdminPublicWallMessage.create(content: "Ah bondou fou foulé dé mak
                                           volunteer_id: aude.id)
 New::Event::AdminPrivateWallMessage.create(content: "Sushi maki pas cher",
                                            event_id: event_five.id,
-                                           volunteer_id: aude.id)
+                                           volunteer_id: aude.id,
+                                           private: true)
 
 New::Volunteer::SelfWallMessage.create(content: "Je m'appelle Robin et j'aime les pommes", volunteer_id: robin.id)
 New::Volunteer::SelfWallMessage.create(content: "Cool non?", volunteer_id: robin.id)
