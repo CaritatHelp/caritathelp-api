@@ -92,7 +92,7 @@ class AssocsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.assocs('members')
   def members
-    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, volunteers.thumb_path, av_links.rights"
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.email, volunteers.thumb_path, av_links.rights"
     render :json => create_response(Volunteer.joins(:av_links)
                                       .where(av_links: { assoc_id: @assoc.id })
                                       .select(query).limit(100))

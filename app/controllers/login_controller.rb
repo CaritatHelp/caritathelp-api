@@ -2,7 +2,7 @@ class LoginController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
   def_param_group :login do
-    param :mail, String, "Your mail address", :required => true
+    param :email, String, "Your email address", :required => true
     param :password, String, "Your password", :required => true
   end
 
@@ -15,12 +15,12 @@ class LoginController < ApplicationController
       return
     end
 
-    if !Volunteer.exist?(user_params[:mail])
-      render :json => create_error(400, t("login.failure.params.mail.wrong"))
+    if !Volunteer.exist?(user_params[:email])
+      render :json => create_error(400, t("login.failure.params.email.wrong"))
       return
     end
 
-    db_user = Volunteer.find_by mail: user_params[:mail]
+    db_user = Volunteer.find_by email: user_params[:email]
     new_user = Volunteer.new(user_params)
 
     if db_user.password.eql? new_user.password
@@ -35,12 +35,12 @@ class LoginController < ApplicationController
 
   private
   def user_params
-    params.permit(:mail, :password)
+    params.permit(:email, :password)
   end
 
   def param_is_missing?
     hash = user_params
-    [:mail, :password].each do |key|
+    [:email, :password].each do |key|
       if !hash.has_key? key
         return key.to_s
       end

@@ -5,7 +5,7 @@ class VolunteersController < ApplicationController
   before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
 
   def_param_group :volunteers_creation do
-    param :mail, String, "Your mail address", :required => true
+    param :email, String, "Your email address", :required => true
     param :password, String, "Chosen password, must contain letters and numbers", :required => true
     param :firstname, String, "Your firstname", :required => true
     param :lastname, String, "Your lastname", :required => true
@@ -20,7 +20,7 @@ class VolunteersController < ApplicationController
 
   def_param_group :volunteers_update do
     param :token, String, "Your token", :required => true
-    param :mail, String, "Your mail address"
+    param :email, String, "Your email address"
     param :password, String, "Chosen password, must contain letters and numbers"
     param :firstname, String, "Your firstname"
     param :lastname, String, "Your lastname"
@@ -37,7 +37,7 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('index')
   def index
-    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+    query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
@@ -53,8 +53,8 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('create')
   def create
     begin
-      if Volunteer.exist? volunteer_params[:mail]
-        render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
+      if Volunteer.exist? volunteer_params[:email]
+        render :json => create_error(400, t("volunteers.failure.email.unavailable"))
         return
       end
       new_volunteer = Volunteer.create!(volunteer_params)
@@ -162,8 +162,8 @@ class VolunteersController < ApplicationController
   example SampleJson.volunteers('update')
   def update
     begin
-      if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @current_volunteer.mail)
-        render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
+      if !Volunteer.is_new_email_available?(volunteer_params[:email], @current_volunteer.email)
+        render :json => create_error(400, t("volunteers.failure.email.unavailable"))
       elsif @current_volunteer.update!(volunteer_params)
         render :json => create_response(@current_volunteer.as_json(:except => [:password, :token])
                                           .merge('friendship' => 'yourself')) and return
@@ -191,7 +191,7 @@ class VolunteersController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('friends')
   def friends
-    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+    query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
@@ -313,7 +313,7 @@ class VolunteersController < ApplicationController
   end
   
   def volunteer_params
-    params.permit(:mail, :password, :firstname, :lastname,
+    params.permit(:email, :password, :firstname, :lastname,
                   :birthday, :gender, :city, :latitude, :longitude,
                   :allowgps)
   end
