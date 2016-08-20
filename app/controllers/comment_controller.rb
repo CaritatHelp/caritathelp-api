@@ -101,7 +101,7 @@ class CommentController < ApplicationController
           end
         else # private friend news
           link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @new.volunteer_id).first
+            .where(volunteer_id: @volunteer.id).first
           if !link.eql?(nil)
             return true
           end
@@ -125,7 +125,7 @@ class CommentController < ApplicationController
           end
         else # public friend news
           link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @new.volunteer_id).first
+            .where(volunteer_id: @volunteer.id).first
           if !link.eql?(nil)
             return true
           end
