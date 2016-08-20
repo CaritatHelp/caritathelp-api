@@ -124,10 +124,37 @@ class NewsController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.news('comments')
   def comments
-    render :json => create_response(Comment
-                                      .joins('INNER JOIN volunteers ON comments.volunteer_id=volunteers.id')
-                                      .where(new_id: @new.id)
-                                      .select('comments.*', :firstname, :lastname, :thumb_path))
+    type = nil
+    name = nil
+    id = nil
+    if @new.assoc_id.present?
+      assoc = Assoc.find(@new.assoc_id)
+      type = "Assoc"
+      name = assoc.name
+      id = assoc.id
+    elsif @new.event_id.present?
+      event = Event.find(@new.event_id)
+      type = "Event"
+      name = event.title
+      id = event.id
+    else
+      vol = Volunteer.find(@new.volunteer_id)
+      type = "Volunteer"
+      name = vol.fullname
+      id = vol.id
+    end
+    result = Comment.joins('INNER JOIN volunteers ON comments.volunteer_id=volunteers.id')
+                    .where(new_id: @new.id)
+                    .select('comments.*', :firstname, :lastname, :thumb_path)
+
+
+    final_result = { news_info: { sender_type: type,
+                                  sender_id: id,
+                                  sender_name: name},
+                      comments: result
+                    }
+
+    render :json => create_response(final_result)
   end
 
   private
