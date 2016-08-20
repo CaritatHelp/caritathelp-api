@@ -21,6 +21,9 @@ Rails.application.routes.draw do
     put '/block', to: 'followers#block'
   end
 
+  scope 'notifications' do
+    put '/:id/read', to: 'notifications#read'
+  end
 
   scope '/news' do
     post '/wall_message', to: 'news#wall_message'

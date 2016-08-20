@@ -58,4 +58,8 @@ class SampleJson < ActiveRecord::Base
   def self.followers(filename)
     File.open("#{Rails.root}/public/samples_json/followers/"+filename+".json").read
   end
+
+  def self.notifications(filename)
+    File.open("#{Rails.root}/public/samples_json/notifications/"+filename+".json").read
+  end
 end

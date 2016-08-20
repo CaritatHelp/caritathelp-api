@@ -89,6 +89,7 @@ en:
 
   notifications:
     failure:
+      id: "Unknown notification id"
       rights: 'Permission denied'
       addfriend:
         self: 'Cannot add yourself as friend'
