@@ -1,13 +1,13 @@
 class FriendshipController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
-    
+
   def_param_group :respond_friend do
     param :token, String, "Volunteer token", :required => true
     param :notif_id, String, "Id of the notification", :required => true
     param :acceptance, String, "True if friendship accepted, false otherwise", :required => true
   end
-  
+
   api :POST, '/friendship/add', "Send a friend request to 'id' volunteer"
   param :token, String, "Your token", :required => true
   param :volunteer_id, String, "Id of volunteer to add as friend", :required => true
@@ -16,29 +16,29 @@ class FriendshipController < ApplicationController
     begin
       @volunteer = Volunteer.find_by!(token: params[:token])
       @friend = Volunteer.find_by!(id: params[:volunteer_id])
-      
+
       if ((VFriend.where(volunteer_id: @volunteer.id)
-             .where(friend_volunteer_id: @friend.id).first != nil))
+            .where(friend_volunteer_id: @friend.id).first != nil))
         render :json => create_error(400, t("notifications.failure.addfriend.exist")) and return
       elsif ((Notification.where(notif_type: 'AddFriend').where(sender_id: @volunteer.id)
-             .where(receiver_id: @friend.id).first != nil) ||
-          (Notification.where(notif_type: 'AddFriend').where(sender_id: @friend.id)
-             .where(receiver_id: @volunteer.id).first != nil))
+               .where(receiver_id: @friend.id).first != nil) ||
+             (Notification.where(notif_type: 'AddFriend').where(sender_id: @friend.id)
+               .where(receiver_id: @volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.addfriend.pending_invitation"))
         return
       end
-      
+
       if @volunteer.id == @friend.id
         render :json => create_error(400, t("notifications.failure.addfriend.self"))
         return
       end
       
-      notif = Notification.create!(create_add_friend)
+      @notif = Notification.create!(create_add_friend)
 
-      send_notif_to_socket(notif[0])
+      send_notif_to_socket(@notif[0])
 
       render :json => create_response(nil, 200, t("notifications.success.invitefriend"))
-    rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
+    rescue => e
       render :json => create_error(400, e.to_s)
       return
     end
@@ -118,12 +118,12 @@ class FriendshipController < ApplicationController
   
   private
   def create_add_friend
-    [sender_id: @volunteer.id,
+    {sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
      thumb_path: @volunteer.thumb_path,
      receiver_id: @friend.id,
      receiver_name: @friend.fullname,
-     notif_type: 'AddFriend']
+     notif_type: 'AddFriend'}
   end
 
   def create_friend_link(sender, receiver)

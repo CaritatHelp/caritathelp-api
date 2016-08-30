@@ -5,7 +5,7 @@ class CreateNotifications < ActiveRecord::Migration
       t.integer :friend_id
       t.integer :assoc_id
       t.integer :event_id
-      t.boolean :read
+      t.boolean :read, default: false
       t.string :notif_type
 
       t.timestamps null: false

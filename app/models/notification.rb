@@ -1,6 +1,4 @@
 class Notification < ActiveRecord::Base
-  before_create :set_read
-
   has_many :volunteers, through: :notification_volunteers
   has_many :notification_volunteers
 
@@ -20,9 +18,5 @@ class Notification < ActiveRecord::Base
 
   def single_receiver?
     self.notif_type.eql?('InviteMember') or self.notif_type.eql?('InviteGuest') or self.notif_type.eql?('AddFriend')
-  end
-
-  def set_read
-    self.read = false
   end
 end

@@ -83,16 +83,8 @@ class MessagesController < ApplicationController
   param :token, String, "Your token", :required => true
   example SampleJson.chatrooms('index')
   def index
-    # on liste toutes les chatroom d'un user, trié en fonction de la date du dernier
-    # message present dedans
-    # pour chaque, il faudrait la liste des volunteers qui sont dedans...
-    query = "chatrooms.id, chatrooms.name, chatrooms.number_volunteers, chatrooms.number_messages"
-
-    render :json => create_response(Chatroom.joins(:chatroom_volunteers)
-                                      .where(:chatroom_volunteers => { volunteer_id: @volunteer.id })
-                                      .order(updated_at: :desc)
-                                      .select(query))
-  end
+      render json: create_response(@volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
+end
 
   api :GET, '/chatrooms/:id/volunteers', "Get the list of chatroom's volunteers"
   param :token, String, "Your token", :required => true
