@@ -1,8 +1,8 @@
 class EventsController < ApplicationController
   swagger_controller :events, "Events management"
 
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_volunteer!
+  
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]
   before_action :set_link, only: [:update, :delete, :show]
@@ -17,9 +17,9 @@ class EventsController < ApplicationController
   end
   def index
     events = Event.select("events.*")
-      .select("(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights")
+      .select("(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights")
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
       .where(private: false)
     render :json => create_response(events)
   end
@@ -43,7 +43,7 @@ class EventsController < ApplicationController
         render :json => create_error(400, t("events.failure.wrong_assoc")) and return
       end
 
-      assoc_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
+      assoc_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
 
       if assoc_link == nil or assoc_link.level < AvLink.levels["admin"]
         render :json => create_error(400, t("events.failure.rights")) and return        
@@ -55,7 +55,7 @@ class EventsController < ApplicationController
       end
 
       event_link = EventVolunteer.create!(event_id: new_event.id,
-                                          volunteer_id: @volunteer.id,
+                                          volunteer_id: current_volunteer.id,
                                           rights: 'host')
 
       render :json => create_response(new_event.as_json.merge("rights" => "host"))
@@ -82,7 +82,7 @@ class EventsController < ApplicationController
 
     notif = Notification.where(notif_type: 'InviteGuest')
       .where(event_id: @event.id)
-      .where(receiver_id: @volunteer.id).first
+      .where(receiver_id: current_volunteer.id).first
     
     if notif != nil
       rights = 'invited'
@@ -90,7 +90,7 @@ class EventsController < ApplicationController
 
     notif = Notification.where(notif_type: 'JoinEvent')
       .where(event_id: @event.id)
-      .where(sender_id: @volunteer.id).first
+      .where(sender_id: current_volunteer.id).first
 
     if notif != nil
       rights = 'waiting'
@@ -156,10 +156,10 @@ class EventsController < ApplicationController
   def owned
     events = Event.select(:id, :title, :place, :begin, :end, :assoc_id, :thumb_path)
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
       .joins("INNER JOIN event_volunteers ON event_volunteers.event_id=events.id")
       .select("event_volunteers.rights AS rights")
-      .where("event_volunteers.volunteer_id=#{@volunteer.id} AND event_volunteers.rights='host'")
+      .where("event_volunteers.volunteer_id=#{current_volunteer.id} AND event_volunteers.rights='host'")
     render :json => create_response(events)
   end
 
@@ -171,10 +171,10 @@ class EventsController < ApplicationController
   def invited
     events = Event.select(:id, :title, :place, :begin, :end, :assoc_id, :thumb_path)
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
       .joins("INNER JOIN notifications ON notifications.event_id=events.id")
       .select("notifications.id AS notif_id")
-      .where("notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteGuest'")
+      .where("notifications.receiver_id=#{current_volunteer.id} AND notifications.notif_type='InviteGuest'")
     render :json => create_response(events)
   end
 
@@ -209,15 +209,11 @@ class EventsController < ApplicationController
     response :ok
   end
   def news
-    rights = @volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
+    rights = current_volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
     render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
   end
 
   private
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def set_event
     begin
       @event = Event.find(params[:id])
@@ -245,11 +241,11 @@ class EventsController < ApplicationController
   end
 
   def set_link
-    @link = EventVolunteer.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id).first
+    @link = EventVolunteer.where(:volunteer_id => current_volunteer.id).where(:event_id => @event.id).first
   end
 
   def check_privacy
-    assoc_link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @event.assoc_id).first
+    assoc_link = AvLink.where(volunteer_id: current_volunteer.id).where(assoc_id: @event.assoc_id).first
     if @event.private.eql?(true) and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
       render :json => create_error(400, t("events.failure.rights")) and return      
     end
