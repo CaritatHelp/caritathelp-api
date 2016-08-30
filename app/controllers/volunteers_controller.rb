@@ -1,37 +1,9 @@
 class VolunteersController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
-  before_filter :check_token, except: [:create, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => [:destroy]
+  
+  before_action :authenticate_volunteer!
+
   before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
-
-  def_param_group :volunteers_creation do
-    param :email, String, "Your email address", :required => true
-    param :password, String, "Chosen password, must contain letters and numbers", :required => true
-    param :firstname, String, "Your firstname", :required => true
-    param :lastname, String, "Your lastname", :required => true
-    param :birthday, Date, "Your birthday"
-    param :gender, String, "Must be 'm' or 'f'"
-    param :city, String, "Your current city"
-    param :latitude, Float, "Latitude position"
-    param :longitude, Float, "Longitude position"
-    param :allowgps, String, "Must be 'true' or 'false' for allowing geolocalisation"
-    param :allow_notifications, String, "Must be 'true' or 'false' for allowing notifications"
-  end
-
-  def_param_group :volunteers_update do
-    param :token, String, "Your token", :required => true
-    param :email, String, "Your email address"
-    param :password, String, "Chosen password, must contain letters and numbers"
-    param :firstname, String, "Your firstname"
-    param :lastname, String, "Your lastname"
-    param :birthday, Date, "Your birthday"
-    param :gender, String, "Must be 'm' or 'f'"
-    param :city, String, "Your current city"
-    param :latitude, Float, "Latitude position"
-    param :longitude, Float, "Longitude position"
-    param :allowgps, String, "Must be 'true' or 'false' for allowing geolocalisation"
-    param :allow_notifications, String, "Must be 'true' or 'false' for allowing notifications"
-  end
   
   api :GET, '/volunteers', "Get a list of all volunteers"
   param :token, String, "Your token", :required => true
@@ -41,28 +13,11 @@ class VolunteersController < ApplicationController
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
-      "link.volunteer_id=#{@current_volunteer.id} AND " +
+      "link.volunteer_id=#{current_volunteer.id} AND " +
       "v_friends.volunteer_id=volunteers.id AND " +
-      "v_friends.volunteer_id<>#{@current_volunteer.id}) AS nb_common_friends FROM volunteers"
+      "v_friends.volunteer_id<>#{current_volunteer.id}) AS nb_common_friends FROM volunteers"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
-  end
-
-  api :POST, '/volunteers', "Allow volunteer to create an account"
-  param_group :volunteers_creation
-  example SampleJson.volunteers('create')
-  def create
-    begin
-      if Volunteer.exist? volunteer_params[:email]
-        render :json => create_error(400, t("volunteers.failure.email.unavailable"))
-        return
-      end
-      new_volunteer = Volunteer.create!(volunteer_params)
-      render :json => create_response(new_volunteer.as_json(:except => [:password]))
-    rescue ActiveRecord::RecordInvalid => e
-      render :json => create_error(400, e.to_s)
-      return
-    end
   end
 
   api :GET, '/volunteers/:id', "Get volunteer informations by its id"
@@ -71,7 +26,7 @@ class VolunteersController < ApplicationController
   def show
     begin
 
-      if @current_volunteer.id == @volunteer.id
+      if current_volunteer.id == @volunteer.id
         render :json => create_response(@volunteer.as_json(:except => [:password, :token])
                                           .merge('friendship' => 'yourself')) and return
       end
@@ -81,16 +36,16 @@ class VolunteersController < ApplicationController
 
       link = VFriend
         .where(:volunteer_id => @volunteer.id)
-        .where(:friend_volunteer_id => @current_volunteer.id).first
+        .where(:friend_volunteer_id => current_volunteer.id).first
 
       if link.eql?(nil)
         link = Notification.where(notif_type: 'AddFriend')
-          .where(sender_id: @current_volunteer.id)
+          .where(sender_id: current_volunteer.id)
           .where(receiver_id: @volunteer.id)
           .first
         if link.eql?(nil)
           link = Notification.where(notif_type: 'AddFriend')
-            .where(receiver_id: @current_volunteer.id)
+            .where(receiver_id: current_volunteer.id)
             .where(sender_id: @volunteer.id)
             .first
           if !link.eql?(nil)
@@ -130,20 +85,20 @@ class VolunteersController < ApplicationController
 
         assocs = Assoc
           .select(:id, :name, :thumb_path,
-                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{@current_volunteer.id}) AS rights", "'assoc' AS result_type")
+                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{current_volunteer.id}) AS rights", "'assoc' AS result_type")
           .where(condition)
         
         condition = condition.gsub "name", "title"
         events = Event
           .select(:id, 'title AS name', :thumb_path,
-                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@current_volunteer.id}) AS rights", "'event' AS result_type")
+                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights", "'event' AS result_type")
           .where(condition)
         
 
         condition = condition.gsub "title", "fullname"
         volunteers = Volunteer
           .select(:id, 'fullname AS name', :thumb_path,
-                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{@current_volunteer.id}) AS rights", "'volunteer' AS result_type")
+                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{current_volunteer.id}) AS rights", "'volunteer' AS result_type")
           .where(condition)
 
         result = (assocs + events + volunteers).sort {|a,b| a['name']<=>b['name']}
@@ -156,33 +111,14 @@ class VolunteersController < ApplicationController
       render :json => create_error(400, t("volunteers.failure.research"))
     end
   end
-  
-  api :PUT, '/volunteers', "Update volunteer"
-  param_group :volunteers_update
-  example SampleJson.volunteers('update')
-  def update
-    begin
-      if !Volunteer.is_new_email_available?(volunteer_params[:email], @current_volunteer.email)
-        render :json => create_error(400, t("volunteers.failure.email.unavailable"))
-      elsif @current_volunteer.update!(volunteer_params)
-        render :json => create_response(@current_volunteer.as_json(:except => [:password, :token])
-                                          .merge('friendship' => 'yourself')) and return
-      else
-        render :json => create_error(400, t("volunteers.failure.update"))
-      end
-    rescue ActiveRecord::RecordInvalid => e
-      render :json => create_error(400, e.to_s)
-      return
-    end
-  end
 
   api :GET, '/notifications', "Get notifications of volunteer"
   param :token, String, "Your token", :required => true
   example SampleJson.volunteers('notifications')
   def notifications  
     notifs = Notification.select("notifications.*")
-      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{@current_volunteer.id}")
-      .where("notifications.receiver_id=#{@current_volunteer.id} OR notification_volunteers.volunteer_id=#{@current_volunteer.id}").order(created_at: :desc)
+      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{current_volunteer.id}")
+      .where("notifications.receiver_id=#{current_volunteer.id} OR notification_volunteers.volunteer_id=#{current_volunteer.id}").order(created_at: :desc)
 
     render :json => create_response(notifs)    
   end
@@ -258,7 +194,7 @@ class VolunteersController < ApplicationController
 
     volunteers = Volunteer
       .joins("INNER JOIN notifications ON notifications.#{friend_id_field}=volunteers.id")
-      .where("notifications.#{current_id_field}=#{@current_volunteer.id}")
+      .where("notifications.#{current_id_field}=#{current_volunteer.id}")
       .select(:id, :thumb_path, :firstname, :lastname, 'notifications.id AS notif_id')
     
     render :json => create_response(volunteers)
@@ -306,10 +242,6 @@ class VolunteersController < ApplicationController
       render :json => create_error(400, t("volunteers.failure.id"))
       return
     end
-  end
-
-  def set_current_volunteer
-    @current_volunteer = Volunteer.find_by(token: params[:token])
   end
   
   def volunteer_params

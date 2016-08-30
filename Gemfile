@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+# Authorization handling
+gem 'cancancan', '~> 1.15'
 # Devise
 gem 'devise_token_auth'
 gem 'omniauth', '~> 1.3', '>= 1.3.1'

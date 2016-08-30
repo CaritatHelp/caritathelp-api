@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include DeviseTokenAuth::Concerns::SetUserByToken
+  include CanCan::ControllerAdditions
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
@@ -30,13 +31,6 @@ class ApplicationController < ActionController::Base
   def set_locale
     I18n.available_locales = [:en, :fr]
     I18n.locale = params[:locale] || :en
-  end
-
-  def check_token
-    if params[:token] == nil or !Volunteer.find_by(token: params[:token])
-      render :json => create_error(400, t("token.wrong"))
-      return
-    end
   end
 
   def create_response(result, status = 200, message = 'ok')
