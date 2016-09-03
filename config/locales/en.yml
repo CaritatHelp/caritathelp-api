@@ -194,4 +194,4 @@ en:
 
   doc:
     url: 'Url not found'
-    response: 'See documentation at: /doc'
+    response: 'See documentation at: /swagger/index'

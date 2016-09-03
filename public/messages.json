@@ -1,0 +1,360 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://localhost:3000",
+  "resourcePath": "messages",
+  "apis": [
+    {
+      "path": "/chatrooms.json",
+      "operations": [
+        {
+          "summary": "Create a chatroom with the list of volunteers provided",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "volunteers",
+              "type": "string",
+              "description": "Volunteers' ids",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#create",
+          "method": "post"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms.json",
+      "operations": [
+        {
+          "summary": "Get volunteer's chatrooms ordered by date of last message",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#index",
+          "method": "get"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}.json",
+      "operations": [
+        {
+          "summary": "Get messages of the chatroom, ordered by date",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#show",
+          "method": "get"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/volunteers.json",
+      "operations": [
+        {
+          "summary": "Get the list of chatroom's volunteers",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#participants",
+          "method": "get"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/set_name.json",
+      "operations": [
+        {
+          "summary": "Set chatroom's name",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#set_name",
+          "method": "put"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/add_volunteers.json",
+      "operations": [
+        {
+          "summary": "Add volunteers to the chatroom",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "volunteers",
+              "type": "string",
+              "description": "Volunteers' ids to add",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#add_volunteers",
+          "method": "put"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/new_message.json",
+      "operations": [
+        {
+          "summary": "Write a message to the chatroom",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "content",
+              "type": "string",
+              "description": "Message's content",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#new_message",
+          "method": "put"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/kick.json",
+      "operations": [
+        {
+          "summary": "Kick volunteer from the chatroom",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "volunteer_id",
+              "type": "integer",
+              "description": "Volunteer's id",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#kick_volunteer",
+          "method": "delete"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/leave.json",
+      "operations": [
+        {
+          "summary": "Leave the chatroom",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#leave",
+          "method": "delete"
+        }
+      ]
+    },
+    {
+      "path": "/chatrooms/{id}/delete_message.json",
+      "operations": [
+        {
+          "summary": "Delete message from the chatroom",
+          "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "Chatroom's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "message_id",
+              "type": "integer",
+              "description": "Message's id",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Messages#delete_message",
+          "method": "delete"
+        }
+      ]
+    }
+  ],
+  "authorizations": null
+}

@@ -1,4 +1,6 @@
 class FollowersController < ApplicationController
+  swagger_controller :followers, "Followers management"
+  
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
@@ -6,10 +8,12 @@ class FollowersController < ApplicationController
   before_action :set_target_volunteer, only: [:block]
   before_action :check_rights, only: [:block]
 
-  api :POST, '/follow', "Follow an association"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the association to follow", :required => true
-  example SampleJson.followers('follow')
+  swagger_api :follow do
+    summary "Follow an association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def follow
     begin
       link = AvLink.where(volunteer_id: @volunteer.id,
@@ -30,10 +34,12 @@ class FollowersController < ApplicationController
     end
   end
 
-  api :DELETE, '/unfollow', "Unfollow an association"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the association to unfollow", :required => true
-  example SampleJson.followers('unfollow')
+  swagger_api :unfollow do
+    summary "Unfollow an association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def unfollow
     begin
       link = AvLink.where(volunteer_id: @volunteer.id,
@@ -53,11 +59,13 @@ class FollowersController < ApplicationController
     end
   end
 
-  api :PUT, '/block', "block a follower"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the association", :required => true
-  param :volunteer_id, String, "Id of the volunteer to block", :required => true
-  example SampleJson.followers('block')
+  swagger_api :block do
+    summary "Block a follower"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id"
+    response :ok
+  end
   def block
     begin
       link = AvLink.where(volunteer_id: @target_volunteer.id, assoc_id: @assoc.id).first

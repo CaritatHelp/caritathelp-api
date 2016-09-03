@@ -1,14 +1,17 @@
-# -*- coding: utf-8 -*-
 class MessagesController < ApplicationController
+  swagger_controller :messages, "Messages management"
+
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_chatroom, except: [:index, :create, :reset]
   before_action :check_chatroom_rights, except: [:index, :create, :reset]
   
-  api :POST, '/chatrooms', "Create a chatroom with the list of volunteers provided"
-  param :token, String, "Your token", :required => true
-  param :volunteers, ["1", "2", "..."], "Array of volunteers ids", :required => true
-  example SampleJson.chatrooms('create')
+  swagger_api :create do
+    summary "Create a chatroom with the list of volunteers provided"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteers, :string, :required, "Volunteers' ids"
+    response :ok
+  end
   def create
     begin
       volunteers = chatroom_params[:volunteers]
@@ -79,16 +82,21 @@ class MessagesController < ApplicationController
     end
   end
 
-  api :GET, '/chatrooms', "Get volunteer's chatrooms ordered by date of last message"
-  param :token, String, "Your token", :required => true
-  example SampleJson.chatrooms('index')
+  swagger_api :index do
+    summary "Get volunteer's chatrooms ordered by date of last message"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def index
       render json: create_response(@volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
-end
+  end
 
-  api :GET, '/chatrooms/:id/volunteers', "Get the list of chatroom's volunteers"
-  param :token, String, "Your token", :required => true
-  example SampleJson.chatrooms('participants')
+  swagger_api :participants do
+    summary "Get the list of chatroom's volunteers"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def participants
     query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.thumb_path"
     render :json => create_response(Volunteer.joins(:chatroom_volunteers)
@@ -96,9 +104,12 @@ end
                                       .select(query))
   end
 
-  api :GET, '/chatrooms/:id', "Get messages of the chatroom, ordered by date"
-  param :token, String, "Your token", :required => true
-  example SampleJson.chatrooms('show')
+  swagger_api :show do
+    summary "Get messages of the chatroom, ordered by date"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def show
     messages = Message
                .select("messages.*")
@@ -110,10 +121,12 @@ end
     render :json => create_response(messages)
   end
 
-  api :PUT, '/chatrooms/:id/set_name', "Set the name of the chatroom"
-  param :token, String, "Your token", :required => true
-  param :name, String, "New name to give to the chatroom", :required => true
-  example SampleJson.chatrooms('set_name')
+  swagger_api :set_name do
+    summary "Set chatroom's name"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def set_name
     begin
       @chatroom.name = params[:name]
@@ -124,10 +137,13 @@ end
     end
   end
 
-  api :PUT, '/chatrooms/:id/add_volunteers', "Add volunteers referred by ids to the chatroom"
-  param :token, String, "Your token", :required => true
-  param :volunteers, ["1", "2", "..."], "Array of volunteers ids", :required => true
-  example SampleJson.chatrooms('add_volunteers')
+  swagger_api :add_volunteers do
+    summary "Add volunteers to the chatroom"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteers, :string, :required, "Volunteers' ids to add"
+    response :ok
+  end
   def add_volunteers
     begin
       # avoid adding on is_private chatroom ?
@@ -155,10 +171,13 @@ end
     end
   end
 
-  api :PUT, '/chatrooms/:id/new_message', "Add a message to the chatroom"
-  param :token, String, "Your token", :required => true
-  param :content, String, "Content of the message", :required => true
-  example SampleJson.chatrooms('new_message')
+  swagger_api :new_message do
+    summary "Write a message to the chatroom"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :content, :string, :required, "Message's content"
+    response :ok
+  end
   def new_message
     begin
       message = Message.create!(:content => params[:content],
@@ -175,10 +194,13 @@ end
     end
   end
 
-  api :DELETE, '/chatrooms/:id/kick', "Kick a volunteer from the chatroom"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of the volunteer to kick", :required => true
-  example SampleJson.chatrooms('kick_volunteer')
+  swagger_api :kick_volunteer do
+    summary "Kick volunteer from the chatroom"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id"
+    response :ok
+  end
   def kick_volunteer
     begin
       link = ChatroomVolunteer.where(:chatroom_id => @chatroom.id)
@@ -198,9 +220,12 @@ end
     end
   end
 
-  api :DELETE, '/chatrooms/:id/leave', "Leave the chatroom"
-  param :token, String, "Your token", :required => true
-  example SampleJson.chatrooms('leave')
+  swagger_api :leave do
+    summary "Leave the chatroom"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def leave
     begin
       @link.destroy
@@ -218,10 +243,13 @@ end
     end    
   end
 
-  api :DELETE, '/chatrooms/:id/delete_message', "Delete a message of the chatroom"
-  param :token, String, "Your token", :required => true
-  param :message_id, String, "Id of the message to delete", :required => true
-  example SampleJson.chatrooms('delete_message')
+  swagger_api :delete_message do
+    summary "Delete message from the chatroom"
+    param :path, :id, :integer, :required, "Chatroom's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :message_id, :integer, :required, "Message's id"
+    response :ok
+  end
   def delete_message
     begin
       message = Message.find(params[:message_id])

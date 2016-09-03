@@ -1,0 +1,141 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://localhost:3000",
+  "resourcePath": "friendship",
+  "apis": [
+    {
+      "path": "/friendship/add.json",
+      "operations": [
+        {
+          "summary": "Sends a friend request",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "volunteer_id",
+              "type": "integer",
+              "description": "Volunteer's id to invite",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Friendship#add",
+          "method": "post"
+        }
+      ]
+    },
+    {
+      "path": "/friendship/reply.json",
+      "operations": [
+        {
+          "summary": "Reply to a friend request",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "notif_id",
+              "type": "integer",
+              "description": "Notification's id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "acceptance",
+              "type": "boolean",
+              "description": "true to accept, false otherwise",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Friendship#reply",
+          "method": "post"
+        }
+      ]
+    },
+    {
+      "path": "/friendship/remove.json",
+      "operations": [
+        {
+          "summary": "Remove friendship",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "volunteer_id",
+              "type": "integer",
+              "description": "Volunteer's id to remove from friends",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Friendship#remove",
+          "method": "delete"
+        }
+      ]
+    },
+    {
+      "path": "/friendship/received_invitations.json",
+      "operations": [
+        {
+          "summary": "List all pending friends' invitations",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "token",
+              "type": "string",
+              "description": "Your token",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            }
+          ],
+          "nickname": "Friendship#received_invitations",
+          "method": "get"
+        }
+      ]
+    }
+  ],
+  "authorizations": null
+}

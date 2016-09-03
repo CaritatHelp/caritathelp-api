@@ -1,4 +1,6 @@
 class EventsController < ApplicationController
+  swagger_controller :events, "Events management"
+
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
@@ -7,29 +9,12 @@ class EventsController < ApplicationController
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
-  def_param_group :create_event do
-    param :token, String, "Creator's token", :required => true
-    param :assoc_id, String, "Association's id", :required => true
-    param :title, String, "Title of the event", :required => true
-    param :description, String, "Association's description", :required => true
-    param :place, String, "Place where the event will take place"
-    param :begin, Date, "Beginning of the event"
-    param :end, Date, "End of the event"
+  swagger_api :index do
+    summary "Get a list of all events"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :ranger, :string, :optional, "Can be 'past', 'current' or 'futur'"
+    response :ok
   end
-
-  def_param_group :update_event do
-    param :token, String, "Creator's token", :required => true
-    param :title, String, "Title of the event"
-    param :description, String, "Association's description"
-    param :place, String, "Place where the event will take place"
-    param :begin, Date, "Beginning of the event"
-    param :end, Date, "End of the event"
-  end
-
-  api :GET, '/events', "Get a list of all events"
-  param :token, String, "Your token", :required => true
-  param :range, String, "can be 'past', 'current' or 'futur'", :required => true
-  example SampleJson.events('index')
   def index
     events = Event.select("events.*")
       .select("(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights")
@@ -39,9 +24,17 @@ class EventsController < ApplicationController
     render :json => create_response(events)
   end
 
-  api :POST, '/events', "Allow an association to create an event"
-  param_group :create_event
-  example SampleJson.events('create')
+  swagger_api :create do
+    summary "Allow an association to create an event"
+    param :query, :token, :string, :required, "Your token"
+    param :form, :assoc_id, :integer, :required, "Association's id"
+    param :form, :title, :string, :required, "Event's title"
+    param :form, :description, :string, :required, "Event's description"
+    param :form, :begin, :date, :required, "Beginning of the event"
+    param :form, :end, :date, :required, "End of the event"
+    param :form, :place, :string, :optional, "Where the event takes place"
+    response :ok
+  end
   def create
     begin
       @assoc = Assoc.find_by!(id: params[:assoc_id])
@@ -56,14 +49,17 @@ class EventsController < ApplicationController
         render :json => create_error(400, t("events.failure.rights")) and return        
       end
       
-      new_event = Event.create!(event_params_creation)
+      new_event = Event.new(event_params_creation)
+      if !new_event.save
+        render :json => create_error(400, new_event.errors) and return
+      end
 
       event_link = EventVolunteer.create!(event_id: new_event.id,
                                           volunteer_id: @volunteer.id,
                                           rights: 'host')
 
       render :json => create_response(new_event.as_json.merge("rights" => "host"))
-    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
+    rescue => e
       begin
         new_event.destroy
       rescue
@@ -72,14 +68,17 @@ class EventsController < ApplicationController
     end
   end
   
-  api :GET, '/events/:id', "Get events information by its id"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('show')
+  swagger_api :show do
+    summary "Returns event's information"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def show
     if @link != nil
       render :json => create_response(@event.as_json.merge('rights' => @link.rights)) and return
     end
-    rights = 'none'
+    rights = nil
 
     notif = Notification.where(notif_type: 'InviteGuest')
       .where(event_id: @event.id)
@@ -100,9 +99,12 @@ class EventsController < ApplicationController
     render :json => create_response(@event.as_json.merge('rights' => rights))
   end
 
-  api :GET, '/events/:id/guests', 'Get a list of all guests'
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('guests')
+  swagger_api :guests do
+    summary "Returns a list of all guests"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def guests
     query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, volunteers.thumb_path, event_volunteers.rights"
     render :json => create_response(Volunteer.joins(:event_volunteers)
@@ -110,9 +112,17 @@ class EventsController < ApplicationController
                                       .select(query).limit(100))
   end
 
-  api :PUT, '/events/:id', "Update event"
-  param_group :update_event
-  example SampleJson.events('update')
+  swagger_api :update do
+    summary "Updates event"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    param :form, :title, :string, :optional, "Event's title"
+    param :form, :description, :string, :optional, "Event's description"
+    param :form, :begin, :date, :optional, "Beginning of the event"
+    param :form, :end, :date, :optional, "End of the event"
+    param :form, :place, :string, :optional, "Where the event takes place"
+    response :ok
+  end
   def update
     begin
       @event.update!(event_params_update)
@@ -121,11 +131,13 @@ class EventsController < ApplicationController
       render :json => create_error(400, e.to_s) and return
     end
   end
-  
 
-  api :DELETE, '/events/:id', "Delete event (need to be host)"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('delete')
+  swagger_api :delete do
+    summary "Deletes event (needs to be host)"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def delete
     if @link.rights.eql?('host')
       Notification.where(event_id: @event.id).destroy_all
@@ -136,9 +148,11 @@ class EventsController < ApplicationController
     render :json => create_error(400, t("events.failure.rights"))    
   end
 
-  api :GET, '/events/owned', "Get all event where you're owner"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('owned')
+  swagger_api :owned do
+    summary "Get all event where you're the owner"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def owned
     events = Event.select(:id, :title, :place, :begin, :end, :assoc_id, :thumb_path)
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
@@ -149,9 +163,11 @@ class EventsController < ApplicationController
     render :json => create_response(events)
   end
 
-  api :GET, '/events/invited', "Get all event where you're invited"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('invited')
+  swagger_api :invited do
+    summary "Get all event where you're invited"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def invited
     events = Event.select(:id, :title, :place, :begin, :end, :assoc_id, :thumb_path)
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
@@ -162,27 +178,36 @@ class EventsController < ApplicationController
     render :json => create_response(events)
   end
 
-  api :GET, '/events/:id/pictures', "Return a list of all event's pictures path"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('pictures')
+  swagger_api :pictures do
+    summary "Returns a list of all event's pictures paths"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def pictures
     query = "id, file_size, picture_path, is_main"
     pictures = Picture.where(:event_id => @event.id).select(query).limit(100)
     render :json => create_response(pictures)
   end
 
-  api :GET, '/events/:id/main_picture', "Return path of main picture"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('main_picture')
+  swagger_api :main_picture do
+    summary "Returns path of main picture"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def main_picture
     query = "id, file_size, picture_path"
     pictures = Picture.where(:event_id => @event.id).where(:is_main => true).select(query).first
     render :json => create_response(pictures)
   end
   
-  api :GET, '/events/:id/news', "Get event's news"
-  param :token, String, "Your token", :required => true
-  example SampleJson.events('news')
+  swagger_api :news do
+    summary "Returns event's news"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def news
     privacy = ""
     link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first

@@ -1,14 +1,13 @@
 class LoginController < ApplicationController
+  swagger_controller :login, "Login management"
+  
   skip_before_filter :verify_authenticity_token
 
-  def_param_group :login do
-    param :mail, String, "Your mail address", :required => true
-    param :password, String, "Your password", :required => true
+  swagger_api :index do
+    summary "Allow a volunteer to log into the app"
+    param :query, :mail, :string, :required, "Your mail address"
+    param :query, :password, :string, :required, "Your password"
   end
-
-  api :POST, '/login', "Allow a volunteer to log into the app"
-  param_group :login
-  example SampleJson.login('index')
   def index
     if (missing_param = param_is_missing?) != nil
       render :json => create_error(400, t("login.failure.params."+missing_param.to_s+".missing"))

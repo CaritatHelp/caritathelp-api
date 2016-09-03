@@ -1,24 +1,24 @@
-# -*- coding: utf-8 -*-
 class PicturesController < ApplicationController
+  swagger_controller :pictures, "Pictures management"
+  
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_picture, only: [:delete, :update]
   before_action :check_rights, only: [:create]
 
-  def_param_group :upload do
-    param :token, String, "Your token", :required => true
-    param :file, String, "File content, IMPORTANT : need to be encoded in base64", :required => true
-    param :filename, String, "Name to give to the file", :required => true
-    param :original_filename, String, "Original name of the file", :required => true
-    param :assoc_id, Integer, "Id of the assoc, if the picture is about an assoc"
-    param :shelter_id, Integer, "Id of the shelter, if the picture is about a shelter"
-    param :event_id, Integer, "Id of the event, if the picture is about an event"
-    param :is_main, String, "True to make it the main picture of your profile/event. Will be automatically set to true if it's the first picture to be upload, and to false otherwise"
+  swagger_api :create do
+    summary "Upload picture on the server"
+    notes "You need to chose between assoc_id, shelter_id & event_id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :file, :string, :required, "File content (base64)"
+    param :query, :filename, :string, :required, "Name to give to the file"
+    param :query, :original_filename, :string, :required, "Original name of the file"
+    param :query, :assoc_id, :integer, :optional, "Assoc's id"
+    param :query, :shelter_id, :integer, :optional, "Shelter's id"
+    param :query, :event_id, :integer, :optional, "Event's id"
+    param :query, :is_main, :boolean, :optional, "true to make it the main picture"
+    response :ok
   end
-
-  api :POST, '/pictures', "Upload a picture on the server"
-  param_group :upload
-  example SampleJson.pictures('create')
   def create
     #check if file is within picture_path
     actual_params = Hash.new
@@ -103,10 +103,13 @@ class PicturesController < ApplicationController
     end
   end
   
-  
-  api :DELETE, '/pictures/:id', "Delete the picture referred by id, if it's not the main picture"
-  param :token, String, "Your token", :required => true
-  example SampleJson.pictures('delete')
+  swagger_api :delete do
+    summary "Delete picture"
+    notes "Can't delete main picture"
+    param :path, :id, :integer, :required, "Picture's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def delete
     if @current_picture.event_id.eql?(nil) and @current_picture.assoc_id.eql?(nil) and @current_picture.volunteer_id != @volunteer.id
       render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
@@ -131,9 +134,12 @@ class PicturesController < ApplicationController
     end
   end
 
-  api :PUT, '/pictures/:id', "Set the picture referred by id as the main picture"
-  param :token, String, "Your token", :required => true
-  example SampleJson.pictures('update')
+  swagger_api :update do
+    summary "Set picture as main picture"
+    param :path, :id, :integer, :required, "Picture's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def update
     if @current_picture.event_id.eql?(nil) and @current_picture.assoc_id.eql?(nil) and @current_picture.volunteer_id != @volunteer.id
       render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return

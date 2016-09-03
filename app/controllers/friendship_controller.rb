@@ -1,17 +1,15 @@
 class FriendshipController < ApplicationController
+  swagger_controller :friendship, "Friendship management"
+  
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
 
-  def_param_group :respond_friend do
-    param :token, String, "Volunteer token", :required => true
-    param :notif_id, String, "Id of the notification", :required => true
-    param :acceptance, String, "True if friendship accepted, false otherwise", :required => true
+  swagger_api :add do
+    summary "Sends a friend request"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to invite"
+    response :ok
   end
-
-  api :POST, '/friendship/add', "Send a friend request to 'id' volunteer"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of volunteer to add as friend", :required => true
-  example SampleJson.friendship('add')
   def add
     begin
       @volunteer = Volunteer.find_by!(token: params[:token])
@@ -44,9 +42,13 @@ class FriendshipController < ApplicationController
     end
   end
 
-  api :POST, '/friendship/reply', "Reply to friend request"
-  param_group :respond_friend
-  example SampleJson.friendship('reply')
+  swagger_api :reply do
+    summary "Reply to a friend request"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :notif_id, :integer, :required, "Notification's id"
+    param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
+    response :ok
+  end
   def reply
     begin
       @volunteer = Volunteer.find_by!(token: params[:token])
@@ -76,10 +78,12 @@ class FriendshipController < ApplicationController
     end
   end
 
-  api :DELETE, '/friendship/remove', 'Remove frienship with volunteer referred by id'
-  param :token, String, "Your token", :required => true
-  param :id, String, "Id of volunteer to unfriend", :required => true
-  example SampleJson.friendship('remove')
+  swagger_api :remove do
+    summary "Remove friendship"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to remove from friends"
+    response :ok
+  end
   def remove
     begin
       @volunteer = Volunteer.find_by!(token: params[:token])
@@ -102,9 +106,11 @@ class FriendshipController < ApplicationController
     end
   end
 
-  api :GET, '/friendship/received_invitations', "List all pending friends' invitations"
-  param :token, String, "Your token", :required => true
-  example SampleJson.friendship('received_invitations')
+  swagger_api :received_invitations do
+    summary "List all pending friends' invitations"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def received_invitations
     @volunteer = Volunteer.find_by!(token: params[:token])
 

@@ -9,6 +9,6 @@ class New::Event::AdminPrivateWallMessage < New::New
   private 
 
   def set_privacy
-  	self.private = true
+    self.private = true
   end
 end

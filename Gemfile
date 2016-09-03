@@ -11,8 +11,9 @@ gem 'mini_magick', '~> 4.4'
 gem 'twitter-bootstrap-rails', '~> 3.2', '>= 3.2.2'
 # Awesome Print
 gem 'awesome_print', '~> 1.6', '>= 1.6.1'
-# Apipie
-gem 'apipie-rails'
+# Doc
+gem 'swagger-docs', '~> 0.2.9'
+gem 'swagger-ui_rails'
 # SecureRandom
 gem 'rubysl-securerandom', '~> 2.0.0'
 # Json gem

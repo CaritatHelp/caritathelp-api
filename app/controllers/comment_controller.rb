@@ -1,15 +1,20 @@
 class CommentController < ApplicationController
+  swagger_controller :comments, "Comments management"
+
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
   before_action :check_rights
 
-  api :POST, '/comments', 'Create a comment linked to the new'
-  param :token, String, "Your token", :required => true
-  param :content, String, "Content of comment", :required => true
-  param :new_id, String, "Id of the new", :required => true
-  example SampleJson.comments('create')
+  swagger_api :create do
+    summary "Creates a comment linked to the new"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :content, :string, :required, "Content of the comment"
+    param :query, :new_id, :integer, :required, "New's id"
+    response :ok
+    response 400
+  end
   def create
     begin
       new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
@@ -23,10 +28,14 @@ class CommentController < ApplicationController
     end
   end
 
-  api :PUT, '/comments/:id', 'Update the comment referred by id'
-  param :token, String, "Your token", :required => true
-  param :content, String, "Content of comment", :required => true
-  example SampleJson.comments('update')
+  swagger_api :update do
+    summary "Update the comment referred by id"
+    param :path, :id, :integer, :required, "Comment's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :content, :string, :required, "Content of the comment"
+    response :ok
+    response 400
+  end
   def update
     begin
       if @comment.volunteer_id != @volunteer.id
@@ -40,16 +49,24 @@ class CommentController < ApplicationController
     end
   end
 
-  api :GET, '/comments/:id', 'Get the comment'
-  param :token, String, "Your token", :required => true
-  example SampleJson.comments('show')
+  swagger_api :show do
+    summary "Returns the comment's information"
+    param :path, :id, :integer, :required, "Comment's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def show
     render :json => create_response(@comment)
   end
 
-  api :DELETE, '/comments/:id', 'Get the comment'
-  param :token, String, "Your token", :required => true
-  example SampleJson.comments('delete')
+  swagger_api :delete do
+    summary "Delete the comment"
+    param :path, :id, :integer, :required, "Comment's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def delete
     # permettre au owner d'une actu de delete un comment
     if @comment.volunteer_id != @volunteer.id

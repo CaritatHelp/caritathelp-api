@@ -1,12 +1,16 @@
 class NewsController < ApplicationController
+  swagger_controller :news, "News manager"
+
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_new, only: [:show, :comments]
   before_action :check_news_rights, only: [:show, :comments]
 
-  api :GET, '/news', 'Get all news concerning the volunteer refered by the token'
-  param :token, String, "Your token", :required => true
-  example SampleJson.news('index')
+  swagger_api :index do
+    summary "Get all news concerning the volunteer refered by the token"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def index
     news = New::New.select("new_news.*, new_news.type AS news_type")
       .select("(SELECT title FROM events WHERE events.id=new_news.event_id) AS event_name")
@@ -22,14 +26,17 @@ class NewsController < ApplicationController
     render :json => create_response(news)
   end
 
-  api :POST, '/news/wall_message', "Create a wall message for yourself, friend, assoc or event"
-  param :token, String, "Your token", :required => true
-  param :content, String, "Content of status", :required => true
-  param :friend_id, String, "Id of the friend you want to write on the wall"
-  param :assoc_id, String, "Id of the association you want to write on the wall"
-  param :event_id, String, "Id of the event you want to write on the wall"
-  param :public, String, "Default: true. Set to false if you want the news to be visible only by members. (only for an event or association wall message)"
-  example SampleJson.news('wall_message')
+  swagger_api :wall_message do
+    summary "Creates a wall message for yourself, friend, assoc or event"
+    notes "You need to chose between assoc_id, event_id & friend_id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :content, :string, :required, "Content of status"
+    param :query, :friend_id, :integer, :optional, "Friend's id"
+    param :query, :assoc_id, :integer, :optional, "Association's id"
+    param :query, :event_id, :integer, :optional, "Event's id"
+    param :query, :public, :boolean, :optional, "false to make it private"
+    response :ok
+  end
   def wall_message
     begin
       a = params.has_key?(:friend_id)
@@ -107,9 +114,11 @@ class NewsController < ApplicationController
     end
   end
 
-  api :GET, '/news/:id', 'Get information of the new'
-  param :token, String, "Your token", :required => true
-  example SampleJson.news('show')
+  swagger_api :show do
+    summary "Get new's information"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def show
     infos = Assoc.where(id: @new.assoc_id).select('name, thumb_path').first unless @new.assoc_id.nil?
     infos = Event.where(id: @new.event_id).select('title, thumb_path').first unless @new.event_id.nil?
@@ -120,9 +129,11 @@ class NewsController < ApplicationController
     render :json => create_response(@new.as_json.merge(sender_name: name, thumb_path: infos['thumb_path'], type: @new.type))
   end
 
-  api :GET, '/news/:id/comments', 'Get comments of the new'
-  param :token, String, "Your token", :required => true
-  example SampleJson.news('comments')
+  swagger_api :comments do
+    summary "Get new's comments"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def comments
     type = nil
     name = nil

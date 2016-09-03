@@ -1,50 +1,37 @@
 class SheltersController < ApplicationController
+  swagger_controller :shelters, "Shelters management"
+
   before_filter :check_token, except: [:index, :show, :search]
   before_action :set_volunteer, except: [:index, :show, :search]
   before_action :set_assoc, except: [:index, :show, :search, :pictures, :main_picture]
   before_action :set_shelter, only: [:show, :update, :delete, :pictures, :main_picture]
   before_action :check_rights, except: [:index, :show, :search, :pictures, :main_picture]
-
-  def_param_group :shelter_create do
-    param :token, String, "Creator's token", :required => true
-    param :assoc_id, String, "Association's id", :required => true
-    param :name, String, "Shelter's name", :required => true
-    param :address, String, "Shelter's address", :required => true
-    param :zipcode, Integer, "Shelter's zipcode", :required => true
-    param :city, String, "Shelter's city", :required => true
-    param :total_places, Integer, "Shelter's total places", :required => true
-    param :free_places, Integer, "Shelter's free places", :required => true
-    param :description, String, "Shelter's description"
-    param :latitude, Float, "Shelter's latitude"
-    param :longitude, Float, "Shelter's longitude"
-    param :tags, String, "Shelter's tags"
-  end
   
-  def_param_group :shelter_update do
-    param :token, String, "Creator's token", :required => true
-    param :assoc_id, String, "Association's id", :required => true
-    param :name, String, "Shelter's name"
-    param :address, String, "Shelter's address"
-    param :zipcode, Integer, "Shelter's zipcode"
-    param :city, String, "Shelter's city"
-    param :total_places, Integer, "Shelter's total places"
-    param :free_places, Integer, "Shelter's free places"
-    param :description, String, "Shelter's description"
-    param :latitude, Float, "Shelter's latitude"
-    param :longitude, Float, "Shelter's longitude"
-    param :tags, String, "Shelter's tags"
+  swagger_api :index do
+    summary "Get a list of all existing shelters"
+    response :ok
   end
-  
-  api :GET, '/shelters', "Get a list of all existing shelters"
-  example SampleJson.shelters('index')
   def index
     query = "id, name, address, zipcode, city, total_places, free_places, latitude, longitude, tags, thumb_path"
     render :json => create_response(Shelter.select(query).all)
   end
   
-  api :POST, '/shelters', "Allow association to add a shelter"
-  param_group :shelter_create
-  example SampleJson.shelters('create')
+  swagger_api :create do
+    summary "Allow an association to add a shelter"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    param :query, :name, :string, :required, "Shelter's name"
+    param :query, :address, :string, :required, "Shelter's address"
+    param :query, :zipcode, :integer, :required, "Shelter's zipcode"
+    param :query, :city, :string, :required, "Shelter's city"
+    param :query, :total_places, :integer, :required, "Shelter's total places"
+    param :query, :free_places, :integer, :required, "Shelter's free places"
+    param :query, :description, :string, :optional, "Shelter's description"
+    param :query, :latitude, :decimal, :optional, "Shelter's latitude"
+    param :query, :longitude, :decimal, :optional, "Shelter's longitude"
+    param :query, :tags, :string, :optional, "Shelter's tags"
+    response :ok
+  end
   def create
     begin
       existing_shelter = Shelter.where(:name => shelter_params[:name])
@@ -62,15 +49,20 @@ class SheltersController < ApplicationController
     end
   end
   
-  api :GET, '/shelters/:id', "Show information about the shelter refered by id"
-  example SampleJson.shelters('show')
+  swagger_api :show do
+    summary "Get a list of all existing shelters"
+    param :path, :id, :integer, :required, "Shelter's id"
+    response :ok
+  end
   def show    
     render :json => create_response(@shelter)
   end
 
-  api :GET, '/shelters/search', "Search for shelter by its name, returns a list of matching shelters"
-  param :research, String, "Shelter's name", :required => true
-  example SampleJson.shelters('search')
+  swagger_api :search do
+    summary "Search for shelter by its name, returns a list of shelters"
+    param :query, :research, :string, :required, "Shelter's name"
+    response :ok
+  end
   def search
     begin
       name = params[:research].downcase
@@ -86,9 +78,23 @@ class SheltersController < ApplicationController
     end
   end
 
-  api :PUT, '/shelters/:id', "Allow association to update the shelter refered by id"
-  param_group :shelter_update
-  example SampleJson.shelters('update')
+  swagger_api :update do
+    summary "Allow association to update shelter"
+    param :path, :id, :integer, :required, "Shelter's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    param :query, :name, :string, :optional, "Shelter's name"
+    param :query, :address, :string, :optional, "Shelter's address"
+    param :query, :zipcode, :integer, :optional, "Shelter's zipcode"
+    param :query, :city, :string, :optional, "Shelter's city"
+    param :query, :total_places, :integer, :optional, "Shelter's total places"
+    param :query, :free_places, :integer, :optional, "Shelter's free places"
+    param :query, :description, :string, :optional, "Shelter's description"
+    param :query, :latitude, :decimal, :optional, "Shelter's latitude"
+    param :query, :longitude, :decimal, :optional, "Shelter's longitude"
+    param :query, :tags, :string, :optional, "Shelter's tags"
+    response :ok
+  end
   def update
     begin
       existing_shelter = Shelter.where(:name => shelter_params[:name])
@@ -106,27 +112,36 @@ class SheltersController < ApplicationController
     end
   end
   
-  api :DELETE, '/shelters/:id', "Allow association to delete a shelter"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Association's id", :required => true
-  example SampleJson.shelters('delete')
+  swagger_api :delete do
+    summary "Allow association to delete a shelter"
+    param :path, :id, :integer, :required, "Shelter's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def delete
     @shelter.destroy
     render :json => create_response(t("shelters.success.deleted"))
   end
 
-  api :GET, '/shelters/:id/pictures', "Return a list of all shelter's pictures path"
-  param :token, String, "Your token", :required => true
-  example SampleJson.shelters('pictures')
+  swagger_api :pictures do
+    summary "Returns a list of all shelter's pictures path"
+    param :path, :id, :integer, :required, "Shelter's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def pictures
     query = "id, file_size, picture_path, is_main"
     pictures = Picture.where(:shelter_id => @shelter.id).select(query).limit(100)
     render :json => create_response(pictures)
   end
 
-  api :GET, '/shelters/:id/main_picture', "Return path of main picture"
-  param :token, String, "Your token", :required => true
-  example SampleJson.shelters('main_picture')
+  swagger_api :main_picture do
+    summary "Returns path of main picture"
+    param :path, :id, :integer, :required, "Shelter's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
   def main_picture
     query = "id, file_size, picture_path"
     pictures = Picture.where(:shelter_id => @shelter.id).where(:is_main => true).select(query).first

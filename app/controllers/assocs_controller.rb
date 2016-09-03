@@ -1,4 +1,6 @@
 class AssocsController < ApplicationController
+  swagger_controller :assocs, "Associations management"
+  
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_link, only: [:update, :delete, :events]
@@ -6,30 +8,12 @@ class AssocsController < ApplicationController
   before_action :check_block, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
-  def_param_group :assocs_create do
-    param :token, String, "Creator's token", :required => true
-    param :name, String, "Association's name", :required => true
-    param :description, String, "Association's description", :required => true
-    param :birthday, Date, "Date of creation"
-    param :city, String, "City where the association is located"
-    param :latitude, Float, "Association latitude position"
-    param :longitude, Float, "Association longitude position"
+  swagger_api :index do
+    summary "Get a list of all associations"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
   end
-
-  def_param_group :assocs_update do
-    param :token, String, "Creator's token, must be owner or admin of the association",
-    :required => true
-    param :name, String, "Association's name"
-    param :description, String, "Association's description"
-    param :birthday, Date, "Date of creation"
-    param :city, String, "City where the association is located"
-    param :latitude, Float, "Association latitude position"
-    param :longitude, Float, "Association longitude position"
-  end
-
-  api :GET, '/associations', "Get a list of all associations"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('index')
   def index    
     query = "SELECT assocs.id, assocs.name, assocs.city, assocs.description, assocs.thumb_path, " +
       "(SELECT av_links.rights FROM av_links WHERE av_links.assoc_id=assocs.id " + 
@@ -42,9 +26,18 @@ class AssocsController < ApplicationController
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
-  api :POST, '/associations', "Allow volunteer to create an association"
-  param_group :assocs_create
-  example SampleJson.assocs('create')
+  swagger_api :create do
+    summary "Allow volunteer to create an association"
+    param :query, :token, :string, :required, "Creator's token"
+    param :query, :name, :string, :required, "Association's name"
+    param :query, :description, :string, :required, "Association's description"
+    param :query, :birthday, :date, :optional, "Date of creation"
+    param :query, :city, :string,  :optional, "City where the association is located"
+    param :query, :latitude, :decimal,  :optional, "Association latitude position"
+    param :query, :longitude, :decimal,  :optional, "Association longitude position"    
+    response :ok
+    response 400
+  end
   def create
     begin
       if Assoc.exist? assoc_params[:name]
@@ -63,15 +56,19 @@ class AssocsController < ApplicationController
     end
   end
 
-  api :GET, '/associations/:id', "Get associations information by its id"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('show')
+  swagger_api :show do
+    summary "Get associations information by its id"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def show
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
     if link != nil
       render :json => create_response(@assoc.as_json.merge('rights' => link.rights)) and return
     end
-    rights = 'none'
+    rights = nil
 
     notif = Notification.where(notif_type: 'InviteMember').where(assoc_id: @assoc.id)
       .where(receiver_id: @volunteer.id).first
@@ -88,9 +85,13 @@ class AssocsController < ApplicationController
     render :json => create_response(@assoc.as_json.merge('rights' => rights)) and return
   end
 
-  api :GET, '/associations/:id/members', 'Get a list of all members'
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('members')
+  swagger_api :members do
+    summary "Get a list of all members"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def members
     query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, volunteers.thumb_path, av_links.rights"
     render :json => create_response(Volunteer.joins(:av_links)
@@ -98,9 +99,13 @@ class AssocsController < ApplicationController
                                       .select(query).limit(100))
   end
 
-  api :GET, '/associations/:id/events', "Get a list of all association's events"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('events')
+  swagger_api :events do
+    summary "Get a list of all association's events"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def events
     privacy = ""
     if @link.eql?(nil)
@@ -119,9 +124,19 @@ class AssocsController < ApplicationController
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
-  api :PUT, '/associations/:id', "Update association"
-  param_group :assocs_update
-  example SampleJson.assocs('update')
+  swagger_api :update do
+    summary "Update association"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Creator's token"
+    param :query, :name, :string, :optional, "Association's name"
+    param :query, :description, :string, :optional, "Association's description"
+    param :query, :birthday, :date, :optional, "Date of creation"
+    param :query, :city, :string,  :optional, "City where the association is located"
+    param :query, :latitude, :decimal,  :optional, "Association latitude position"
+    param :query, :longitude, :decimal,  :optional, "Association longitude position"    
+    response :ok
+    response 400
+  end
   def update
     begin
       if !Assoc.is_new_name_available?(assoc_params[:name],
@@ -137,10 +152,13 @@ class AssocsController < ApplicationController
     end
   end
 
-  
-  api :DELETE, '/associations/:id', "Delete association (need to be owner)"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('delete')
+  swagger_api :delete do
+    summary "Deletes association (needs to be owner)"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def delete
     if @link.rights.eql?('owner')
       Notification.where(assoc_id: @assoc.id).destroy_all
@@ -151,9 +169,12 @@ class AssocsController < ApplicationController
     render :json => create_error(400, t("assocs.failure.rights"))    
   end
 
-  api :GET, '/assocs/invited', "Get all assocs where you're invited"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('invited')
+  swagger_api :invited do
+    summary "Get all associations where you're invited"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def invited
     assocs = Assoc.select(:id, :name, :city, :thumb_path)
       .select("(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members")
@@ -164,27 +185,39 @@ class AssocsController < ApplicationController
     render :json => create_response(assocs)
   end
 
-  api :GET, '/associations/:id/pictures', "Return a list of all assoc's pictures path"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('pictures')
+  swagger_api :pictures do
+    summary "Returns a list of all association's pictures paths"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def pictures
     query = "id, file_size, picture_path, is_main"
     pictures = Picture.where(:assoc_id => @assoc.id).select(query).limit(100)
     render :json => create_response(pictures)
   end
 
-  api :GET, '/associations/:id/main_picture', "Return path of main picture"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('main_picture')
+  swagger_api :main_picture do
+    summary "Returns path of main picture"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def main_picture
     query = "id, file_size, picture_path"
     pictures = Picture.where(:assoc_id => @assoc.id).where(:is_main => true).select(query).first
     render :json => create_response(pictures)
   end
   
-  api :GET, '/associations/:id/news', "Get associations's news"
-  param :token, String, "Your token", :required => true
-  example SampleJson.assocs('news')
+  swagger_api :news do
+    summary "Returns association's news"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
   def news
     privacy = ""
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first

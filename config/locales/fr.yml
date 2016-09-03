@@ -49,4 +49,4 @@ fr:
 
   doc:
     url: "Adresse introuvable"
-    response: "Voir documentation: /doc"
+    response: "Voir documentation: /swagger/index"

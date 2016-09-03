@@ -6,8 +6,6 @@ Rails.application.routes.draw do
 
   get 'pictures/update'
 
-  apipie
-
   scope '/' do
     get '/search', to: 'volunteers#search'
     get '/friend_requests', to: 'volunteers#friend_requests'

@@ -1,4 +1,6 @@
 class GuestsController < ApplicationController
+  swagger_controller :guests, "Guests management"
+  
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
@@ -6,11 +8,13 @@ class GuestsController < ApplicationController
   before_action :set_link, except: [:reply_invite, :leave_event]
   before_action :check_rights, except: [:join, :reply_invite, :leave_event]
 
-  api :DELETE, '/guests/kick', "Kick guest from the event"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of guest to kick", :required => true
-  param :event_id, String, "Event concerned", :required => true
-  example SampleJson.guests('kick')
+  swagger_api :kick do
+    summary "Kick guest from the event"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
   def kick
     begin
       if (@link == nil)
@@ -34,12 +38,14 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :PUT, '/guests/upgrade', "Change rights of guest"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of guest to upgrade", :required => true
-  param :event_id, String, "Event concerned", :required => true
-  param :rights, String, "New rights to apply", :required => true
-  example SampleJson.guests('upgrade')
+  swagger_api :upgrade do
+    summary "Upgrade a guest"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
+    param :query, :event_id, :integer, :required, "Event's id"
+    param :query, :rights, :string, :required, "Rights to apply"
+    response :ok
+  end
   def upgrade
     begin
       if (@link == nil)
@@ -65,10 +71,12 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :POST, '/guests/join', "Ask to join an event"
-  param :token, String, "Your token", :required => true
-  param :event_id, String, "Event concerned", :required => true
-  example SampleJson.guests('join')
+  swagger_api :join do
+    summary "Apply to an event"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
   def join
     begin
       # Check if already guest or if already applied
@@ -117,11 +125,13 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :POST, '/guests/reply_guest', "Respond to a guest request to join the event"
-  param :token, String, "Your token", :required => true
-  param :notif_id, String, "Notification's id", :required => true
-  param :acceptance, String, "True to accept, false otherwise", :required => true
-  example SampleJson.guests('reply_guest')
+  swagger_api :reply_guest do
+    summary "Respond to a guest request"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :notif_id, :integer, :required, "Notification's id"
+    param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
+    response :ok
+  end
   def reply_guest
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
@@ -152,11 +162,13 @@ class GuestsController < ApplicationController
     end
   end
   
-  api :POST, '/guests/invite', "Invite a volunteer to join the event"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of the volunteer to invite", :required => true
-  param :event_id, String, "Id of the event", :required => true
-  example SampleJson.guests('invite')
+  swagger_api :invite do
+    summary "Invite a volunteer to join the event"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
   def invite
     begin
       # Check if volunteer has the permission to invite a guest in event
@@ -187,11 +199,13 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :POST, '/guests/reply_invite', "Respond to an invitation from an event"
-  param :token, String, "Your token", :required => true
-  param :notif_id, String, "Notification's id", :required => true
-  param :acceptance, String, "True to accept, false otherwise", :required => true
-  example SampleJson.guests('reply_invite')
+  swagger_api :reply_invite do
+    summary "Respond to an invitation from an event"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :notif_id, :integer, :required, "Notification's id"
+    param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
+    response :ok
+  end
   def reply_invite
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
@@ -221,10 +235,12 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :DELETE, '/guests/leave', "Leave an event"
-  param :token, String, "Your token", :required => true
-  param :event_id, String, "Id of the event to leave", :required => true
-  example SampleJson.guests('leave')
+  swagger_api :leave_event do
+    summary "Leave an event"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
   def leave_event
     begin
       volunteer = Volunteer.find_by!(token: params[:token])
@@ -246,10 +262,12 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :GET, 'guests/invited', "List all invited volunteers"
-  param :token, String, "Your token", :required => true
-  param :event_id, String, "Id of the event", :required => true
-  example SampleJson.guests('invited')
+  swagger_api :invited do
+    summary "List all invited volunteers"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
   def invited
     invited_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.receiver_id=volunteers.id")
       .where("notifications.notif_type='InviteGuest'")
@@ -260,11 +278,13 @@ class GuestsController < ApplicationController
                                                        :created_at, :updated_at]))
   end
 
-  api :DELETE, 'guests/uninvite', "Remove invitation to volunteer"
-  param :token, String, "Your token", :required => true
-  param :event_id, String, "Id of the event", :required => true
-  param :volunteer_id, String, "Id of the volunteer to uninvite", :required => true
-  example SampleJson.guests('uninvite')
+  swagger_api :uninvite do
+    summary "Remove an invitation"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :event_id, :integer, :required, "Event's id"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to uninvite"
+    response :ok
+  end
   def uninvite
     begin
       notif = Notification.where(notif_type: "InviteGuest")
@@ -283,10 +303,12 @@ class GuestsController < ApplicationController
     end
   end
 
-  api :GET, 'guests/waiting', "List all volunteers waiting to join the event"
-  param :token, String, "Your token", :required => true
-  param :event_id, String, "Id of the event", :required => true
-  example SampleJson.guests('waiting')
+  swagger_api :waiting do
+    summary "List all volunteers waiting to join the event"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
   def waiting
     waiting_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
       .where("notifications.notif_type='JoinEvent'")

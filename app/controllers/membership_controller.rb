@@ -1,4 +1,6 @@
 class MembershipController < ApplicationController
+  swagger_controller :members, "Members management"
+  
   skip_before_filter :verify_authenticity_token
   before_filter :check_token
   before_action :set_volunteer
@@ -7,11 +9,13 @@ class MembershipController < ApplicationController
   before_action :check_target_follower, only: [:kick, :upgrade]
   before_action :check_rights, except: [:join_assoc, :reply_invite]
 
-  api :DELETE, '/membership/kick', "Kick member from the association"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of member to kick", :required => true
-  param :assoc_id, String, "Association concerned", :required => true
-  example SampleJson.membership('kick')
+  swagger_api :kick do
+    summary "Kick member"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def kick
     begin
       volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
@@ -35,12 +39,14 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :PUT, '/membership/upgrade', "Change rights of member"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of member to upgrade", :required => true
-  param :assoc_id, String, "Association concerned", :required => true
-  param :rights, String, "New rights to apply", :required => true
-  example SampleJson.membership('upgrade')
+  swagger_api :upgrade do
+    summary "Upgrade member"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to upgrade"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    param :query, :rights, :string, :required, "Rights to apply"
+    response :ok
+  end
   def upgrade
     begin
       volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
@@ -64,10 +70,12 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :POST, '/membership/join', "Ask to join an association"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Association concerned", :required => true
-  example SampleJson.membership('join')
+  swagger_api :join_assoc do
+    summary "Request to join an association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def join_assoc
     begin
       # Check if already member or if already applied
@@ -105,11 +113,13 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :POST, '/membership/reply_member', "Respond to a member request to join the association"
-  param :token, String, "Your token", :required => true
-  param :notif_id, String, "Notification's id", :required => true
-  param :acceptance, String, "True to accept, false otherwise", :required => true
-  example SampleJson.membership('reply_member')
+  swagger_api :reply_member do
+    summary "Respond to a request to join the association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :notif_id, :integer, :required, "Notification's id"
+    param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
+    response :ok
+  end
   def reply_member
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
@@ -142,11 +152,13 @@ class MembershipController < ApplicationController
     end
   end
   
-  api :POST, '/membership/invite', "Invite a volunteer to join the assocation"
-  param :token, String, "Your token", :required => true
-  param :volunteer_id, String, "Id of the volunteer to invite", :required => true
-  param :assoc_id, String, "Id of the association", :required => true
-  example SampleJson.membership('invite')
+  swagger_api :invite do
+    summary "Invite a volunteer to join the association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id to invite"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def invite
     begin
       # Check if invited_member is already member or if already applied
@@ -172,11 +184,13 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :POST, '/membership/reply_invite', "Respond to an invitation form an association"
-  param :token, String, "Your token", :required => true
-  param :notif_id, String, "Notification's id", :required => true
-  param :acceptance, String, "True to accept, false otherwise", :required => true
-  example SampleJson.membership('reply_invite')
+  swagger_api :reply_invite do
+    summary "Respond to an invitation"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :notif_id, :integer, :required, "Notification's id"
+    param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
+    response :ok
+  end
   def reply_invite
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
@@ -206,10 +220,12 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :DELETE, '/membership/leave', "Leave an association"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the assoc to leave", :required => true
-  example SampleJson.membership('leave')
+  swagger_api :leave_assoc do
+    summary "Leave an association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id to leave"
+    response :ok
+  end
   def leave_assoc
     begin
       link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id).first
@@ -228,10 +244,12 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :GET, 'membership/invited', "List all invited volunteers"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the association", :required => true
-  example SampleJson.membership('invited')
+  swagger_api :invited do
+    summary "List all invited volunteers"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
   def invited
     target_volunteerunteers = Volunteer.joins("INNER JOIN notifications ON notifications.receiver_id=volunteers.id")
       .where("notifications.notif_type='InviteMember'")
@@ -242,11 +260,13 @@ class MembershipController < ApplicationController
                                                        :created_at, :updated_at]))
   end
 
-  api :DELETE, 'membership/uninvite', "Remove invitation to volunteer"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the association", :required => true
-  param :volunteer_id, String, "Id of the volunteer to uninvite", :required => true
-  example SampleJson.membership('uninvite')
+  swagger_api :uninvite do
+    summary "Cancel an invitation"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    param :query, :volunteer_id, :integer, :required, "Volunteer's id"
+    response :ok
+  end
   def uninvite
     begin
       notif = Notification.where(notif_type: "InviteMember")
@@ -265,10 +285,11 @@ class MembershipController < ApplicationController
     end
   end
 
-  api :GET, 'membership/waiting', "List all volunteers waiting to join the assoc"
-  param :token, String, "Your token", :required => true
-  param :assoc_id, String, "Id of the association", :required => true
-  example SampleJson.membership('waiting')
+  swagger_api :waiting do
+    summary "List all volunteers waiting to join the association"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+  end
   def waiting
     waiting_volunteers = Volunteer.joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
       .where("notifications.notif_type='JoinAssoc'")

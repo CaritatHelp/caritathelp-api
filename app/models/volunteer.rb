@@ -36,7 +36,7 @@ class Volunteer < ActiveRecord::Base
   validates_inclusion_of :gender, :in => ['m', 'f'], :allow_nil => true
   validates_inclusion_of :allowgps, :in => [true, false], :allow_nil => true
   validates_inclusion_of :allow_notifications, :in => [true, false], :allow_nil => true
-
+  
   def generate_token
     generation = loop do
       self.token = SecureRandom.urlsafe_base64
