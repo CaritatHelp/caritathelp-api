@@ -1,6 +1,6 @@
 class SheltersController < ApplicationController
-  before_filter :check_token, except: [:index, :show, :search]
-  before_action :set_volunteer, except: [:index, :show, :search]
+  before_action :authenticate_volunteer!, except: [:index, :show, :search]
+
   before_action :set_assoc, except: [:index, :show, :search, :pictures, :main_picture]
   before_action :set_shelter, only: [:show, :update, :delete, :pictures, :main_picture]
   before_action :check_rights, except: [:index, :show, :search, :pictures, :main_picture]
@@ -141,11 +141,7 @@ class SheltersController < ApplicationController
     params_shelter[:assoc_id] = @assoc.id
     params_shelter
   end
-  
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-  
+
   def set_assoc
     begin
       @assoc = Assoc.find(params[:assoc_id])
@@ -163,7 +159,7 @@ class SheltersController < ApplicationController
   end
   
   def check_rights
-    @link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id).first
+    @link = AvLink.where(:volunteer_id => current_volunteer.id).where(:assoc_id => @assoc.id).first
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("assocs.failure.rights")) and return
     end

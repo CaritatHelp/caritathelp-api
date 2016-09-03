@@ -1,7 +1,8 @@
 class FollowersController < ApplicationController
   skip_before_filter :verify_authenticity_token
-  before_filter :check_token
-  before_action :set_volunteer
+
+  before_action :authenticate_volunteer!
+  
   before_action :set_assoc
   before_action :set_target_volunteer, only: [:block]
   before_action :check_rights, only: [:block]
@@ -12,11 +13,11 @@ class FollowersController < ApplicationController
   example SampleJson.followers('follow')
   def follow
     begin
-      link = AvLink.where(volunteer_id: @volunteer.id,
+      link = AvLink.where(volunteer_id: current_volunteer.id,
                           assoc_id: @assoc.id,
                           rights: 'follower').first
       if link.eql?(nil)
-        AvLink.create!(volunteer_id: @volunteer.id,
+        AvLink.create!(volunteer_id: current_volunteer.id,
                        assoc_id: @assoc.id,
                        rights: 'follower')
         render :json => create_response(t("follower.success.following")) and return
@@ -36,7 +37,7 @@ class FollowersController < ApplicationController
   example SampleJson.followers('unfollow')
   def unfollow
     begin
-      link = AvLink.where(volunteer_id: @volunteer.id,
+      link = AvLink.where(volunteer_id: current_volunteer.id,
                           assoc_id: @assoc.id).first
       if link.eql?(nil)
         render :json => create_error(400, t("follower.failure.nil")) and return
@@ -77,11 +78,7 @@ class FollowersController < ApplicationController
     end
   end
 
-  private
-  def set_volunteer
-    @volunteer = Volunteer.find_by!(token: params[:token])
-  end
-  
+  private  
   def set_assoc
     begin
       @assoc = Assoc.find_by!(id: params[:assoc_id])
@@ -99,7 +96,7 @@ class FollowersController < ApplicationController
   end
 
   def check_rights
-    link = AvLink.where(volunteer_id: @volunteer.id, assoc_id: @assoc.id).first
+    link = AvLink.where(volunteer_id: current_volunteer.id, assoc_id: @assoc.id).first
     if link.eql?(nil) or link.level < 2
       render :json => create_error(400, t("follower.failure.rights")) and return      
     end

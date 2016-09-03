@@ -1,6 +1,6 @@
 class CommentController < ApplicationController
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_volunteer!
+  
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
   before_action :check_rights
@@ -12,12 +12,12 @@ class CommentController < ApplicationController
   example SampleJson.comments('create')
   def create
     begin
-      new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
+      new_comment = Comment.create!([new_id: @new.id, volunteer_id: current_volunteer.id,
                                      content: params[:content]]).first
       render :json => create_response(new_comment.as_json.merge(
-                                       thumb_path: @volunteer.thumb_path,
-                                       firstname: @volunteer.firstname,
-                                       lastname: @volunteer.lastname))
+                                       thumb_path: current_volunteer.thumb_path,
+                                       firstname: current_volunteer.firstname,
+                                       lastname: current_volunteer.lastname))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -29,12 +29,12 @@ class CommentController < ApplicationController
   example SampleJson.comments('update')
   def update
     begin
-      if @comment.volunteer_id != @volunteer.id
+      if @comment.volunteer_id != current_volunteer.id
         render :json => create_error(400, t("comments.failure.rights")) and return        
       end
       # changer le permit
       @comment.update!(params.permit(:content))
-      render :json => create_response(@comment.as_json.merge(thumb_path: @volunteer.thumb_path))
+      render :json => create_response(@comment.as_json.merge(thumb_path: current_volunteer.thumb_path))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -52,7 +52,7 @@ class CommentController < ApplicationController
   example SampleJson.comments('delete')
   def delete
     # permettre au owner d'une actu de delete un comment
-    if @comment.volunteer_id != @volunteer.id
+    if @comment.volunteer_id != current_volunteer.id
       render :json => create_error(400, t("comments.failure.rights")) and return        
     end
     @comment.destroy
@@ -60,10 +60,6 @@ class CommentController < ApplicationController
   end
 
   private
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def set_comment
     begin
       @comment = Comment.find(params[:id])
@@ -83,25 +79,25 @@ class CommentController < ApplicationController
 
   def check_rights
     begin
-      if @new.volunteer_id.eql?(@volunteer.id)
+      if @new.volunteer_id.eql?(current_volunteer.id)
         return true
       end
       
       if @new.private # Checking rights for a private news
         if @new.assoc_id != nil # private assoc news
-          link = AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).first
+          link = AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: current_volunteer.id).first
           if !link.eql?(nil) and link.level >= AvLink.levels["member"]
             return true
           end
         elsif @new.event_id != nil # private event news
           link = EventVolunteer.where(event_id: @new.event_id)
-            .where(volunteer_id: @volunteer.id).first
+            .where(volunteer_id: current_volunteer.id).first
           if !link.eql?(nil) and link.level >= EventVolunteer.levels["member"]
             return true
           end
         else # private friend news
           link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @volunteer.id).first
+            .where(volunteer_id: current_volunteer.id).first
           if !link.eql?(nil)
             return true
           end
@@ -112,11 +108,11 @@ class CommentController < ApplicationController
         elsif @new.event_id != nil # public event news
           event = Event.find(@new.event_id)
           event_link = EventVolunteer.where(event_id: @new.event_id)
-            .where(volunteer_id: @volunteer.id).first
+            .where(volunteer_id: current_volunteer.id).first
 
           if event.private # public news of a private event
             assoc_link = AvLink.where(assoc_id: event.assoc_id)
-              .where(volunteer_id: @volunteer.id).first
+              .where(volunteer_id: current_volunteer.id).first
             if !assoc_link.eql?(nil) and assoc_link.level >= AvLink.levels["member"]
               return true
             end
@@ -125,7 +121,7 @@ class CommentController < ApplicationController
           end
         else # public friend news
           link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @volunteer.id).first
+            .where(volunteer_id: current_volunteer.id).first
           if !link.eql?(nil)
             return true
           end
