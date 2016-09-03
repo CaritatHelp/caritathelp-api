@@ -1,7 +1,8 @@
 class NotificationsController < ApplicationController
   swagger_controller :notifications, "Notifications management"
 
-  before_filter :check_token
+  before_action :authenticate_volunteer!
+
   before_action :set_notification
   
   swagger_api :read do
@@ -9,7 +10,7 @@ class NotificationsController < ApplicationController
     param :path, :id, :integer, :required, "Notification's id"
     param :query, :token, :string, :required, "Your token"
     response :ok
-  end
+  end  
   def read
     @notification.read = true
     @notification.save

@@ -1,8 +1,9 @@
 class NewsController < ApplicationController
   swagger_controller :news, "News manager"
 
-  before_filter :check_token
+  before_action :authenticate_volunteer!
   before_action :set_volunteer
+
   before_action :set_new, only: [:show, :comments]
   before_action :check_news_rights, only: [:show, :comments]
 
@@ -91,5 +92,15 @@ class NewsController < ApplicationController
         render json: create_error(400, t("volunteers.failure.rights"))
       end
     end
+  end
+  
+  def check_assoc_rights
+    @link = AvLink.where(:volunteer_id => current_volunteer.id)
+      .where(:assoc_id => @assoc.id).first
+    if @link.eql?(nil) || @link.rights.eql?('member')
+      render :json => create_error(400, t("assocs.failure.rights"))
+      return false
+    end
+    return true
   end
 end

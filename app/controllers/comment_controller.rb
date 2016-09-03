@@ -1,8 +1,8 @@
 class CommentController < ApplicationController
   swagger_controller :comments, "Comments management"
 
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_volunteer!
+
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
   before_action :check_rights
@@ -17,12 +17,12 @@ class CommentController < ApplicationController
   end
   def create
     begin
-      new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
+      new_comment = Comment.create!([new_id: @new.id, volunteer_id: current_volunteer.id,
                                      content: params[:content]]).first
       render :json => create_response(new_comment.as_json.merge(
-                                       thumb_path: @volunteer.thumb_path,
-                                       firstname: @volunteer.firstname,
-                                       lastname: @volunteer.lastname))
+                                       thumb_path: current_volunteer.thumb_path,
+                                       firstname: current_volunteer.firstname,
+                                       lastname: current_volunteer.lastname))
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -38,12 +38,12 @@ class CommentController < ApplicationController
   end
   def update
     begin
-      if @comment.volunteer_id != @volunteer.id
+      if @comment.volunteer_id != current_volunteer.id
         render :json => create_error(400, t("comments.failure.rights")) and return        
       end
       # changer le permit
       @comment.update!(params.permit(:content))
-      render :json => create_response(@comment.as_json.merge(thumb_path: @volunteer.thumb_path))
+      render :json => create_response(@comment.as_json.merge(thumb_path: current_volunteer.thumb_path))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -69,7 +69,7 @@ class CommentController < ApplicationController
   end
   def delete
     # permettre au owner d'une actu de delete un comment
-    if @comment.volunteer_id != @volunteer.id
+    if @comment.volunteer_id != current_volunteer.id
       render :json => create_error(400, t("comments.failure.rights")) and return        
     end
     @comment.destroy
@@ -77,10 +77,6 @@ class CommentController < ApplicationController
   end
 
   private
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def set_comment
     begin
       @comment = Comment.find(params[:id])

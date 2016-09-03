@@ -1,8 +1,8 @@
 class MessagesController < ApplicationController
   swagger_controller :messages, "Messages management"
 
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_user!
+  
   before_action :set_chatroom, except: [:index, :create, :reset]
   before_action :check_chatroom_rights, except: [:index, :create, :reset]
   
@@ -18,8 +18,8 @@ class MessagesController < ApplicationController
       volunteers = chatroom_params[:volunteers]
       is_private = false
 
-      if !volunteers.eql?(nil) and !volunteers.include?(@volunteer.id.to_s)
-        volunteers.push @volunteer.id.to_s
+      if !volunteers.eql?(nil) and !volunteers.include?(current_volunteer.id.to_s)
+        volunteers.push current_volunteer.id.to_s
       end
 
       # check if at least 2 people
@@ -35,7 +35,7 @@ class MessagesController < ApplicationController
         query = "SELECT chatrooms.id, chatrooms.name, chatrooms.number_volunteers, " +
           "(SELECT chatroom_volunteers.volunteer_id FROM chatroom_volunteers " +
           "WHERE chatroom_volunteers.chatroom_id=chatrooms.id AND " +
-          "chatroom_volunteers.volunteer_id<>#{@volunteer.id.to_s})" +
+          "chatroom_volunteers.volunteer_id<>#{current_volunteer.id.to_s})" +
           " AS participants FROM chatrooms WHERE chatrooms.is_private=true"
 
         # query = "SELECT chatrooms.id, chatrooms.name, chatrooms.number_volunteers, " +
@@ -89,7 +89,7 @@ class MessagesController < ApplicationController
     response :ok
   end
   def index
-      render json: create_response(@volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
+    render json: create_response(@volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
   end
 
   swagger_api :participants do
@@ -182,12 +182,12 @@ class MessagesController < ApplicationController
   def new_message
     begin
       message = Message.create!(:content => params[:content],
-                                :volunteer_id => @volunteer.id,
+                                :volunteer_id => current_volunteer.id,
                                 :chatroom_id => @chatroom.id)
       @chatroom.number_messages += 1
       @chatroom.save!
 
-      send_msg_to_socket(message, @chatroom.id, @volunteer)
+      send_msg_to_socket(message, @chatroom.id, current_volunteer)
 
       render :json => create_response(message)
     rescue => e
@@ -255,7 +255,7 @@ class MessagesController < ApplicationController
     begin
       message = Message.find(params[:message_id])
 
-      if message.volunteer_id.eql?(@volunteer.id)
+      if message.volunteer_id.eql?(current_volunteer.id)
         message.destroy
         
         @chatroom.number_messages -= 1
@@ -274,10 +274,6 @@ class MessagesController < ApplicationController
     params.permit(:name, :volunteers => [])
   end
 
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def set_chatroom
     begin
       @chatroom = Chatroom.find(params[:id])
@@ -287,7 +283,7 @@ class MessagesController < ApplicationController
   end
 
   def check_chatroom_rights
-    @link = ChatroomVolunteer.where(volunteer_id: @volunteer.id)
+    @link = ChatroomVolunteer.where(volunteer_id: current_volunteer.id)
       .where(chatroom_id: @chatroom.id).first
     if @link.eql?(nil)
       render :json => create_error(400, t("chatrooms.failure.rights")) and return      
