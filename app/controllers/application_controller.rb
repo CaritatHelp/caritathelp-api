@@ -71,7 +71,7 @@ class ApplicationController < ActionController::Base
         thumb_path: notification.thumb_path,
         concerned_volunteers: concerned_volunteers
       }.to_json
-
+      
       WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" +
                                         Rails.application.config.port_websocket.to_s) do |ws|
         ws.on :open do
@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
           ws.close
         end
       end
-    rescue
+    rescue => e
     end
   end
 end
