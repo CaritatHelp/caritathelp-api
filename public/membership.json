@@ -5,7 +5,7 @@
   "resourcePath": "membership",
   "apis": [
     {
-      "path": "/membership/invited.json",
+      "path": "/membership/invited",
       "operations": [
         {
           "summary": "List all invited volunteers",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "path": "/membership/waiting.json",
+      "path": "/membership/waiting",
       "operations": [
         {
           "summary": "List all volunteers waiting to join the association",
@@ -64,7 +64,7 @@
       ]
     },
     {
-      "path": "/membership/join.json",
+      "path": "/membership/join",
       "operations": [
         {
           "summary": "Request to join an association",
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "path": "/membership/reply_member.json",
+      "path": "/membership/reply_member",
       "operations": [
         {
           "summary": "Respond to a request to join the association",
@@ -137,7 +137,7 @@
       ]
     },
     {
-      "path": "/membership/invite.json",
+      "path": "/membership/invite",
       "operations": [
         {
           "summary": "Invite a volunteer to join the association",
@@ -177,7 +177,7 @@
       ]
     },
     {
-      "path": "/membership/reply_invite.json",
+      "path": "/membership/reply_invite",
       "operations": [
         {
           "summary": "Respond to an invitation",
@@ -217,7 +217,7 @@
       ]
     },
     {
-      "path": "/membership/upgrade.json",
+      "path": "/membership/upgrade",
       "operations": [
         {
           "summary": "Upgrade member",
@@ -264,7 +264,7 @@
       ]
     },
     {
-      "path": "/membership/kick.json",
+      "path": "/membership/kick",
       "operations": [
         {
           "summary": "Kick member",
@@ -304,7 +304,7 @@
       ]
     },
     {
-      "path": "/membership/leave.json",
+      "path": "/membership/leave",
       "operations": [
         {
           "summary": "Leave an association",
@@ -337,7 +337,7 @@
       ]
     },
     {
-      "path": "/membership/uninvite.json",
+      "path": "/membership/uninvite",
       "operations": [
         {
           "summary": "Cancel an invitation",

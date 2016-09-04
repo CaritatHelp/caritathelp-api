@@ -5,7 +5,7 @@
   "resourcePath": "followers",
   "apis": [
     {
-      "path": "/follow.json",
+      "path": "/follow",
       "operations": [
         {
           "summary": "Follow an association",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "path": "/unfollow.json",
+      "path": "/unfollow",
       "operations": [
         {
           "summary": "Unfollow an association",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "path": "/block.json",
+      "path": "/block",
       "operations": [
         {
           "summary": "Block a follower",

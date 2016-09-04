@@ -5,7 +5,7 @@
   "resourcePath": "assocs",
   "apis": [
     {
-      "path": "/associations.json",
+      "path": "/associations",
       "operations": [
         {
           "summary": "Get a list of all associations",
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "path": "/associations/invited.json",
+      "path": "/associations/invited",
       "operations": [
         {
           "summary": "Get all associations where you're invited",
@@ -67,7 +67,7 @@
       ]
     },
     {
-      "path": "/associations/{id}.json",
+      "path": "/associations/{id}",
       "operations": [
         {
           "summary": "Get associations information by its id",
@@ -105,7 +105,7 @@
       ]
     },
     {
-      "path": "/associations/{id}/members.json",
+      "path": "/associations/{id}/members",
       "operations": [
         {
           "summary": "Get a list of all members",
@@ -143,7 +143,7 @@
       ]
     },
     {
-      "path": "/associations/{id}/events.json",
+      "path": "/associations/{id}/events",
       "operations": [
         {
           "summary": "Get a list of all association's events",
@@ -181,7 +181,7 @@
       ]
     },
     {
-      "path": "/associations/{id}/pictures.json",
+      "path": "/associations/{id}/pictures",
       "operations": [
         {
           "summary": "Returns a list of all association's pictures paths",
@@ -219,7 +219,7 @@
       ]
     },
     {
-      "path": "/associations/{id}/main_picture.json",
+      "path": "/associations/{id}/main_picture",
       "operations": [
         {
           "summary": "Returns path of main picture",
@@ -257,7 +257,7 @@
       ]
     },
     {
-      "path": "/associations/{id}/news.json",
+      "path": "/associations/{id}/news",
       "operations": [
         {
           "summary": "Returns association's news",
@@ -295,7 +295,7 @@
       ]
     },
     {
-      "path": "/associations.json",
+      "path": "/associations",
       "operations": [
         {
           "summary": "Allow volunteer to create an association",
@@ -368,7 +368,7 @@
       ]
     },
     {
-      "path": "/associations/{id}.json",
+      "path": "/associations/{id}",
       "operations": [
         {
           "summary": "Update association",
@@ -448,7 +448,7 @@
       ]
     },
     {
-      "path": "/associations/{id}.json",
+      "path": "/associations/{id}",
       "operations": [
         {
           "summary": "Deletes association (needs to be owner)",

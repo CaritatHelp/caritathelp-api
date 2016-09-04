@@ -5,7 +5,7 @@
   "resourcePath": "guests",
   "apis": [
     {
-      "path": "/guests/invited.json",
+      "path": "/guests/invited",
       "operations": [
         {
           "summary": "List all invited volunteers",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "path": "/guests/waiting.json",
+      "path": "/guests/waiting",
       "operations": [
         {
           "summary": "List all volunteers waiting to join the event",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "path": "/guests/join.json",
+      "path": "/guests/join",
       "operations": [
         {
           "summary": "Apply to an event",
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "path": "/guests/reply_guest.json",
+      "path": "/guests/reply_guest",
       "operations": [
         {
           "summary": "Respond to a guest request",
@@ -144,7 +144,7 @@
       ]
     },
     {
-      "path": "/guests/invite.json",
+      "path": "/guests/invite",
       "operations": [
         {
           "summary": "Invite a volunteer to join the event",
@@ -184,7 +184,7 @@
       ]
     },
     {
-      "path": "/guests/reply_invite.json",
+      "path": "/guests/reply_invite",
       "operations": [
         {
           "summary": "Respond to an invitation from an event",
@@ -224,7 +224,7 @@
       ]
     },
     {
-      "path": "/guests/upgrade.json",
+      "path": "/guests/upgrade",
       "operations": [
         {
           "summary": "Upgrade a guest",
@@ -271,7 +271,7 @@
       ]
     },
     {
-      "path": "/guests/kick.json",
+      "path": "/guests/kick",
       "operations": [
         {
           "summary": "Kick guest from the event",
@@ -311,7 +311,7 @@
       ]
     },
     {
-      "path": "/guests/leave.json",
+      "path": "/guests/leave",
       "operations": [
         {
           "summary": "Leave an event",
@@ -344,7 +344,7 @@
       ]
     },
     {
-      "path": "/guests/uninvite.json",
+      "path": "/guests/uninvite",
       "operations": [
         {
           "summary": "Remove an invitation",

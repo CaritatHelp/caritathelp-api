@@ -5,7 +5,7 @@
   "resourcePath": "comment",
   "apis": [
     {
-      "path": "/comments.json",
+      "path": "/comments",
       "operations": [
         {
           "summary": "Creates a comment linked to the new",
@@ -50,7 +50,7 @@
       ]
     },
     {
-      "path": "/comments/{id}.json",
+      "path": "/comments/{id}",
       "operations": [
         {
           "summary": "Returns the comment's information",
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "path": "/comments/{id}.json",
+      "path": "/comments/{id}",
       "operations": [
         {
           "summary": "Update the comment referred by id",
@@ -133,7 +133,7 @@
       ]
     },
     {
-      "path": "/comments/{id}.json",
+      "path": "/comments/{id}",
       "operations": [
         {
           "summary": "Delete the comment",

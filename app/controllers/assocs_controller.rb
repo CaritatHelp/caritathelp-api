@@ -219,19 +219,8 @@ class AssocsController < ApplicationController
     response 400
   end
   def news
-    privacy = ""
-    link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
-    if link.eql?(nil)
-      privacy = " AND new_news.type<>'New::Assoc::AdminPrivateWallMessage'"
-    end
-    news = New::New
-      .where("new_news.assoc_id=#{@assoc.id}" + privacy)
-      .select('new_news.*, new_news.type AS news_type')
-      .joins("INNER JOIN assocs ON assocs.id=new_news.assoc_id")
-      .select("assocs.name, assocs.thumb_path")
-      .select("(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_fullname")
-      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path").order(updated_at: :desc)
-    render :json => create_response(news)
+    rights = @volunteer.av_links.find_by(assoc_id: @assoc.id).try(:level)
+    render json: create_response(@assoc.news.select { |new| (new.private and rights.present? and rights >= AvLink.levels["member"]) or new.public })
   end
 
   private

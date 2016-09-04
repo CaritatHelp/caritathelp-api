@@ -5,7 +5,7 @@
   "resourcePath": "notifications",
   "apis": [
     {
-      "path": "/notifications/{id}/read.json",
+      "path": "/notifications/{id}/read",
       "operations": [
         {
           "summary": "Set a notification as read",
