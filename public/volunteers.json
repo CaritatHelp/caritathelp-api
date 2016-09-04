@@ -5,7 +5,7 @@
   "resourcePath": "volunteers",
   "apis": [
     {
-      "path": "/search.json",
+      "path": "/search",
       "operations": [
         {
           "summary": "Search for volunteers, returns a list of volunteers",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "path": "/friend_requests.json",
+      "path": "/friend_requests",
       "operations": [
         {
           "summary": "Returns a list of all pendinf friends' invitations",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "path": "/notifications.json",
+      "path": "/notifications",
       "operations": [
         {
           "summary": "Get volunteer's notifications",
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "path": "/volunteers.json",
+      "path": "/volunteers",
       "operations": [
         {
           "summary": "Get a list of all volunteers",
@@ -123,7 +123,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}.json",
+      "path": "/volunteers/{id}",
       "operations": [
         {
           "summary": "Get volunteer's profile",
@@ -156,7 +156,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}/friends.json",
+      "path": "/volunteers/{id}/friends",
       "operations": [
         {
           "summary": "Get volunteer's friends list",
@@ -189,7 +189,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}/associations.json",
+      "path": "/volunteers/{id}/associations",
       "operations": [
         {
           "summary": "Get volunteer's associations list",
@@ -222,7 +222,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}/events.json",
+      "path": "/volunteers/{id}/events",
       "operations": [
         {
           "summary": "Get volunteer's events list",
@@ -255,7 +255,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}/pictures.json",
+      "path": "/volunteers/{id}/pictures",
       "operations": [
         {
           "summary": "Returns a list of all volunteer's pictures path",
@@ -288,7 +288,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}/main_picture.json",
+      "path": "/volunteers/{id}/main_picture",
       "operations": [
         {
           "summary": "Returns path of main picture",
@@ -321,7 +321,7 @@
       ]
     },
     {
-      "path": "/volunteers/{id}/news.json",
+      "path": "/volunteers/{id}/news",
       "operations": [
         {
           "summary": "Get volunteer's news",
@@ -354,7 +354,7 @@
       ]
     },
     {
-      "path": "/volunteers.json",
+      "path": "/volunteers",
       "operations": [
         {
           "summary": "Allow volunteer to create an account",
@@ -450,7 +450,7 @@
       ]
     },
     {
-      "path": "/volunteers.json",
+      "path": "/volunteers",
       "operations": [
         {
           "summary": "Update volunteer",

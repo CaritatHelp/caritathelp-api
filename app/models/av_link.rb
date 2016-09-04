@@ -1,5 +1,9 @@
 class AvLink < ActiveRecord::Base
   enum levels: { owner: 10, admin: 8, member: 5, follower: 0, block: -10} 
+
+  belongs_to :assoc
+  belongs_to :volunteer
+
   before_save :check_nil
   before_save :set_level
 

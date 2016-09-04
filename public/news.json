@@ -5,11 +5,10 @@
   "resourcePath": "news",
   "apis": [
     {
-      "path": "/news/wall_message.json",
+      "path": "/news/wall_message",
       "operations": [
         {
           "summary": "Creates a wall message for yourself, friend, assoc or event",
-          "notes": "You need to chose between assoc_id, event_id & friend_id",
           "parameters": [
             {
               "paramType": "query",
@@ -22,35 +21,42 @@
               "paramType": "query",
               "name": "content",
               "type": "string",
-              "description": "Content of status",
+              "description": "New's content",
               "required": true
             },
             {
               "paramType": "query",
-              "name": "friend_id",
+              "name": "group_id",
               "type": "integer",
-              "description": "Friend's id",
+              "description": "Id of Event, Assoc or Volunteer",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "group_type",
+              "type": "string",
+              "description": "Id's type",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "news_type",
+              "type": "string",
+              "description": "'Status' is the only possibility for now",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "title",
+              "type": "string",
+              "description": "New's title",
               "required": false
             },
             {
               "paramType": "query",
-              "name": "assoc_id",
-              "type": "integer",
-              "description": "Association's id",
-              "required": false
-            },
-            {
-              "paramType": "query",
-              "name": "event_id",
-              "type": "integer",
-              "description": "Event's id",
-              "required": false
-            },
-            {
-              "paramType": "query",
-              "name": "public",
+              "name": "private",
               "type": "boolean",
-              "description": "false to make it private",
+              "description": "true to make it private",
               "required": false
             }
           ],
@@ -67,7 +73,7 @@
       ]
     },
     {
-      "path": "/news.json",
+      "path": "/news",
       "operations": [
         {
           "summary": "Get all news concerning the volunteer refered by the token",
@@ -93,11 +99,18 @@
       ]
     },
     {
-      "path": "/news/{id}.json",
+      "path": "/news/{id}",
       "operations": [
         {
           "summary": "Get new's information",
           "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "New's id",
+              "required": true
+            },
             {
               "paramType": "query",
               "name": "token",
@@ -119,11 +132,18 @@
       ]
     },
     {
-      "path": "/news/{id}/comments.json",
+      "path": "/news/{id}/comments",
       "operations": [
         {
           "summary": "Get new's comments",
           "parameters": [
+            {
+              "paramType": "path",
+              "name": "id",
+              "type": "integer",
+              "description": "New's id",
+              "required": true
+            },
             {
               "paramType": "query",
               "name": "token",

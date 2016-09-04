@@ -84,7 +84,7 @@ class CommentController < ApplicationController
   def set_comment
     begin
       @comment = Comment.find(params[:id])
-      @new = New::New.find(@comment.new_id)
+      @new = New.find(@comment.new_id)
     rescue
       render :json => create_error(400, t("comments.failure.id"))
     end
@@ -92,7 +92,7 @@ class CommentController < ApplicationController
 
   def set_new
     begin
-      @new = New::New.find(params[:new_id])
+      @new = New.find(params[:new_id])
     rescue
       render :json => create_error(400, t("news.failure.id"))
     end

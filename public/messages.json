@@ -5,7 +5,7 @@
   "resourcePath": "messages",
   "apis": [
     {
-      "path": "/chatrooms.json",
+      "path": "/chatrooms",
       "operations": [
         {
           "summary": "Create a chatroom with the list of volunteers provided",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "path": "/chatrooms.json",
+      "path": "/chatrooms",
       "operations": [
         {
           "summary": "Get volunteer's chatrooms ordered by date of last message",
@@ -64,7 +64,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}.json",
+      "path": "/chatrooms/{id}",
       "operations": [
         {
           "summary": "Get messages of the chatroom, ordered by date",
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/volunteers.json",
+      "path": "/chatrooms/{id}/volunteers",
       "operations": [
         {
           "summary": "Get the list of chatroom's volunteers",
@@ -130,7 +130,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/set_name.json",
+      "path": "/chatrooms/{id}/set_name",
       "operations": [
         {
           "summary": "Set chatroom's name",
@@ -163,7 +163,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/add_volunteers.json",
+      "path": "/chatrooms/{id}/add_volunteers",
       "operations": [
         {
           "summary": "Add volunteers to the chatroom",
@@ -203,7 +203,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/new_message.json",
+      "path": "/chatrooms/{id}/new_message",
       "operations": [
         {
           "summary": "Write a message to the chatroom",
@@ -243,7 +243,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/kick.json",
+      "path": "/chatrooms/{id}/kick",
       "operations": [
         {
           "summary": "Kick volunteer from the chatroom",
@@ -283,7 +283,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/leave.json",
+      "path": "/chatrooms/{id}/leave",
       "operations": [
         {
           "summary": "Leave the chatroom",
@@ -316,7 +316,7 @@
       ]
     },
     {
-      "path": "/chatrooms/{id}/delete_message.json",
+      "path": "/chatrooms/{id}/delete_message",
       "operations": [
         {
           "summary": "Delete message from the chatroom",

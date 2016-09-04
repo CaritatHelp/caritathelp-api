@@ -5,7 +5,7 @@
   "resourcePath": "logout",
   "apis": [
     {
-      "path": "/logout.json",
+      "path": "/logout",
       "operations": [
         {
           "summary": "Allow volunteer to logout",

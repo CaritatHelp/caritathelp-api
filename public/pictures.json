@@ -5,7 +5,7 @@
   "resourcePath": "pictures",
   "apis": [
     {
-      "path": "/pictures/create.json",
+      "path": "/pictures/create",
       "operations": [
         {
           "summary": "Upload picture on the server",
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "path": "/pictures/delete.json",
+      "path": "/pictures/delete",
       "operations": [
         {
           "summary": "Delete picture",
@@ -108,7 +108,7 @@
       ]
     },
     {
-      "path": "/pictures/update.json",
+      "path": "/pictures/update",
       "operations": [
         {
           "summary": "Set picture as main picture",

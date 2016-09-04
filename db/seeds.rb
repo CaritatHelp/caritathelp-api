@@ -54,20 +54,20 @@ AvLink.create([assoc_id: resto[:id], volunteer_id: aude[:id], rights: 'admin'])
 # Events
 
 event_one = Event.create([title: 'Soignage de gens', description: 'On va soigner des gens',
-                         place: 'Zimbabwe', begin: '21/02/2016', end: '22/02/2016', assoc_id: 1,
+                         place: 'Zimbabwe', begin: 2.days.from_now, end: 3.days.from_now, assoc_id: 1,
                          assoc_name: croix_rouge[:name]]).first
 event_two = Event.create([title: 'Sauvetage du soldat Ryan',
                           description: 'Pour faire plaisir à sa maman',
-                         place: 'Normandie', begin: '06/06/1970', end: '07/06/1970', assoc_id: 1,
+                         place: 'Normandie', begin: 2.days.from_now, end: 5.days.from_now, assoc_id: 1,
                          assoc_name: croix_rouge[:name]]).first
 event_three = Event.create([title: 'Donnage de miam miam', description: 'bonap',
-                         place: 'Paris', begin: '21/07/2016', end: '22/07/2016', assoc_id: 2,
+                         place: 'Paris', begin: 22.days.from_now, end: 23.days.from_now, assoc_id: 2,
                          assoc_name: resto[:name]]).first
 event_four = Event.create([title: 'Soirée Pizza !', description: "Mais seulement avec de l'ananas",
-                         place: 'Italie', begin: '01/05/2016', end: '30/12/2016', assoc_id: 2,
+                         place: 'Italie', begin: 256.days.from_now, end: 258.days.from_now, assoc_id: 2,
                          assoc_name: resto[:name]]).first
 event_five = Event.create([title: 'Buffet à volonté', description: 'Sushi Maki Brochette',
-                         place: 'Tokyo-Chine', begin: '29/07/2016', end: '30/07/2016', assoc_id: 2,
+                         place: 'Tokyo-Chine', begin: 2.days.from_now, end: 10.days.from_now, assoc_id: 2,
                          assoc_name: resto[:name]]).first
 
 # EventVolunteers
@@ -151,54 +151,7 @@ Shelter.create([name: 'Auberge de vieillesse', address: 'Rue du swag',
 
 # News
 
-New::Assoc::AdminPublicWallMessage.create(content: "Donnez des sous à la croix verte et vous deviendrez riche",
-                                          assoc_id: croix_rouge.id,
-                                          volunteer_id: robin.id)
-New::Assoc::AdminPrivateWallMessage.create(content: "Que Dieu vous protège wala",
-                                          assoc_id: croix_rouge.id,
-                                          volunteer_id: robin.id,
-                                          private: true)
-New::Assoc::AdminPublicWallMessage.create(content: "Et donnez nous de la thune encore",
-                                          assoc_id: croix_rouge.id,
-                                          volunteer_id: robin.id)
-New::Assoc::AdminPublicWallMessage.create(content: "Nous on aime manger",
-                                          assoc_id: resto.id,
-                                          volunteer_id: pierre.id)
-New::Assoc::AdminPublicWallMessage.create(content: "Et faire des batailles de bouffe",
-                                          assoc_id: resto.id,
-                                          volunteer_id: pierre.id)
-
-New::Event::AdminPublicWallMessage.create(content: "Qui veut se faire soigner?",
-                                          event_id: event_one.id,
-                                          volunteer_id: robin.id)
-New::Event::AdminPrivateWallMessage.create(content: "Pourquoi on doit tous risquer sa peau pour un seul soldat?",
-                                           event_id: event_two.id,
-                                           volunteer_id: nicolas.id,
-                                           private: true)
-New::Event::MemberPublicWallMessage.create(content: "PARCE QUE VIVE L'AMERIQUE",
-                                           event_id: event_two.id,
-                                           volunteer_id: jeremy.id)
-New::Event::AdminPublicWallMessage.create(content: "On vous donne à manger mais laissez nous en quand même please",
-                                          event_id: event_three.id,
-                                          volunteer_id: robin.id)
-New::Event::AdminPublicWallMessage.create(content: "Va fencu*** ti amo viva italia sisi",
-                                          event_id: event_four.id,
-                                          volunteer_id: pierre.id)
-New::Event::AdminPublicWallMessage.create(content: "Ah bondou fou foulé dé makihein?",
-                                          event_id: event_five.id,
-                                          volunteer_id: aude.id)
-New::Event::AdminPrivateWallMessage.create(content: "Sushi maki pas cher",
-                                           event_id: event_five.id,
-                                           volunteer_id: aude.id,
-                                           private: true)
-
-New::Volunteer::SelfWallMessage.create(content: "Je m'appelle Robin et j'aime les pommes", volunteer_id: robin.id)
-New::Volunteer::SelfWallMessage.create(content: "Cool non?", volunteer_id: robin.id)
-New::Volunteer::SelfWallMessage.create(content: "Je m'apelle Nicolas et je suis moche", volunteer_id: nicolas.id)
-New::Volunteer::SelfWallMessage.create(content: "League of Legend c'est trop bien", volunteer_id: nicolas.id)
-New::Volunteer::SelfWallMessage.create(content: "J'suis lvl 351 sur overwatch lol", volunteer_id: aude.id)
-New::Volunteer::SelfWallMessage.create(content: "Je suis secretement amoureux de Jeremy", volunteer_id: pierre.id)
-New::Volunteer::SelfWallMessage.create(content: "Je suis secretement amoureux de Pierre", volunteer_id: jeremy.id)
-New::Volunteer::SelfWallMessage.create(content: "J'ai posé une google map sur un site et bim 30 crédits OKLM !", volunteer_id: jerome.id)
-New::Volunteer::SelfWallMessage.create(content: "Moi aussi je t'aime Jeremy", volunteer_id: pierre.id)
-New::Volunteer::SelfWallMessage.create(content: "Haha je rigolais t'es moche Pierre", volunteer_id: jeremy.id)
+news1 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Toto")
+news1.save
+news2 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Toto", private: true)
+news2.save

@@ -5,7 +5,7 @@
   "resourcePath": "friendship",
   "apis": [
     {
-      "path": "/friendship/add.json",
+      "path": "/friendship/add",
       "operations": [
         {
           "summary": "Sends a friend request",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "path": "/friendship/reply.json",
+      "path": "/friendship/reply",
       "operations": [
         {
           "summary": "Reply to a friend request",
@@ -78,7 +78,7 @@
       ]
     },
     {
-      "path": "/friendship/remove.json",
+      "path": "/friendship/remove",
       "operations": [
         {
           "summary": "Remove friendship",
@@ -111,7 +111,7 @@
       ]
     },
     {
-      "path": "/friendship/received_invitations.json",
+      "path": "/friendship/received_invitations",
       "operations": [
         {
           "summary": "List all pending friends' invitations",

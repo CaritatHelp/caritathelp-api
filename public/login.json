@@ -5,7 +5,7 @@
   "resourcePath": "login",
   "apis": [
     {
-      "path": "/login.json",
+      "path": "/login",
       "operations": [
         {
           "summary": "Allow a volunteer to log into the app",
