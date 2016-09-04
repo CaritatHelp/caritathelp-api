@@ -304,7 +304,7 @@ class MessagesController < ApplicationController
         chatroom_id: chatroom_id,
         sender_firstname: volunteer.firstname,
         sender_lastname: volunteer.lastname,
-        content: message[0]['content'],
+        content: message['content'],
         concerned_volunteers: concerned_volunteers
       }.to_json
 
