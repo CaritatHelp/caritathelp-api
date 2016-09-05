@@ -116,6 +116,7 @@ class NewsController < ApplicationController
 
   swagger_api :show do
     summary "Get new's information"
+    param :path, :id, :integer, :required, "New's id"
     param :query, :token, :string, :required, "Your token"
     response :ok
   end
@@ -131,6 +132,7 @@ class NewsController < ApplicationController
 
   swagger_api :comments do
     summary "Get new's comments"
+    param :path, :id, :integer, :required, "New's id"
     param :query, :token, :string, :required, "Your token"
     response :ok
   end
