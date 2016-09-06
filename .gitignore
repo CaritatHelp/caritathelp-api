@@ -1,5 +1,8 @@
 log
 tmp
+restart.sh
 config/database.yml
+config/application.rb
 db/schema.rb
+websocket/server.rb
 node_modules

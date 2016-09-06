@@ -15,7 +15,9 @@ class Volunteer < ActiveRecord::Base
 
   has_and_belongs_to_many :volunteers, join_table: :v_friends
   has_many :v_friends
-
+  
+  has_many :news, as: :group, class_name: 'New'
+  
   require 'securerandom'
 
   VALID_EMAIL_REGEX = /\b[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}\z/
