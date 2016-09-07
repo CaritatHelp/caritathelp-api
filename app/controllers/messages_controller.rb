@@ -9,7 +9,12 @@ class MessagesController < ApplicationController
   swagger_api :create do
     summary "Create a chatroom with the list of volunteers provided"
     param :query, :token, :string, :required, "Your token"
-    param :query, :volunteers, :string, :required, "Volunteers' ids"
+    param :query, :name, :string, :optional, "Chatroom's name"
+    param :query, "volunteers\[\]", :string, :required, "Volunteers' ids"
+    param :query, 'volunteers[]', :string, :required, "Volunteers' ids"
+    param :query, 'volunteers[]', :string, :optional, "Volunteers' ids"
+    param :query, 'volunteers[]', :string, :optional, "Volunteers' ids"
+    param :query, 'volunteers[]', :string, :optional, "Volunteers' ids"
     response :ok
   end
   def create

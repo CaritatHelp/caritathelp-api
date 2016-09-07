@@ -99,58 +99,12 @@ class CommentController < ApplicationController
   end
 
   def check_rights
-    begin
-      if @new.volunteer_id.eql?(@volunteer.id)
-        return true
+    if @new.private
+      level = @volunteer.av_links.find_by(assoc_id: @new.group_id).try(:level) if @new.group_type == "Assoc"
+      level = @volunteer.event_volunteers.find_by(event_id: @new.group_id).try(:level) if @new.group_type == "Event"
+      if ((@new.group_type == "Assoc" and (level.blank? or level < AvLink.levels["member"])) || (@new.group_type == "Event" and (level.blank? or level < EventVolunteer.levels["member"])) || (@new.group_type == "Volunteer" and @volunteer.v_friends.find_by(friend_volunteer_id: @new.group_id)))
+        render json: create_error(400, t("volunteers.failure.rights"))
       end
-      
-      if @new.private # Checking rights for a private news
-        if @new.assoc_id != nil # private assoc news
-          link = AvLink.where(assoc_id: @new.assoc_id).where(volunteer_id: @volunteer.id).first
-          if !link.eql?(nil) and link.level >= AvLink.levels["member"]
-            return true
-          end
-        elsif @new.event_id != nil # private event news
-          link = EventVolunteer.where(event_id: @new.event_id)
-            .where(volunteer_id: @volunteer.id).first
-          if !link.eql?(nil) and link.level >= EventVolunteer.levels["member"]
-            return true
-          end
-        else # private friend news
-          link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @volunteer.id).first
-          if !link.eql?(nil)
-            return true
-          end
-        end
-      else # Checking rights for a public news
-        if @new.assoc_id != nil # public assoc news
-          return true
-        elsif @new.event_id != nil # public event news
-          event = Event.find(@new.event_id)
-          event_link = EventVolunteer.where(event_id: @new.event_id)
-            .where(volunteer_id: @volunteer.id).first
-
-          if event.private # public news of a private event
-            assoc_link = AvLink.where(assoc_id: event.assoc_id)
-              .where(volunteer_id: @volunteer.id).first
-            if !assoc_link.eql?(nil) and assoc_link.level >= AvLink.levels["member"]
-              return true
-            end
-          else # public news of a public event
-            return true
-          end
-        else # public friend news
-          link = VFriend.where(friend_volunteer_id: @new.volunteer_id)
-            .where(volunteer_id: @volunteer.id).first
-          if !link.eql?(nil)
-            return true
-          end
-        end
-      end
-      render :json => create_error(400, t("comments.failure.rights"))
-    rescue => e
-      render :json => create_error(400, e.to_s)
-    end    
+    end
   end
 end

@@ -59,7 +59,11 @@ class NewsController < ApplicationController
     response :ok
   end
   def comments
-    render json: create_response(@new.comments.order(created_at: :asc))
+    render json: create_response(@new.comments.order(created_at: :asc)
+                                  .map { |com|
+                                   com.attributes.merge(thumb_path: com.volunteer.thumb_path,
+                                                        firstname: com.volunteer.firstname,
+                                                        lastname: com.volunteer.lastname)})
   end
 
   private
