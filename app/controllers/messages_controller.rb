@@ -10,11 +10,7 @@ class MessagesController < ApplicationController
     summary "Create a chatroom with the list of volunteers provided"
     param :query, :token, :string, :required, "Your token"
     param :query, :name, :string, :optional, "Chatroom's name"
-    param :query, "volunteers\[\]", :string, :required, "Volunteers' ids"
-    param :query, 'volunteers[]', :string, :required, "Volunteers' ids"
-    param :query, 'volunteers[]', :string, :optional, "Volunteers' ids"
-    param :query, 'volunteers[]', :string, :optional, "Volunteers' ids"
-    param :query, 'volunteers[]', :string, :optional, "Volunteers' ids"
+    param :form, 'volunteers[]', :string, :required, "Volunteers' ids"
     response :ok
   end
   def create
@@ -146,7 +142,7 @@ class MessagesController < ApplicationController
     summary "Add volunteers to the chatroom"
     param :path, :id, :integer, :required, "Chatroom's id"
     param :query, :token, :string, :required, "Your token"
-    param :query, :volunteers, :string, :required, "Volunteers' ids to add"
+    param :form, 'volunteers[]', :string, :required, "Volunteers' ids to add"
     response :ok
   end
   def add_volunteers
