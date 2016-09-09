@@ -43,7 +43,9 @@ class CommentController < ApplicationController
       end
       # changer le permit
       @comment.update!(params.permit(:content))
-      render :json => create_response(@comment.as_json.merge(thumb_path: @volunteer.thumb_path))
+      render :json => create_response(@comment.as_json.merge(thumb_path: @volunteer.thumb_path,
+                                                             firstname: @volunteer.firstname,
+                                                             lastname: @volunteer.lastname))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -57,7 +59,10 @@ class CommentController < ApplicationController
     response 400
   end
   def show
-    render :json => create_response(@comment)
+    render :json => create_response(@comment.as_json
+                                     .merge(thumb_path: @comment.volunteer.thumb_path,
+                                            firstname: @comment.volunteer.firstname,
+                                            lastname: @comment.volunteer.lastname))
   end
 
   swagger_api :delete do
