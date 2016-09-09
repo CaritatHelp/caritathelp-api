@@ -1,5 +1,6 @@
 class Notification < ActiveRecord::Base
   has_many :volunteers, through: :notification_volunteers
+  belongs_to :volunteer
   has_many :notification_volunteers
 
   validates :sender_id, presence: true, :on => :create

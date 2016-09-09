@@ -3,6 +3,7 @@ class Volunteer < ActiveRecord::Base
   has_many :chatroom_volunteers
 
   has_many :notifications, through: :notification_volunteers
+  has_many :notifications, foreign_key: 'sender_id'
   has_many :notification_volunteers
 
   has_many :comments
