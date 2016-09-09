@@ -13,7 +13,7 @@ class Volunteer < ActiveRecord::Base
   has_and_belongs_to_many :events, join_table: :event_volunteers
   has_many :event_volunteers
 
-  has_and_belongs_to_many :volunteers, join_table: :v_friends
+  has_and_belongs_to_many :volunteers, join_table: :v_friends, foreign_key: 'friend_volunteer_id'
   has_many :v_friends
   
   has_many :news, as: :group, class_name: 'New'
