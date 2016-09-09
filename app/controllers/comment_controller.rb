@@ -68,9 +68,10 @@ class CommentController < ApplicationController
     response 400
   end
   def delete
-    # permettre au owner d'une actu de delete un comment
-    if @comment.volunteer_id != @volunteer.id
-      render :json => create_error(400, t("comments.failure.rights")) and return        
+    unless @comment.new.volunteer_id == @volunteer.id # allow new's creator to remove all comments
+      if @comment.volunteer_id != @volunteer.id
+        render :json => create_error(400, t("comments.failure.rights")) and return        
+      end
     end
     @comment.destroy
     render :json => create_response(t("comments.success.deleted"))
