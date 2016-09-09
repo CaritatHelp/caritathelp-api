@@ -15,69 +15,50 @@ class MessagesController < ApplicationController
   end
   def create
     begin
-      volunteers = chatroom_params[:volunteers]
+      volunteers = []
+      volunteers_params = chatroom_params[:volunteers]
       is_private = false
-
-      if !volunteers.eql?(nil) and !volunteers.include?(@volunteer.id.to_s)
-        volunteers.push @volunteer.id.to_s
+      
+      # handle passing params has volunteers[]=[1, 2, 3] and volunteers[]=1&volunteers[]=2
+      # cannot JSON.parse a string of length <= 1
+      if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
+        volunteers_params = JSON.parse(volunteers_params.first)
       end
 
-      # check if at least 2 people
-      if volunteers.eql?(nil) or volunteers.count <= 1
+      volunteers_params.each do |volunteer_id|
+        volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)
+
+        if volunteer_to_add.blank?
+          render :json => create_error(400, t("chatrooms.failure.unknown_volunteer_id")) and return
+        end
+        volunteers.push volunteer_to_add
+      end
+
+      volunteers.push(@volunteer) unless volunteers.include?(@volunteer)
+
+      if volunteers.count < 2
         render :json => create_error(400, t("chatrooms.failure.min_two")) and return
       end
 
-      # check if a private room between two people doesn't already exist
-      if volunteers.count.eql?(2)
+      if volunteers.count == 2
         is_private = true
+        existing_chatroom = @volunteer.chatrooms.select { |chatroom| chatroom.number_volunteers == 2 and chatroom.volunteers.find_by(id: volunteers.first) }
+        render json: create_response(existing_chatroom.first) and return if existing_chatroom.present?
+      end
 
-        # need to find the correct query to avoid iterating through the chatrooms
-        query = "SELECT chatrooms.id, chatrooms.name, chatrooms.number_volunteers, " +
-          "(SELECT chatroom_volunteers.volunteer_id FROM chatroom_volunteers " +
-          "WHERE chatroom_volunteers.chatroom_id=chatrooms.id AND " +
-          "chatroom_volunteers.volunteer_id<>#{@volunteer.id.to_s})" +
-          " AS participants FROM chatrooms WHERE chatrooms.is_private=true"
+      new_chatroom = Chatroom.new(name: params[:name],
+                                  number_volunteers: volunteers.count,
+                                  number_messages: 0,
+                                  is_private: is_private)
 
-        # query = "SELECT chatrooms.id, chatrooms.name, chatrooms.number_volunteers, " +
-        #   "chatrooms.number_messages, chatrooms.is_private FROM chatrooms " +
-        #   "LEFT JOIN chatroom_volunteers link1 ON chatrooms.id=link1.chatroom_id AND " +
-        #   "link1.volunteer_id=#{volunteers[0].to_s} " +
-        #   "LEFT JOIN chatroom_volunteers link2 ON chatrooms.id=link2.chatroom_id AND " +
-        #   "link2.volunteer_id=#{volunteers[1].to_s} GROUP BY chatrooms.id " +
-        #   "WHERE chatrooms.is_private=true"
-
-        # p "###"
-        # p volunteers
-        # p "###"
-        exist_chatroom = ActiveRecord::Base.connection.execute(query)
-
-        # unless exist_chatroom.eql?(nil) or exist_chatroom.first.eql?(nil)
-        #   render :json => create_response(exist_chatroom.first) and return
-        # end
-
-        unless exist_chatroom.eql?(nil)
-          exist_chatroom.each do |chatroom|
-            if chatroom['participants'].eql?(volunteers[0])
-              render :json => create_response(chatroom) and return
-            end
-          end
+      if new_chatroom.save
+        volunteers.each do |volunteer|
+          ChatroomVolunteer.create!(chatroom_id: new_chatroom.id, volunteer_id: volunteer.id)
         end
-
+        render :json => create_response(new_chatroom) and return
+      else
+        render :json => create_error(400, new_chatroom.errors) and return
       end
-
-      new_chatroom = Chatroom.new({
-                                    name: params[:name],
-                                    number_volunteers: volunteers.count,
-                                    number_messages: 0,
-                                    is_private: is_private
-                                  })
-      new_chatroom.save!
-
-      volunteers.each do |id|
-        ChatroomVolunteer.create!([chatroom_id: new_chatroom.id, volunteer_id: id])
-      end
-
-      render :json => create_response(new_chatroom) and return
     rescue => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -147,26 +128,32 @@ class MessagesController < ApplicationController
   end
   def add_volunteers
     begin
-      # avoid adding on is_private chatroom ?
-
-      volunteers = params[:volunteers]
-      names = []
-
-      volunteers.each do |id|
-        # check if the volunteer is not already in the chatroom
-        if ChatroomVolunteer.where(chatroom_id: @chatroom.id).where(volunteer_id: id).first.eql?(nil)
-          ChatroomVolunteer.create!([chatroom_id: @chatroom.id, volunteer_id: id])
-          current_volunteer = Volunteer.find(id)
-          names.push current_volunteer[:firstname]
-        end
+      volunteers_params = params[:volunteers]
+      
+      # handle passing params has volunteers[]=[1, 2, 3] and volunteers[]=1&volunteers[]=2
+      # cannot JSON.parse a string of length <= 1
+      if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
+        volunteers_params = JSON.parse(volunteers_params.first)
       end
 
-      # increment the total number of participants in the chatroom
-      @chatroom.number_volunteers += names.count
+      volunteers_params.each do |volunteer_id|
+        # check if the volunteer is not already in the chatroom
+        volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)          
+        
+        if volunteer_to_add.blank?
+          render :json => create_error(400, t("chatrooms.failure.unknown_volunteer_id")) and return
+        end
+        
+        unless @chatroom.volunteers.include?(volunteer_to_add)
+          @chatroom.chatroom_volunteers.build(volunteer: volunteer_to_add)
+          @chatroom.number_volunteers += 1
+        end
+      end
+      
       @chatroom.is_private = false
       @chatroom.save!
 
-      render :json => create_response(names) and return
+      render :json => create_response(@chatroom.volunteers.map { |volunteer| volunteer.fullname }) and return
     rescue => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -317,6 +304,15 @@ class MessagesController < ApplicationController
         end
       end
     rescue
+    end
+  end
+
+  def is_valid_json?(str)
+    begin
+      JSON.parse(str)
+      return true
+    rescue JSON::ParserError => e
+      return false
     end
   end
 end

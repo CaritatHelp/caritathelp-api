@@ -153,6 +153,7 @@ en:
       id: 'Unknown chatroom id'
       min_two: "You must be at least 2 to create a chatroom"
       not_found: 'This volunteer is not in the chatroom'
+      unknown_volunteer_id: 'One of the ids you provided is wrong'
 
     success:
       kicked: 'Volunteer has been kicked from chatroom'
