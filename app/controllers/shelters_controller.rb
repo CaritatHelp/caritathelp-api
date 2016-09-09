@@ -27,6 +27,8 @@ class SheltersController < ApplicationController
     param :query, :total_places, :integer, :required, "Shelter's total places"
     param :query, :free_places, :integer, :required, "Shelter's free places"
     param :query, :description, :string, :optional, "Shelter's description"
+    param :query, :phone, :string, :optional, "Shelter's phone number"
+    param :query, :mail, :string, :optional, "Shelter's mail"
     param :query, :latitude, :decimal, :optional, "Shelter's latitude"
     param :query, :longitude, :decimal, :optional, "Shelter's longitude"
     param :query, :tags, :string, :optional, "Shelter's tags"
@@ -90,6 +92,8 @@ class SheltersController < ApplicationController
     param :query, :total_places, :integer, :optional, "Shelter's total places"
     param :query, :free_places, :integer, :optional, "Shelter's free places"
     param :query, :description, :string, :optional, "Shelter's description"
+    param :query, :phone, :string, :optional, "Shelter's phone number"
+    param :query, :mail, :string, :optional, "Shelter's mail"
     param :query, :latitude, :decimal, :optional, "Shelter's latitude"
     param :query, :longitude, :decimal, :optional, "Shelter's longitude"
     param :query, :tags, :string, :optional, "Shelter's tags"
@@ -152,7 +156,8 @@ class SheltersController < ApplicationController
   
   def shelter_params
     params_shelter = params.permit(:name, :address, :zipcode, :city, :total_places, :description,
-                                   :free_places, :tags, :latitude, :longitude, :tags => [])
+                                   :free_places, :tags, :phone, :mail, :latitude, :longitude,
+                                   :tags => [])
     params_shelter[:assoc_id] = @assoc.id
     params_shelter
   end
