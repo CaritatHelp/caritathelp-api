@@ -1,6 +1,6 @@
 class Notification < ActiveRecord::Base
   has_many :volunteers, through: :notification_volunteers
-  has_many :notification_volunteers
+  has_many :notification_volunteers, dependent: :destroy
 
   validates :sender_id, presence: true, :on => :create
   validates :notif_type, presence: true, :on => :create
