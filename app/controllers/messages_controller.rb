@@ -1,3 +1,4 @@
+# coding: utf-8
 class MessagesController < ApplicationController
   swagger_controller :messages, "Messages management"
 
