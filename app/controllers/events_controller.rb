@@ -4,10 +4,10 @@ class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency]
   before_action :set_link, only: [:update, :delete, :show]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
-  before_action :check_rights, only: [:update, :delete]
+  before_action :check_rights, only: [:update, :delete, :raise_emergency]
 
   swagger_api :index do
     summary "Get a list of all events"
@@ -213,6 +213,36 @@ class EventsController < ApplicationController
     render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
   end
 
+  # TO TEST
+  swagger_api :raise_emergency do
+    summary "Raise an emergency to call for volunteers"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :number_volunteers, :integer, :required, "Number of volunteers you need"
+    param :query, :zone, :integer, :optional, "Size (in km) of the zone, default: 50km"
+    response :ok
+  end
+  def raise_emergency
+    zone = 50
+    zone = params[:zone] if params[:zone].present?
+
+    volunteers = @event.assoc.volunteers.select { |volunteer|
+      #3959 for miles
+      volunteer.allowgps and (6371  * Math.acos(Math.cos(rad(@event.latitude)) *
+                                                Math.cos(rad(volunteer.latitude)) *
+                                                Math.cos(rad(volunteer.longitude) -
+                                                         rad(@event.longitude) +
+                                                         Math.sin(rad(@event.latitude)) *
+                                                         Math.sin(rad(volunteer.latitude))))) < zone
+    }
+
+    render json: volunteers
+  end
+  
+  def rad(angle)
+    (angle/180) * Math::PI
+  end
+  
   private
   def set_volunteer
     @volunteer = Volunteer.find_by(token: params[:token])
