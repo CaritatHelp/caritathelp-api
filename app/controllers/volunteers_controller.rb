@@ -4,7 +4,7 @@ class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
+  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications, :news]
 
   swagger_api :index do
     summary "Get a list of all volunteers"
