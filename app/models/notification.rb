@@ -1,7 +1,7 @@
 class Notification < ActiveRecord::Base
   has_many :volunteers, through: :notification_volunteers
   has_many :notification_volunteers
-
+  
   validates :sender_id, presence: true, :on => :create
   validates :notif_type, presence: true, :on => :create
   validates :receiver_id, presence: true, :on => :create, :if => :single_receiver?
