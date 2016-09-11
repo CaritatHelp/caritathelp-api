@@ -65,6 +65,18 @@ class Volunteer < ActiveRecord::Base
       write_attribute :password, nil
     end
   end
+
+  def distance_from_event_in_km(event)
+    distance = Haversine.distance(event.latitude, event.longitude,
+                                  self.latitude, self.longitude)
+    Haversine.to_km(distance)
+  end
+
+  def distance_from_event_in_miles(event)
+    distance = Haversine.distance(event.latitude, event.longitude,
+                                  self.latitude, self.longitude)
+    Haversine.to_miles(distance)
+  end
   
   def self.exist?(mail)
     if Volunteer.find_by(mail: mail).eql? nil

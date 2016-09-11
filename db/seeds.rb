@@ -9,87 +9,154 @@
 
 # Volunteers
 
-robin = Volunteer.create([firstname: 'Robin', lastname: 'Vasseur',
-                  mail: 'robin@root.com', password: 'root']).first
-pierre = Volunteer.create([firstname: 'Pierre', lastname: 'Enjalbert',
-                  mail: 'pierre@root.com', password: 'root']).first
-aude = Volunteer.create([firstname: 'Aude', lastname: 'Sikorav',
-                  mail: 'aude@root.com', password: 'root']).first
-jeremy = Volunteer.create([firstname: 'Jeremy', lastname: 'Gros',
-                  mail: 'jeremy@root.com', password: 'root']).first
-nicolas = Volunteer.create([firstname: 'Nicolas', lastname: 'Temenides',
-                  mail: 'nicolas@root.com', password: 'root']).first
-jerome = Volunteer.create([firstname: 'Jerome', lastname: 'Caudoux',
-                  mail: 'jerome@root.com', password: 'root']).first
+robin = Volunteer.create(firstname: 'Robin',
+                         lastname: 'Vasseur',
+                         mail: 'robin@root.com',
+                         allowgps: true,
+                         latitude: 49.00841620000001, # home
+                         longitude: 2.045980600000007,
+                         password: 'root')
+
+pierre = Volunteer.create(firstname: 'Pierre',
+                          lastname: 'Enjalbert',
+                          mail: 'pierre@root.com',
+                          allowgps: true,
+                          latitude: 48.8066706, # kremlin
+                          longitude: 2.3654136000000108,
+                          password: 'root')
+
+aude = Volunteer.create(firstname: 'Aude',
+                        lastname: 'Sikorav',
+                        mail: 'aude@root.com',
+                        allowgps: true,
+                        latitude: 37.7749295, # SF
+                        longitude: -122.41941550000001,
+                        password: 'root')
+
+jeremy = Volunteer.create(firstname: 'Jeremy',
+                          lastname: 'Gros',
+                          mail: 'jeremy@root.com',
+                          allowgps: true,
+                          latitude: 48.801408, # Versaille
+                          longitude: 2.1301220000000285,
+                          password: 'root')
+
+nicolas = Volunteer.create(firstname: 'Nicolas',
+                           lastname: 'Temenides',
+                           mail: 'nicolas@root.com',
+                           allowgps: true,
+                           latitude: 43.296482, # Marseille
+                           longitude: 5.369779999999992,
+                           password: 'root')
+
+jerome = Volunteer.create(firstname: 'Jerome',
+                          lastname: 'Caudoux', 
+                          mail: 'jerome@root.com',
+                          allowgps: true,
+                          latitude: 20.593684, # Inde
+                          longitude: 78.96288000000004,
+                          password: 'root')
 
 # VFriends
 
-VFriend.create([volunteer_id: robin[:id], friend_volunteer_id: pierre[:id]])
-VFriend.create([volunteer_id: pierre[:id], friend_volunteer_id: robin[:id]])
-VFriend.create([volunteer_id: robin[:id], friend_volunteer_id: nicolas[:id]])
-VFriend.create([volunteer_id: nicolas[:id], friend_volunteer_id: robin[:id]])
+VFriend.create(volunteer_id: robin[:id], friend_volunteer_id: pierre[:id])
+VFriend.create(volunteer_id: pierre[:id], friend_volunteer_id: robin[:id])
+VFriend.create(volunteer_id: robin[:id], friend_volunteer_id: nicolas[:id])
+VFriend.create(volunteer_id: nicolas[:id], friend_volunteer_id: robin[:id])
 
 # Assocs
 
-croix_rouge = Assoc.create([name: 'Croix verte', description: 'Croix verte du swag',
-                           birthday: '02/12/2015', city: 'Paris',
-                           latitude: 9.99, longitude: 9.99]).first
-resto  = Assoc.create([name: "Les resto de l'estomac", description: 'Pour se remplir le bide',
-                           birthday: '02/12/2015', city: 'Là-bas',
-                           latitude: 9.99, longitude: 9.99]).first
+croix_rouge = Assoc.create(name: 'Croix verte',
+                           description: 'Croix verte du swag',
+                           birthday: '02/12/2015',
+                           city: 'Paris',
+                           latitude: 9.99,
+                           longitude: 9.99)
+
+resto  = Assoc.create(name: "Les resto de l'estomac",
+                      description: 'Pour se remplir le bide',
+                      birthday: '02/12/2015',
+                      city: 'Là-bas',
+                      latitude: 9.99,
+                      longitude: 9.99)
 
 # AvLinks
 
-AvLink.create([assoc_id: croix_rouge[:id], volunteer_id: robin[:id], rights: 'owner'])
-AvLink.create([assoc_id: croix_rouge[:id], volunteer_id: nicolas[:id], rights: 'admin'])
-AvLink.create([assoc_id: croix_rouge[:id], volunteer_id: pierre[:id], rights: 'admin'])
-AvLink.create([assoc_id: croix_rouge[:id], volunteer_id: jeremy[:id], rights: 'member'])
-AvLink.create([assoc_id: croix_rouge[:id], volunteer_id: aude[:id], rights: 'member'])
-AvLink.create([assoc_id: croix_rouge[:id], volunteer_id: jerome[:id], rights: 'member'])
+AvLink.create(assoc_id: croix_rouge[:id], volunteer_id: robin[:id], rights: 'owner')
+AvLink.create(assoc_id: croix_rouge[:id], volunteer_id: nicolas[:id], rights: 'admin')
+AvLink.create(assoc_id: croix_rouge[:id], volunteer_id: pierre[:id], rights: 'admin')
+AvLink.create(assoc_id: croix_rouge[:id], volunteer_id: jeremy[:id], rights: 'member')
+AvLink.create(assoc_id: croix_rouge[:id], volunteer_id: aude[:id], rights: 'member')
+AvLink.create(assoc_id: croix_rouge[:id], volunteer_id: jerome[:id], rights: 'member')
 
-AvLink.create([assoc_id: resto[:id], volunteer_id: robin[:id], rights: 'member'])
-AvLink.create([assoc_id: resto[:id], volunteer_id: pierre[:id], rights: 'owner'])
-AvLink.create([assoc_id: resto[:id], volunteer_id: aude[:id], rights: 'admin'])
+AvLink.create(assoc_id: resto[:id], volunteer_id: robin[:id], rights: 'member')
+AvLink.create(assoc_id: resto[:id], volunteer_id: pierre[:id], rights: 'owner')
+AvLink.create(assoc_id: resto[:id], volunteer_id: aude[:id], rights: 'admin')
 
 # Events
 
-event_one = Event.create([title: 'Soignage de gens', description: 'On va soigner des gens',
-                         place: 'Zimbabwe', begin: 2.days.from_now, end: 3.days.from_now, assoc_id: 1,
-                         assoc_name: croix_rouge[:name]]).first
-event_two = Event.create([title: 'Sauvetage du soldat Ryan',
-                          description: 'Pour faire plaisir à sa maman',
-                         place: 'Normandie', begin: 2.days.from_now, end: 5.days.from_now, assoc_id: 1,
-                         assoc_name: croix_rouge[:name]]).first
-event_three = Event.create([title: 'Donnage de miam miam', description: 'bonap',
-                         place: 'Paris', begin: 22.days.from_now, end: 23.days.from_now, assoc_id: 2,
-                         assoc_name: resto[:name]]).first
-event_four = Event.create([title: 'Soirée Pizza !', description: "Mais seulement avec de l'ananas",
-                         place: 'Italie', begin: 256.days.from_now, end: 258.days.from_now, assoc_id: 2,
-                         assoc_name: resto[:name]]).first
-event_five = Event.create([title: 'Buffet à volonté', description: 'Sushi Maki Brochette',
-                         place: 'Tokyo-Chine', begin: 2.days.from_now, end: 10.days.from_now, assoc_id: 2,
-                         assoc_name: resto[:name]]).first
+event_one = Event.create(title: 'Soignage de gens',
+                         description: 'On va soigner des gens',
+                         place: 'Zimbabwe',
+                         begin: 2.days.from_now,
+                         end: 3.days.from_now,
+                         latitude: 48.85661400000001,
+                         longitude: 2.3522219000000177,
+                         assoc_id: 1,
+                         assoc_name: croix_rouge[:name])
+
+event_two = Event.create(title: 'Sauvetage du soldat Ryan',
+                         description: 'Pour faire plaisir à sa maman',
+                         place: 'Normandie',
+                         begin: 2.days.from_now,
+                         end: 5.days.from_now,
+                         assoc_id: 1,
+                         assoc_name: croix_rouge[:name])
+
+event_three = Event.create(title: 'Donnage de miam miam',
+                           description: 'bonap',
+                           place: 'Paris',
+                           begin: 22.days.from_now,
+                           end: 23.days.from_now,
+                           assoc_id: 2,
+                           assoc_name: resto[:name])
+
+event_four = Event.create(title: 'Soirée Pizza !',
+                          description: "Mais seulement avec de l'ananas",
+                          place: 'Italie',
+                          begin: 256.days.from_now,
+                          end: 258.days.from_now,
+                          assoc_id: 2,
+                          assoc_name: resto[:name])
+
+event_five = Event.create(title: 'Buffet à volonté',
+                          description: 'Sushi Maki Brochette',
+                          place: 'Tokyo-Chine',
+                          begin: 2.days.from_now,
+                          end: 10.days.from_now,
+                          assoc_id: 2,
+                          assoc_name: resto[:name])
 
 # EventVolunteers
 
-EventVolunteer.create([event_id: event_one[:id], volunteer_id: robin[:id], rights: 'host'])
-EventVolunteer.create([event_id: event_one[:id], volunteer_id: nicolas[:id], rights: 'admin'])
-EventVolunteer.create([event_id: event_one[:id], volunteer_id: pierre[:id], rights: 'member'])
+EventVolunteer.create(event_id: event_one[:id], volunteer_id: robin[:id], rights: 'host')
+EventVolunteer.create(event_id: event_one[:id], volunteer_id: nicolas[:id], rights: 'admin')
+EventVolunteer.create(event_id: event_one[:id], volunteer_id: pierre[:id], rights: 'member')
 
-EventVolunteer.create([event_id: event_two[:id], volunteer_id: nicolas[:id], rights: 'host'])
-EventVolunteer.create([event_id: event_two[:id], volunteer_id: pierre[:id], rights: 'admin'])
-EventVolunteer.create([event_id: event_two[:id], volunteer_id: jeremy[:id], rights: 'member'])
+EventVolunteer.create(event_id: event_two[:id], volunteer_id: nicolas[:id], rights: 'host')
+EventVolunteer.create(event_id: event_two[:id], volunteer_id: pierre[:id], rights: 'admin')
+EventVolunteer.create(event_id: event_two[:id], volunteer_id: jeremy[:id], rights: 'member')
 
-EventVolunteer.create([event_id: event_three[:id], volunteer_id: robin[:id], rights: 'host'])
-EventVolunteer.create([event_id: event_four[:id], volunteer_id: pierre[:id], rights: 'host'])
-EventVolunteer.create([event_id: event_five[:id], volunteer_id: aude[:id], rights: 'host'])
+EventVolunteer.create(event_id: event_three[:id], volunteer_id: robin[:id], rights: 'host')
+EventVolunteer.create(event_id: event_four[:id], volunteer_id: pierre[:id], rights: 'host')
+EventVolunteer.create(event_id: event_five[:id], volunteer_id: aude[:id], rights: 'host')
 
 # Chatrooms
 
-chatroom_one = Chatroom.create([name: 'Hi everyone', number_volunteers: 6,
-                               number_messages: 6, is_private: false]).first
-chatroom_two = Chatroom.create([name: 'Nico - Rob', number_volunteers: 2,
-                               number_messages: 5, is_private: true]).first
+chatroom_one = Chatroom.create(name: 'Hi everyone', number_volunteers: 6,
+                               number_messages: 6, is_private: false)
+chatroom_two = Chatroom.create(name: 'Nico - Rob', number_volunteers: 2,
+                               number_messages: 5, is_private: true)
 
 # ChatroomVolunteers
 

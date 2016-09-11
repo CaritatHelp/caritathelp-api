@@ -5,14 +5,14 @@ class EventsController < ApplicationController
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency]
-  before_action :set_link, only: [:update, :delete, :show]
+  before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete, :raise_emergency]
 
   swagger_api :index do
     summary "Get a list of all events"
     param :query, :token, :string, :required, "Your token"
-    param :query, :ranger, :string, :optional, "Can be 'past', 'current' or 'futur'"
+    param :query, :range, :string, :optional, "Can be 'past', 'current' or 'futur'"
     response :ok
   end
   def index
@@ -223,24 +223,14 @@ class EventsController < ApplicationController
     response :ok
   end
   def raise_emergency
-    zone = 50
-    zone = params[:zone] if params[:zone].present?
+    zone = 50.to_f
+    zone = params[:zone].to_f if params[:zone].present?
 
     volunteers = @event.assoc.volunteers.select { |volunteer|
-      #3959 for miles
-      volunteer.allowgps and (6371  * Math.acos(Math.cos(rad(@event.latitude)) *
-                                                Math.cos(rad(volunteer.latitude)) *
-                                                Math.cos(rad(volunteer.longitude) -
-                                                         rad(@event.longitude) +
-                                                         Math.sin(rad(@event.latitude)) *
-                                                         Math.sin(rad(volunteer.latitude))))) < zone
+      volunteer.allowgps and volunteer.distance_from_event_in_km(@event) < zone
     }
-
+    
     render json: volunteers
-  end
-  
-  def rad(angle)
-    (angle/180) * Math::PI
   end
   
   private

@@ -121,7 +121,8 @@ Rails.application.routes.draw do
     get '/:id/news', to: 'events#news'
     
     post '/', to: 'events#create'
-
+    post '/:id/raise_emergency', to: 'events#raise_emergency'
+    
     put '/:id', to: 'events#update'
 
     delete '/:id', to: 'events#delete'
