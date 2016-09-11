@@ -229,6 +229,11 @@ class EventsController < ApplicationController
     volunteers = @event.assoc.volunteers.select { |volunteer|
       volunteer.allowgps and volunteer.distance_from_event_in_km(@event) < zone
     }
+
+    volunteers.each do |volunteer|
+      notification = Notification.create(create_emergency_notification(volunteer))
+      send_notif_to_socket(notification)
+    end
     
     render json: volunteers
   end
@@ -275,6 +280,17 @@ class EventsController < ApplicationController
     end
   end
 
+  def create_emergency_notification(volunteer)
+    {event_id: @event.id,
+     event_name: @event.title,
+     thumb_path: @event.thumb_path,
+     sender_id: @volunteer.id,
+     sender_name: @volunteer.fullname,
+     receiver_id: volunteer.id,
+     receiver_name: volunteer.fullname,
+     notif_type: 'Emergency'}
+  end
+  
   def check_rights
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("events.failure.rights"))
