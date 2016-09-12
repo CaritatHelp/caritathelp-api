@@ -110,6 +110,8 @@ en:
       acceptinvite: 'You successfuly answered to the invitation'
 
   news:
+    success:
+      destroyed: 'New successfuly destroyed'
     failure:
       id: 'Unknown new id'
       rights: 'Permission denied'

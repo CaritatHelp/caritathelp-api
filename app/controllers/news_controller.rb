@@ -3,7 +3,7 @@ class NewsController < ApplicationController
 
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_new, only: [:show, :comments]
+  before_action :set_new, only: [:show, :comments, :update, :destroy]
   before_action :check_news_rights, only: [:show, :comments]
 
   swagger_api :index do
@@ -66,6 +66,41 @@ class NewsController < ApplicationController
                                                         lastname: com.volunteer.lastname)})
   end
 
+  swagger_api :update do
+    summary "Update new"
+    param :path, :id, :integer, :required, "New's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :title, :string, :optional, "New's title"
+    param :query, :content, :string, :optional, "New's content"
+    param :query, :private, :boolean, :optional, "New's privacy"
+    response :ok
+  end
+  def update
+    if @volunteer.id != @new.volunteer_id
+      render json: create_error(400, t("news.failure.rights")) and return
+    end
+
+    if @new.update_attributes(new_update_params)
+      render json: create_response(@new)
+    else
+      render json: create_error(400, @new.errors)
+    end
+  end
+
+  swagger_api :destroy do
+    summary "Destroy new"
+    param :path, :id, :integer, :required, "New's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
+  def destroy
+    if @volunteer.id != @new.volunteer_id
+      render json: create_error(400, t("news.failure.rights")) and return
+    end    
+    @new.destroy
+    render json: create_response(t("news.success.destroyed"))    
+  end
+  
   private
   def set_new
     begin
@@ -81,7 +116,11 @@ class NewsController < ApplicationController
 
   def new_params
     params.permit(:news_type, :group_id, :group_type, :private, :content, :title)
-  end  
+  end
+
+  def new_update_params
+    params.permit(:private, :content, :title)
+  end
 
   def check_news_rights
     if @new.private

@@ -29,6 +29,10 @@ Rails.application.routes.draw do
     get '/', to: 'news#index'
     get '/:id', to: 'news#show'
     get '/:id/comments', to: 'news#comments'
+
+    put '/:id', to: 'news#update'
+
+    delete '/:id', to: 'news#destroy'
   end
 
   scope '/comments' do
