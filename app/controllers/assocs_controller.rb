@@ -3,8 +3,8 @@ class AssocsController < ApplicationController
   
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_link, only: [:update, :delete, :events]
   before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
+  before_action :set_link, only: [:update, :delete, :events]
   before_action :check_block, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
 
