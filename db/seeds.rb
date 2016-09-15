@@ -151,7 +151,7 @@ Shelter.create([name: 'Auberge de vieillesse', address: 'Rue du swag',
 
 # News
 
-news1 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Toto")
+news1 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Toto")
 news1.save
-news2 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Toto", private: true)
+news2 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Toto", private: true)
 news2.save

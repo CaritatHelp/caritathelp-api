@@ -26,6 +26,7 @@ class NewsController < ApplicationController
     param :query, :content, :string, :required, "New's content"
     param :query, :group_id, :integer, :required, "Id of Event, Assoc or Volunteer"
     param :query, :group_type, :string, :required, "Id's type"
+    param :query, :as_group, :boolean, :optional, "false by default"
     param :query, :news_type, :string, :required, "'Status' is the only possibility for now"
     param :query, :title, :string, :optional, "New's title"
     param :query, :private, :boolean, :optional, "true to make it private"
@@ -34,6 +35,8 @@ class NewsController < ApplicationController
   def wall_message
     new = New.new(new_params)
     new.volunteer_id = @volunteer.id
+    new.volunteer_name = @volunteer.fullname
+    new.volunteer_thumb_path = @volunteer.thumb_path
     
     if new.save
       render json: create_response(new), status: :ok
@@ -115,7 +118,7 @@ class NewsController < ApplicationController
   end
 
   def new_params
-    params.permit(:news_type, :group_id, :group_type, :private, :content, :title)
+    params.permit(:news_type, :group_id, :group_type, :private, :content, :title, :as_group)
   end
 
   def new_update_params
