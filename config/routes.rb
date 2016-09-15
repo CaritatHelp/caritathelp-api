@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   mount_devise_token_auth_for 'Volunteer', at: 'auth', controllers: {
-    registrations: 'registrations'
+    registrations: 'registrations', sessions: 'sessions'
   }
 
   get 'pictures/create'

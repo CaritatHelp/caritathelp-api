@@ -1,4 +1,3 @@
-# coding: utf-8
 class MessagesController < ApplicationController
   swagger_controller :messages, "Messages management"
 
@@ -90,7 +89,7 @@ class MessagesController < ApplicationController
     response :ok
   end
   def index
-    render json: create_response(@volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
+    render json: create_response(current_volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
   end
 
   swagger_api :participants do

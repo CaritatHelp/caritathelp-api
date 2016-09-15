@@ -2,7 +2,6 @@ class NewsController < ApplicationController
   swagger_controller :news, "News manager"
 
   before_action :authenticate_volunteer!
-  before_action :set_volunteer
 
   before_action :set_new, only: [:show, :comments]
   before_action :check_news_rights, only: [:show, :comments]
@@ -13,10 +12,10 @@ class NewsController < ApplicationController
     response :ok
   end
   def index
-    volunteer_news = @volunteer.news.flatten
-    friends_news = @volunteer.v_friends.map { |link| link.volunteer.news }.flatten
-    assocs_news = @volunteer.assocs.map { |assoc| assoc.news.select{ |new| (new.private and @volunteer.av_links.find_by(assoc_id: assoc.id).level >= AvLink.levels["member"]) or new.public } }.flatten
-    events_news = @volunteer.events.map { |event| event.news.select { |new| (new.private and @volunteer.event_volunteers.find_by(event_id: event.id).level >= EventVolunteer.levels["member"]) or new.public} }.flatten
+    volunteer_news = current_volunteer.news.flatten
+    friends_news = current_volunteer.v_friends.map { |link| link.volunteer.news }.flatten
+    assocs_news = current_volunteer.assocs.map { |assoc| assoc.news.select{ |new| (new.private and current_volunteer.av_links.find_by(assoc_id: assoc.id).level >= AvLink.levels["member"]) or new.public } }.flatten
+    events_news = current_volunteer.events.map { |event| event.news.select { |new| (new.private and current_volunteer.event_volunteers.find_by(event_id: event.id).level >= EventVolunteer.levels["member"]) or new.public} }.flatten
 
     render json: create_response((volunteer_news + friends_news + assocs_news + events_news).sort{ |a, b| b.updated_at <=> a.updated_at })
   end
@@ -34,7 +33,7 @@ class NewsController < ApplicationController
   end
   def wall_message
     new = New.new(new_params)
-    new.volunteer_id = @volunteer.id
+    new.volunteer_id = current_volunteer.id
     
     if new.save
       render json: create_response(new), status: :ok
@@ -76,19 +75,15 @@ class NewsController < ApplicationController
     end
   end
 
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def new_params
     params.permit(:news_type, :group_id, :group_type, :private, :content, :title)
   end  
 
   def check_news_rights
     if @new.private
-      level = @volunteer.av_links.find_by(assoc_id: @new.group_id).try(:level) if @new.group_type == "Assoc"
-      level = @volunteer.event_volunteers.find_by(event_id: @new.group_id).try(:level) if @new.group_type == "Event"
-      if ((@new.group_type == "Assoc" and (level.blank? or level < AvLink.levels["member"])) || (@new.group_type == "Event" and (level.blank? or level < EventVolunteer.levels["member"])) || (@new.group_type == "Volunteer" and @volunteer.v_friends.find_by(friend_volunteer_id: @new.group_id)))
+      level = current_volunteer.av_links.find_by(assoc_id: @new.group_id).try(:level) if @new.group_type == "Assoc"
+      level = current_volunteer.event_volunteers.find_by(event_id: @new.group_id).try(:level) if @new.group_type == "Event"
+      if ((@new.group_type == "Assoc" and (level.blank? or level < AvLink.levels["member"])) || (@new.group_type == "Event" and (level.blank? or level < EventVolunteer.levels["member"])) || (@new.group_type == "Volunteer" and current_volunteer.v_friends.find_by(friend_volunteer_id: @new.group_id)))
         render json: create_error(400, t("volunteers.failure.rights"))
       end
     end

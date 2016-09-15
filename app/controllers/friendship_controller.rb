@@ -119,9 +119,9 @@ class FriendshipController < ApplicationController
   
   private
   def create_add_friend
-    {sender_id: @volunteer.id,
-     sender_name: @volunteer.fullname,
-     thumb_path: @volunteer.thumb_path,
+    {sender_id: current_volunteer.id,
+     sender_name: current_volunteer.fullname,
+     thumb_path: current_volunteer.thumb_path,
      receiver_id: @friend.id,
      receiver_name: @friend.fullname,
      notif_type: 'AddFriend'}

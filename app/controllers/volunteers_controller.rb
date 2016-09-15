@@ -6,7 +6,6 @@ class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
 
   swagger_api :index do
     summary "Get a list of all volunteers"
@@ -256,7 +255,7 @@ class VolunteersController < ApplicationController
     response :ok
   end
   def news
-    link = @current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
+    link = current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
     render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public })
   end
 
