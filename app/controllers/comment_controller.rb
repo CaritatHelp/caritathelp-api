@@ -5,7 +5,7 @@ class CommentController < ApplicationController
   before_action :set_volunteer
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
-  before_action :check_rights
+  before_action :check_rights, except: [:create]
 
   swagger_api :create do
     summary "Creates a comment linked to the new"
@@ -17,6 +17,9 @@ class CommentController < ApplicationController
   end
   def create
     begin
+      unless @new.concerns_user?(@volunteer)
+        render :json => create_error(400, t("comments.failure.rights")) and return
+      end
       new_comment = Comment.create!([new_id: @new.id, volunteer_id: @volunteer.id,
                                      content: params[:content]]).first
       render :json => create_response(new_comment.as_json.merge(
@@ -73,9 +76,10 @@ class CommentController < ApplicationController
     response 400
   end
   def delete
-    # permettre au owner d'une actu de delete un comment
-    if @comment.volunteer_id != @volunteer.id
-      render :json => create_error(400, t("comments.failure.rights")) and return        
+    unless @comment.new.volunteer_id == @volunteer.id # allow new's creator to remove all comments
+      if @comment.volunteer_id != @volunteer.id
+        render :json => create_error(400, t("comments.failure.rights")) and return        
+      end
     end
     @comment.destroy
     render :json => create_response(t("comments.success.deleted"))
