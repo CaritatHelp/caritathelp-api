@@ -58,9 +58,11 @@ en:
       id: 'Unknown volunteer id'
       research: 'Research field is missing'
       unfriend: 'No such friendship'
+      notification_not_found: 'Could not find notification'
     success:
       deleted: 'Successfuly deleted volunteer'
       unfriend: 'Successfuly deleted friendship'
+      cancel_request: 'Successfuly canceled friendship request'
 
 
   events:
