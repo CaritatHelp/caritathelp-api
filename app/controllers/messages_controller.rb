@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
       if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
         volunteers_params = JSON.parse(volunteers_params.first)
       end
-
+      
       volunteers_params.each do |volunteer_id|
         volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)
 
@@ -42,7 +42,9 @@ class MessagesController < ApplicationController
 
       if volunteers.count == 2
         is_private = true
-        existing_chatroom = @volunteer.chatrooms.select { |chatroom| chatroom.number_volunteers == 2 and chatroom.volunteers.find_by(id: volunteers.first) }
+        other_volunteer = volunteers.first
+        other_volunteer = volunteers.second if other_volunteer == @volunteer
+        existing_chatroom = @volunteer.chatrooms.select { |chatroom| chatroom.number_volunteers == 2 and chatroom.volunteers.find_by(id: other_volunteer) }
         render json: create_response(existing_chatroom.first) and return if existing_chatroom.present?
       end
 
