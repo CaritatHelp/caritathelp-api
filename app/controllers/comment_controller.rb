@@ -17,11 +17,6 @@ class CommentController < ApplicationController
   end
   def create
     begin
-      p "$$$$$$$$$$"
-      p @new
-      p "$$$$$$$$$$"
-      p @volunteer
-      p "$$$$$$$$$$"
       unless @new.concerns_user?(@volunteer)
         render :json => create_error(400, t("comments.failure.rights")) and return
       end
