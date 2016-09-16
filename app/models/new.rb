@@ -1,6 +1,6 @@
 class New < ActiveRecord::Base
   belongs_to :group, polymorphic: true
-  has_many :comments
+  has_many :comments, dependent: :destroy
   
   validates :volunteer_id, presence: true, on: :create
   validates :news_type, presence: true, on: :create

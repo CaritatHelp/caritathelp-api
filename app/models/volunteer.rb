@@ -1,22 +1,22 @@
 class Volunteer < ActiveRecord::Base
   has_many :chatrooms, through: :chatroom_volunteers
-  has_many :chatroom_volunteers
+  has_many :chatroom_volunteers, dependent: :destroy
 
   has_many :notifications, through: :notification_volunteers
-  has_many :notification_volunteers
+  has_many :notification_volunteers, dependent: :destroy
 
-  has_many :comments
+  has_many :comments, dependent: :destroy
 
   has_and_belongs_to_many :assocs, join_table: :av_links
-  has_many :av_links
+  has_many :av_links, dependent: :destroy
 
   has_and_belongs_to_many :events, join_table: :event_volunteers
-  has_many :event_volunteers
+  has_many :event_volunteers, dependent: :destroy
 
   has_and_belongs_to_many :volunteers, join_table: :v_friends
-  has_many :v_friends
+  has_many :v_friends, dependent: :destroy
   
-  has_many :news, as: :group, class_name: 'New'
+  has_many :news, as: :group, class_name: 'New', dependent: :destroy
   
   require 'securerandom'
 
