@@ -145,18 +145,16 @@ class GuestsController < ApplicationController
       event_id = @notif.event_id
       acceptance = params[:acceptance]
  
-      # modify the notification if there is a clear answer
-      if acceptance != nil
+      if acceptance != nil and acceptance == true
         @notif.notif_type = 'NewGuest'
         @notif.save!
         send_notif_to_socket(@notif)
-      end
-      
-      if acceptance.eql? 'true'
         create_guest_link(guest_id, event_id)
+      else
+        @notif.destroy
       end
       
-      render :json => create_response(nil, 200, t("events.success.reply_guest"))
+      render :json => create_response(t("events.success.reply_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end

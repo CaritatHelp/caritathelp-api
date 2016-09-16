@@ -108,6 +108,7 @@ en:
       replyfriend: 'You successfuly replied to this friend request'
       joinassoc: 'You successfuly applied to this association'
       addmember: 'Member successfuly added'
+      refused_member: 'Member successfuly refused'
       invitemember: 'Member successfuly invited'
       acceptinvite: 'You successfuly answered to the invitation'
 
