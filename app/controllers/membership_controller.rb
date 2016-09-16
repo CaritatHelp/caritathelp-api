@@ -135,18 +135,17 @@ class MembershipController < ApplicationController
       assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
  
-      # destroy the notification if there is a clear answer
-      if acceptance != nil
+      if acceptance != nil and acceptance == 'true'
         @notif.notif_type = 'NewMember'
         @notif.save!
         send_notif_to_socket(@notif)
-      end
-      
-      if acceptance.eql? 'true'
         create_member_link(member_id, assoc_id)
+        render :json => create_response(t("notifications.success.addmember"))
+      else
+        @notif.destroy
+        render :json => create_response(t("notifications.success.refused_member"))
       end
       
-      render :json => create_response(nil, 200, t("notifications.success.addmember"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -308,7 +307,8 @@ class MembershipController < ApplicationController
   def create_join_assoc
     [sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
-     thumb_path: @volunteer.thumb_path,
+     sender_thumb_path: @volunteer.thumb_path,
+     receiver_thumb_path: @assoc.thumb_path,
      assoc_id: @assoc.id,
      assoc_name: @assoc.name,
      notif_type: 'JoinAssoc']
@@ -317,7 +317,8 @@ class MembershipController < ApplicationController
   def create_invite_member
     [assoc_id: @assoc.id,
      assoc_name: @assoc.name,
-     thumb_path: @assoc.thumb_path,
+     sender_thumb_path: @assoc.thumb_path,
+     receiver_thumb_path: @volunteer.thumb_path,
      sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
      receiver_id: @target_volunteer.id,

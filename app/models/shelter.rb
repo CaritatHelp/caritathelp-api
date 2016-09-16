@@ -12,7 +12,9 @@ class Shelter < ActiveRecord::Base
   validates :free_places, :numericality => { :greater_than_or_equal_to => 0},
   presence: true, :on => :create
   validate :if_free_correct
-
+  validates_format_of :phone, with: /\A0[1-7]([-\/. ]?[0-9]{2}){4}\Z/i, allow_blank: true
+  validates_format_of :mail, with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i, allow_blank: true
+  
   def set_default_picture
     self.thumb_path = Rails.application.config.default_shelter
   end

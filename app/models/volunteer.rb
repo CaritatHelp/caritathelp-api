@@ -3,6 +3,7 @@ class Volunteer < ActiveRecord::Base
   has_many :chatroom_volunteers, dependent: :destroy
 
   has_many :notifications, through: :notification_volunteers
+  has_many :notifications, foreign_key: 'sender_id'
   has_many :notification_volunteers, dependent: :destroy
 
   has_many :comments, dependent: :destroy
@@ -13,7 +14,7 @@ class Volunteer < ActiveRecord::Base
   has_and_belongs_to_many :events, join_table: :event_volunteers
   has_many :event_volunteers, dependent: :destroy
 
-  has_and_belongs_to_many :volunteers, join_table: :v_friends
+  has_and_belongs_to_many :volunteers, join_table: :v_friends, foreign_key: 'friend_volunteer_id'
   has_many :v_friends, dependent: :destroy
   
   has_many :news, as: :group, class_name: 'New', dependent: :destroy

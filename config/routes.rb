@@ -57,6 +57,7 @@ Rails.application.routes.draw do
     post '/add', to: 'friendship#add'
     post '/reply', to: 'friendship#reply'
     delete '/remove', to: 'friendship#remove'
+    delete '/cancel_request', to: 'friendship#cancel_request'
     get '/received_invitations', to: 'friendship#received_invitations'
   end
 
