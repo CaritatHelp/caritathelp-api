@@ -7,7 +7,7 @@ class MembershipController < ApplicationController
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
   before_action :set_assoc, except: [:reply_member, :reply_invite]
   before_action :check_target_follower, only: [:kick, :upgrade]
-  before_action :check_rights, except: [:join_assoc, :reply_invite, :reply_member]
+  before_action :check_rights, except: [:join_assoc, :reply_invite, :reply_member, :leave_assoc]
 
   swagger_api :kick do
     summary "Kick member"
