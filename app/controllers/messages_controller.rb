@@ -292,9 +292,12 @@ class MessagesController < ApplicationController
       json_msg = {
         token: ENV['SEND_MSG_CARITATHELP'],
         chatroom_id: chatroom_id,
+        sender_id: volunteer.id,
         sender_firstname: volunteer.firstname,
         sender_lastname: volunteer.lastname,
+        sender_thumb_path: vounteer.thumb_path,
         content: message['content'],
+        created_at: message['created_at'],
         concerned_volunteers: concerned_volunteers
       }.to_json
 
