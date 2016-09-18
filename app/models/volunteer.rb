@@ -80,4 +80,15 @@ class Volunteer < ActiveRecord::Base
     end
     return false
   end
+
+  def is_allowed_to_post_on?(object_id, klass_name)
+    klass = klass_name.classify.safe_constantize
+    if klass.present?
+      object = klass.find_by(id: object_id)
+      if object.present?
+        return true if object.volunteers.include?(self) or object == self
+      end
+    end
+    return false
+  end
 end

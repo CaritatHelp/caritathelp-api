@@ -33,6 +33,10 @@ class NewsController < ApplicationController
     response :ok
   end
   def wall_message
+    unless @volunteer.is_allowed_to_post_on?(new_params[:group_id], new_params[:group_type])
+      render json: create_error(400, t("news.failure.rights")), status: :bad_request and return
+    end
+
     new = New.new(new_params)
     new.volunteer_id = @volunteer.id
     new.volunteer_name = @volunteer.fullname
