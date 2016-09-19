@@ -122,6 +122,8 @@ class NewsController < ApplicationController
   end
 
   def new_params
+    params[:group_type].downcase!
+    params[:group_type].capitalize!
     params.permit(:news_type, :group_id, :group_type, :private, :content, :title, :as_group)
   end
 
