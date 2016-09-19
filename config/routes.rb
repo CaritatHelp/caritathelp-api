@@ -105,6 +105,7 @@ Rails.application.routes.draw do
     get '/:id/pictures', to: 'assocs#pictures'
     get '/:id/main_picture', to: 'assocs#main_picture'
     get '/:id/news', to: 'assocs#news'
+    get '/:id/invitable_volunteers', to: 'assocs#invitable_volunteers'
 
     post '/', to: 'assocs#create'
 
@@ -124,6 +125,7 @@ Rails.application.routes.draw do
     get '/:id/pictures', to: 'events#pictures'
     get '/:id/main_picture', to: 'events#main_picture'
     get '/:id/news', to: 'events#news'
+    get '/:id/invitable_volunteers', to: 'events#invitable_volunteers'
     
     post '/', to: 'events#create'
 

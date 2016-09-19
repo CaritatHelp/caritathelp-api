@@ -4,10 +4,10 @@ class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]
-  before_action :set_link, only: [:update, :delete, :show]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
+  before_action :set_link, only: [:update, :delete, :show, :invitable_volunteers]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
-  before_action :check_rights, only: [:update, :delete]
+  before_action :check_rights, only: [:update, :delete, :invitable_volunteers]
 
   swagger_api :index do
     summary "Get a list of all events"
@@ -148,6 +148,17 @@ class EventsController < ApplicationController
     render :json => create_error(400, t("events.failure.rights"))    
   end
 
+  swagger_api :invitable_volunteers do
+    summary "Get a list of all invitable volunteers"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
+  def invitable_volunteers
+    volunteers = @event.assoc.volunteers.select { |volunteer| volunteer.events.exclude?(@event) }
+    render json: create_response(volunteers)
+  end
+  
   swagger_api :owned do
     summary "Get all event where you're the owner"
     param :query, :token, :string, :required, "Your token"
