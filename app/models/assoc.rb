@@ -3,6 +3,8 @@ class Assoc < ActiveRecord::Base
   has_many :av_links, dependent: :destroy
   
   has_many :news, as: :group, class_name: 'New', dependent: :destroy
+
+  has_many :events
   
   before_create :set_default_picture
 

@@ -3,7 +3,7 @@ class AssocsController < ApplicationController
   
   before_filter :check_token
   before_action :set_volunteer
-  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
+  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :events]
   before_action :check_block, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete]
@@ -185,6 +185,18 @@ class AssocsController < ApplicationController
     render :json => create_response(assocs)
   end
 
+  swagger_api :invitable_volunteers do
+    summary "Get a list of all invitable volunteers"
+    param :path, :id, :integer, :required, "Association's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+    response 400
+  end
+  def invitable_volunteers
+    volunteers = @volunteer.volunteers.select { |volunteer| volunteer.assocs.exclude?(@assoc) }
+    render json: create_response(volunteers)
+  end
+  
   swagger_api :pictures do
     summary "Returns a list of all association's pictures paths"
     param :path, :id, :integer, :required, "Association's id"
