@@ -4,10 +4,10 @@ class EventsController < ApplicationController
   before_filter :check_token
   before_action :set_volunteer
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]
-  before_action :set_link, only: [:update, :delete, :show]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
+  before_action :set_link, only: [:update, :delete, :show, :invitable_volunteers]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
-  before_action :check_rights, only: [:update, :delete]
+  before_action :check_rights, only: [:update, :delete, :invitable_volunteers]
 
   swagger_api :index do
     summary "Get a list of all events"
@@ -148,6 +148,17 @@ class EventsController < ApplicationController
     render :json => create_error(400, t("events.failure.rights"))    
   end
 
+  swagger_api :invitable_volunteers do
+    summary "Get a list of all invitable volunteers"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    response :ok
+  end
+  def invitable_volunteers
+    volunteers = @event.assoc.volunteers.select { |volunteer| volunteer.events.exclude?(@event) }
+    render json: create_response(volunteers)
+  end
+  
   swagger_api :owned do
     summary "Get all event where you're the owner"
     param :query, :token, :string, :required, "Your token"
@@ -209,19 +220,8 @@ class EventsController < ApplicationController
     response :ok
   end
   def news
-    privacy = ""
-    link = EventVolunteer.where(event_id: @event.id).where(volunteer_id: @volunteer.id).first
-    if link.eql?(nil)
-      privacy = " AND new_news.type<>'New::Event::AdminPrivateWallMessage'"
-    end
-    news = New::New
-      .where("new_news.event_id=#{@event.id}" + privacy)
-      .select("new_news.*, new_news.type AS news_type")
-      .joins("INNER JOIN events ON events.id=new_news.event_id")
-      .select("events.title AS name, events.thumb_path")
-      .select("(SELECT fullname FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_fullname")
-      .select("(SELECT thumb_path FROM volunteers WHERE volunteers.id=new_news.volunteer_id) AS volunteer_thumb_path").order(updated_at: :desc)
-    render :json => create_response(news)
+    rights = @volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
+    render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
   end
 
   private

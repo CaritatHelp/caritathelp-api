@@ -4,7 +4,7 @@ class VolunteersController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]
   before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
+  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications, :news]
 
   swagger_api :index do
     summary "Get a list of all volunteers"
@@ -188,11 +188,11 @@ class VolunteersController < ApplicationController
     response :ok
   end
   def notifications  
-    notifs = Notification.select("notifications.*")
-      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{@current_volunteer.id}")
-      .where("notifications.receiver_id=#{@current_volunteer.id} OR notification_volunteers.volunteer_id=#{@current_volunteer.id}").order(created_at: :desc)
+    n1 = Notification.select { |notification| notification.receiver_id == @current_volunteer.id }
+    n2 = NotificationVolunteer.select { |link| link.volunteer_id == @current_volunteer.id }
+         .map { |link| link.notification }
 
-    render :json => create_response(notifs)    
+    render json: create_response((n1 + n2).sort { |a, b| a.created_at <=> b.created_at })
   end
 
   swagger_api :friends do
@@ -316,13 +316,8 @@ class VolunteersController < ApplicationController
     response :ok
   end
   def news
-    news = New::New
-      .where("volunteer_id=#{@volunteer.id} OR friend_id=#{@volunteer.id}")
-      .select("new_news.*, new_news.type AS news_type")
-      .joins("INNER JOIN volunteers ON volunteers.id=new_news.volunteer_id")
-      .select("volunteers.firstname, volunteers.lastname, volunteers.thumb_path")
-      .order(updated_at: :desc)
-    render :json => create_response(news)
+    link = @current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
+    render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public })
   end
 
   private

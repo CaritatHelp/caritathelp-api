@@ -1,21 +1,24 @@
 class Volunteer < ActiveRecord::Base
   has_many :chatrooms, through: :chatroom_volunteers
-  has_many :chatroom_volunteers
+  has_many :chatroom_volunteers, dependent: :destroy
 
   has_many :notifications, through: :notification_volunteers
-  has_many :notification_volunteers
+  has_many :notifications, foreign_key: 'sender_id'
+  has_many :notification_volunteers, dependent: :destroy
 
-  has_many :comments
+  has_many :comments, dependent: :destroy
 
   has_and_belongs_to_many :assocs, join_table: :av_links
-  has_many :av_links
+  has_many :av_links, dependent: :destroy
 
   has_and_belongs_to_many :events, join_table: :event_volunteers
-  has_many :event_volunteers
+  has_many :event_volunteers, dependent: :destroy
 
-  has_and_belongs_to_many :volunteers, join_table: :v_friends
-  has_many :v_friends
-
+  has_and_belongs_to_many :volunteers, join_table: :v_friends, foreign_key: 'friend_volunteer_id'
+  has_many :v_friends, dependent: :destroy
+  
+  has_many :news, as: :group, class_name: 'New', dependent: :destroy
+  
   require 'securerandom'
 
   VALID_EMAIL_REGEX = /\b[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}\z/
@@ -74,6 +77,17 @@ class Volunteer < ActiveRecord::Base
   def self.is_new_mail_available?(new_mail, old_mail)
     if new_mail.eql?(old_mail) || !Volunteer.exist?(new_mail)
       return true
+    end
+    return false
+  end
+
+  def is_allowed_to_post_on?(object_id, klass_name)
+    klass = klass_name.classify.safe_constantize
+    if klass.present?
+      object = klass.find_by(id: object_id)
+      if object.present?
+        return true if object.volunteers.include?(self) or object == self
+      end
     end
     return false
   end

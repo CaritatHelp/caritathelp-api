@@ -68,7 +68,8 @@ class ApplicationController < ActionController::Base
         event_name: notification.event_name,
         sender_name: notification.sender_name,
         receiver_name: notification.receiver_name,
-        thumb_path: notification.thumb_path,
+        sender_thumb_path: notification.sender_thumb_path,
+        receiver_thumb_path: notification.receiver_thumb_path,
         concerned_volunteers: concerned_volunteers
       }.to_json
       
