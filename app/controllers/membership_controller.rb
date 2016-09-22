@@ -106,7 +106,7 @@ class MembershipController < ApplicationController
                                       ])
       end
 
-      send_notif_to_socket(notif[0])
+      send_notif_to_socket(notif[0]) unless Rails.env.test?
       
       render :json => create_response(nil, 200, t("notifications.success.joinassoc"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e

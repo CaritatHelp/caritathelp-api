@@ -51,7 +51,7 @@ class DeviseTokenAuthCreateVolunteers < ActiveRecord::Migration
       t.decimal :longitude
 
       ## Tokens
-      t.json :tokens
+      t.text :tokens # should be t.json but mysql2 does not support it
 
       t.timestamps
     end

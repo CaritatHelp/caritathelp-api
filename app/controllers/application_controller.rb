@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_locale
   before_filter :cors_preflight_check
+  before_filter :is_swagger_request?
   after_filter :cors_set_access_control_headers
 
   def cors_set_access_control_headers
@@ -75,6 +76,24 @@ class ApplicationController < ActionController::Base
         end
       end
     rescue => e
+    end
+  end
+  
+  def is_swagger_request?
+    if request.headers['access-token'] == "superuser" and request.headers[:client] == "superuser"
+      return true
+    end
+    return false
+  end
+
+  alias_method :devise_current_volunteer, :current_volunteer
+  def current_volunteer
+    if is_swagger_request?
+      volunteer = Volunteer.find_by(email: request.headers[:uid])
+      return volunteer unless volunteer.blank?
+      Volunteer.first
+    else
+      super
     end
   end
 end

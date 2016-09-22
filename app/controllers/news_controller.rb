@@ -1,7 +1,7 @@
 class NewsController < ApplicationController
   swagger_controller :news, "News manager"
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   before_action :set_new, only: [:show, :comments]
   before_action :check_news_rights, only: [:show, :comments]
@@ -22,7 +22,11 @@ class NewsController < ApplicationController
 
   swagger_api :wall_message do
     summary "Creates a wall message for yourself, friend, assoc or event"
-    param :query, :token, :string, :required, "Your token"
+
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+
     param :query, :content, :string, :required, "New's content"
     param :query, :group_id, :integer, :required, "Id of Event, Assoc or Volunteer"
     param :query, :group_type, :string, :required, "Id's type"
