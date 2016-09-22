@@ -2,7 +2,7 @@ class FriendshipController < ApplicationController
   swagger_controller :friendship, "Friendship management"
   
   skip_before_filter :verify_authenticity_token
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   swagger_api :add do
     summary "Sends a friend request"

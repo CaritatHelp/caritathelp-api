@@ -1,7 +1,7 @@
 class VolunteersController < ApplicationController
   swagger_controller :volunteers, "Volunteers management"
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
   before_filter :check_token, except: [:create, :destroy]

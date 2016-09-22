@@ -1,7 +1,7 @@
 class AssocsController < ApplicationController
   swagger_controller :assocs, "Associations management"
   
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
   
   before_action :set_link, only: [:update, :delete, :events]
   before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]

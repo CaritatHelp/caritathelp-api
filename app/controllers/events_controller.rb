@@ -1,7 +1,7 @@
 class EventsController < ApplicationController
   swagger_controller :events, "Events management"
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
   
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news]

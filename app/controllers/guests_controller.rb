@@ -3,7 +3,7 @@ class GuestsController < ApplicationController
   
   skip_before_filter :verify_authenticity_token
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
   
   before_action :set_event, except: [:reply_invite, :reply_guest]
   before_action :set_link, except: [:reply_invite, :leave_event]

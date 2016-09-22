@@ -3,7 +3,7 @@ class FollowersController < ApplicationController
   
   skip_before_filter :verify_authenticity_token
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
   
   before_action :set_assoc
   before_action :set_target_volunteer, only: [:block]

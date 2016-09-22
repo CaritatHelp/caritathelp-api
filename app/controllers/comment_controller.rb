@@ -1,7 +1,7 @@
 class CommentController < ApplicationController
   swagger_controller :comments, "Comments management"
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]

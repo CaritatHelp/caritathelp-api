@@ -1,7 +1,7 @@
 class NotificationsController < ApplicationController
   swagger_controller :notifications, "Notifications management"
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   before_action :set_notification
   

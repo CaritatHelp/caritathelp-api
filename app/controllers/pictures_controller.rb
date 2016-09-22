@@ -1,7 +1,7 @@
 class PicturesController < ApplicationController
   swagger_controller :pictures, "Pictures management"
   
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
   
   before_action :set_picture, only: [:delete, :update]
   before_action :check_rights, only: [:create]

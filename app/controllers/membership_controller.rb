@@ -3,7 +3,7 @@ class MembershipController < ApplicationController
   
   skip_before_filter :verify_authenticity_token
 
-  before_action :authenticate_volunteer!
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
   
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
   before_action :set_assoc, except: [:reply_member, :reply_invite]

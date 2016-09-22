@@ -1,7 +1,7 @@
 class MessagesController < ApplicationController
   swagger_controller :messages, "Messages management"
 
-  before_action :authenticate_user!
+  before_action :authenticate_user!, unless: :is_swagger_request?
   
   before_action :set_chatroom, except: [:index, :create, :reset]
   before_action :check_chatroom_rights, except: [:index, :create, :reset]

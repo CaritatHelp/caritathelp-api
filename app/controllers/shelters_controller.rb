@@ -1,7 +1,7 @@
 class SheltersController < ApplicationController
   swagger_controller :shelters, "Shelters management"
 
-  before_action :authenticate_volunteer!, except: [:index, :show, :search]
+  before_action :authenticate_volunteer!, except: [:index, :show, :search], unless: :is_swagger_request?
 
   before_action :set_assoc, except: [:index, :show, :search, :pictures, :main_picture]
   before_action :set_shelter, only: [:show, :update, :delete, :pictures, :main_picture]
