@@ -11,7 +11,9 @@ class EventsController < ApplicationController
 
   swagger_api :index do
     summary "Get a list of all events"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :ranger, :string, :optional, "Can be 'past', 'current' or 'futur'"
     response :ok
   end
@@ -26,7 +28,9 @@ class EventsController < ApplicationController
 
   swagger_api :create do
     summary "Allow an association to create an event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :form, :assoc_id, :integer, :required, "Association's id"
     param :form, :title, :string, :required, "Event's title"
     param :form, :description, :string, :required, "Event's description"
@@ -71,7 +75,9 @@ class EventsController < ApplicationController
   swagger_api :show do
     summary "Returns event's information"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def show
@@ -102,7 +108,9 @@ class EventsController < ApplicationController
   swagger_api :guests do
     summary "Returns a list of all guests"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def guests
@@ -115,7 +123,9 @@ class EventsController < ApplicationController
   swagger_api :update do
     summary "Updates event"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :form, :title, :string, :optional, "Event's title"
     param :form, :description, :string, :optional, "Event's description"
     param :form, :begin, :date, :optional, "Beginning of the event"
@@ -135,7 +145,9 @@ class EventsController < ApplicationController
   swagger_api :delete do
     summary "Deletes event (needs to be host)"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def delete
@@ -150,7 +162,9 @@ class EventsController < ApplicationController
 
   swagger_api :owned do
     summary "Get all event where you're the owner"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def owned
@@ -165,7 +179,9 @@ class EventsController < ApplicationController
 
   swagger_api :invited do
     summary "Get all event where you're invited"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def invited
@@ -181,7 +197,9 @@ class EventsController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all event's pictures paths"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def pictures
@@ -193,7 +211,9 @@ class EventsController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def main_picture
@@ -205,7 +225,9 @@ class EventsController < ApplicationController
   swagger_api :news do
     summary "Returns event's news"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def news

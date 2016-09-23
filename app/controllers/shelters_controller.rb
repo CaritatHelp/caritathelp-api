@@ -18,7 +18,9 @@ class SheltersController < ApplicationController
   
   swagger_api :create do
     summary "Allow an association to add a shelter"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :name, :string, :required, "Shelter's name"
     param :query, :address, :string, :required, "Shelter's address"
@@ -81,7 +83,9 @@ class SheltersController < ApplicationController
   swagger_api :update do
     summary "Allow association to update shelter"
     param :path, :id, :integer, :required, "Shelter's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :name, :string, :optional, "Shelter's name"
     param :query, :address, :string, :optional, "Shelter's address"
@@ -115,7 +119,9 @@ class SheltersController < ApplicationController
   swagger_api :delete do
     summary "Allow association to delete a shelter"
     param :path, :id, :integer, :required, "Shelter's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
@@ -127,7 +133,9 @@ class SheltersController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all shelter's pictures path"
     param :path, :id, :integer, :required, "Shelter's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def pictures
@@ -139,7 +147,9 @@ class SheltersController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Shelter's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def main_picture

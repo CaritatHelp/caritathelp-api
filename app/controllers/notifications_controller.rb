@@ -8,7 +8,9 @@ class NotificationsController < ApplicationController
   swagger_api :read do
     summary "Set a notification as read"
     param :path, :id, :integer, :required, "Notification's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end  
   def read

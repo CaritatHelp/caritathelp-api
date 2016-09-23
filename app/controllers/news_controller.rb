@@ -8,7 +8,9 @@ class NewsController < ApplicationController
 
   swagger_api :index do
     summary "Get all news concerning the volunteer refered by the token"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def index
@@ -22,11 +24,9 @@ class NewsController < ApplicationController
 
   swagger_api :wall_message do
     summary "Creates a wall message for yourself, friend, assoc or event"
-
     param :header, 'access-token', :string, :required, "Access token"
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
-
     param :query, :content, :string, :required, "New's content"
     param :query, :group_id, :integer, :required, "Id of Event, Assoc or Volunteer"
     param :query, :group_type, :string, :required, "Id's type"
@@ -49,7 +49,9 @@ class NewsController < ApplicationController
   swagger_api :show do
     summary "Get new's information"
     param :path, :id, :integer, :required, "New's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def show
@@ -59,7 +61,9 @@ class NewsController < ApplicationController
   swagger_api :comments do
     summary "Get new's comments"
     param :path, :id, :integer, :required, "New's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def comments

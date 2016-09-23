@@ -6,7 +6,9 @@ class FriendshipController < ApplicationController
 
   swagger_api :add do
     summary "Sends a friend request"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to invite"
     response :ok    
   end
@@ -43,7 +45,9 @@ class FriendshipController < ApplicationController
 
   swagger_api :reply do
     summary "Reply to a friend request"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -78,7 +82,9 @@ class FriendshipController < ApplicationController
 
   swagger_api :remove do
     summary "Remove friendship"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to remove from friends"
     response :ok
   end
@@ -105,7 +111,9 @@ class FriendshipController < ApplicationController
 
   swagger_api :received_invitations do
     summary "List all pending friends' invitations"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def received_invitations

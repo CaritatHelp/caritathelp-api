@@ -11,7 +11,9 @@ class FollowersController < ApplicationController
 
   swagger_api :follow do
     summary "Follow an association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
@@ -37,7 +39,9 @@ class FollowersController < ApplicationController
 
   swagger_api :unfollow do
     summary "Unfollow an association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
@@ -62,7 +66,9 @@ class FollowersController < ApplicationController
 
   swagger_api :block do
     summary "Block a follower"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id"
     response :ok

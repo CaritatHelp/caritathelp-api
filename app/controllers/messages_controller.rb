@@ -8,7 +8,9 @@ class MessagesController < ApplicationController
   
   swagger_api :create do
     summary "Create a chatroom with the list of volunteers provided"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :name, :string, :optional, "Chatroom's name"
     param :form, 'volunteers[]', :string, :required, "Volunteers' ids"
     response :ok
@@ -85,7 +87,9 @@ class MessagesController < ApplicationController
 
   swagger_api :index do
     summary "Get volunteer's chatrooms ordered by date of last message"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def index
@@ -95,7 +99,9 @@ class MessagesController < ApplicationController
   swagger_api :participants do
     summary "Get the list of chatroom's volunteers"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def participants
@@ -108,7 +114,9 @@ class MessagesController < ApplicationController
   swagger_api :show do
     summary "Get messages of the chatroom, ordered by date"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def show
@@ -125,7 +133,9 @@ class MessagesController < ApplicationController
   swagger_api :set_name do
     summary "Set chatroom's name"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def set_name
@@ -141,7 +151,9 @@ class MessagesController < ApplicationController
   swagger_api :add_volunteers do
     summary "Add volunteers to the chatroom"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :form, 'volunteers[]', :string, :required, "Volunteers' ids to add"
     response :ok
   end
@@ -175,7 +187,9 @@ class MessagesController < ApplicationController
   swagger_api :new_message do
     summary "Write a message to the chatroom"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :content, :string, :required, "Message's content"
     response :ok
   end
@@ -198,7 +212,9 @@ class MessagesController < ApplicationController
   swagger_api :kick_volunteer do
     summary "Kick volunteer from the chatroom"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id"
     response :ok
   end
@@ -224,7 +240,9 @@ class MessagesController < ApplicationController
   swagger_api :leave do
     summary "Leave the chatroom"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def leave
@@ -247,7 +265,9 @@ class MessagesController < ApplicationController
   swagger_api :delete_message do
     summary "Delete message from the chatroom"
     param :path, :id, :integer, :required, "Chatroom's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :message_id, :integer, :required, "Message's id"
     response :ok
   end

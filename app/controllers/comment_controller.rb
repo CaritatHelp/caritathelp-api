@@ -9,7 +9,9 @@ class CommentController < ApplicationController
 
   swagger_api :create do
     summary "Creates a comment linked to the new"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :content, :string, :required, "Content of the comment"
     param :query, :new_id, :integer, :required, "New's id"
     response :ok
@@ -31,7 +33,9 @@ class CommentController < ApplicationController
   swagger_api :update do
     summary "Update the comment referred by id"
     param :path, :id, :integer, :required, "Comment's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :content, :string, :required, "Content of the comment"
     response :ok
     response 400
@@ -52,7 +56,9 @@ class CommentController < ApplicationController
   swagger_api :show do
     summary "Returns the comment's information"
     param :path, :id, :integer, :required, "Comment's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -63,7 +69,9 @@ class CommentController < ApplicationController
   swagger_api :delete do
     summary "Delete the comment"
     param :path, :id, :integer, :required, "Comment's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end

@@ -3,13 +3,14 @@ class VolunteersController < ApplicationController
 
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
-  skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
-  before_filter :check_token, except: [:create, :destroy]
+  skip_before_filter :verify_authenticity_token, :only => [:destroy]
   before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
 
   swagger_api :index do
     summary "Get a list of all volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def index
@@ -27,14 +28,16 @@ class VolunteersController < ApplicationController
   swagger_api :show do
     summary "Get volunteer's profile"
     param :path, :id, :integer, :required, "Volunteer's id to show"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def show
     begin
 
       if current_volunteer.id == @volunteer.id
-        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+        render :json => create_response(@volunteer.as_json(:except => [:password])
                                           .merge('friendship' => 'yourself')) and return
       end
 
@@ -67,7 +70,7 @@ class VolunteersController < ApplicationController
         friendship = 'friend'
       end
       
-      render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+      render :json => create_response(@volunteer.as_json(:except => [:password])
                                         .merge(friendship: friendship,
                                                notif_id: notif_id)) and return
     rescue => e
@@ -77,7 +80,9 @@ class VolunteersController < ApplicationController
 
   swagger_api :search do
     summary "Search for volunteers, returns a list of volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :research, :string, :required, "Volunteer's firstname/lastname"
     response :ok
   end
@@ -123,7 +128,9 @@ class VolunteersController < ApplicationController
 
   swagger_api :notifications do
     summary "Get volunteer's notifications"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def notifications  
@@ -137,7 +144,9 @@ class VolunteersController < ApplicationController
   swagger_api :friends do
     summary "Get volunteer's friends list"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def friends
@@ -155,7 +164,9 @@ class VolunteersController < ApplicationController
   swagger_api :associations do
     summary "Get volunteer's associations list"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def associations
@@ -173,7 +184,9 @@ class VolunteersController < ApplicationController
   swagger_api :events do
     summary "Get volunteer's events list"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def events
@@ -201,7 +214,9 @@ class VolunteersController < ApplicationController
 
   swagger_api :friend_requests do
     summary "Returns a list of all pendinf friends' invitations"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :sent, :boolean, :optional, "true: invitations sent. false: invitations received."
     response :ok
   end
@@ -224,7 +239,9 @@ class VolunteersController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all volunteer's pictures path"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def pictures
@@ -237,7 +254,9 @@ class VolunteersController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def main_picture
@@ -251,7 +270,9 @@ class VolunteersController < ApplicationController
   swagger_api :news do
     summary "Get volunteer's news"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def news

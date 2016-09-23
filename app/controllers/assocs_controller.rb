@@ -10,7 +10,9 @@ class AssocsController < ApplicationController
 
   swagger_api :index do
     summary "Get a list of all associations"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -28,7 +30,9 @@ class AssocsController < ApplicationController
 
   swagger_api :create do
     summary "Allow volunteer to create an association"
-    param :query, :token, :string, :required, "Creator's token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :name, :string, :required, "Association's name"
     param :query, :description, :string, :required, "Association's description"
     param :query, :birthday, :date, :optional, "Date of creation"
@@ -59,7 +63,9 @@ class AssocsController < ApplicationController
   swagger_api :show do
     summary "Get associations information by its id"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -88,7 +94,9 @@ class AssocsController < ApplicationController
   swagger_api :members do
     summary "Get a list of all members"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -102,7 +110,9 @@ class AssocsController < ApplicationController
   swagger_api :events do
     summary "Get a list of all association's events"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -127,7 +137,9 @@ class AssocsController < ApplicationController
   swagger_api :update do
     summary "Update association"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Creator's token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :name, :string, :optional, "Association's name"
     param :query, :description, :string, :optional, "Association's description"
     param :query, :birthday, :date, :optional, "Date of creation"
@@ -155,7 +167,9 @@ class AssocsController < ApplicationController
   swagger_api :delete do
     summary "Deletes association (needs to be owner)"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -171,7 +185,9 @@ class AssocsController < ApplicationController
 
   swagger_api :invited do
     summary "Get all associations where you're invited"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -188,7 +204,9 @@ class AssocsController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all association's pictures paths"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -201,7 +219,9 @@ class AssocsController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -214,7 +234,9 @@ class AssocsController < ApplicationController
   swagger_api :news do
     summary "Returns association's news"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end

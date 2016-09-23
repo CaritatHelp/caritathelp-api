@@ -9,7 +9,9 @@ class PicturesController < ApplicationController
   swagger_api :create do
     summary "Upload picture on the server"
     notes "You need to chose between assoc_id, shelter_id & event_id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :file, :string, :required, "File content (base64)"
     param :query, :filename, :string, :required, "Name to give to the file"
     param :query, :original_filename, :string, :required, "Original name of the file"
@@ -107,7 +109,9 @@ class PicturesController < ApplicationController
     summary "Delete picture"
     notes "Can't delete main picture"
     param :path, :id, :integer, :required, "Picture's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def delete
@@ -137,7 +141,9 @@ class PicturesController < ApplicationController
   swagger_api :update do
     summary "Set picture as main picture"
     param :path, :id, :integer, :required, "Picture's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def update

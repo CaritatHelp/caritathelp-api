@@ -12,7 +12,9 @@ class MembershipController < ApplicationController
 
   swagger_api :kick do
     summary "Kick member"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
@@ -42,7 +44,9 @@ class MembershipController < ApplicationController
 
   swagger_api :upgrade do
     summary "Upgrade member"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to upgrade"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :rights, :string, :required, "Rights to apply"
@@ -73,7 +77,9 @@ class MembershipController < ApplicationController
 
   swagger_api :join_assoc do
     summary "Request to join an association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
@@ -116,7 +122,9 @@ class MembershipController < ApplicationController
 
   swagger_api :reply_member do
     summary "Respond to a request to join the association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -155,7 +163,9 @@ class MembershipController < ApplicationController
   
   swagger_api :invite do
     summary "Invite a volunteer to join the association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to invite"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
@@ -187,7 +197,9 @@ class MembershipController < ApplicationController
 
   swagger_api :reply_invite do
     summary "Respond to an invitation"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -223,7 +235,9 @@ class MembershipController < ApplicationController
 
   swagger_api :leave_assoc do
     summary "Leave an association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id to leave"
     response :ok
   end
@@ -247,7 +261,9 @@ class MembershipController < ApplicationController
 
   swagger_api :invited do
     summary "List all invited volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
@@ -257,13 +273,15 @@ class MembershipController < ApplicationController
       .where("notifications.assoc_id=#{@assoc.id}")
       .select("volunteers.*, notifications.created_at AS sending_date")
     render :json => create_response(target_volunteerunteers
-                                      .as_json(except: [:token, :password,
+                                     .as_json(except: [:password,
                                                        :created_at, :updated_at]))
   end
 
   swagger_api :uninvite do
     summary "Cancel an invitation"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id"
     response :ok
@@ -288,7 +306,9 @@ class MembershipController < ApplicationController
 
   swagger_api :waiting do
     summary "List all volunteers waiting to join the association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
   end
   def waiting
@@ -297,15 +317,11 @@ class MembershipController < ApplicationController
       .where("notifications.assoc_id=#{@assoc.id}")
       .select("volunteers.*, notifications.created_at AS sending_date, notifications.id AS notif_id")
     render :json => create_response(waiting_volunteers
-                                      .as_json(except: [:token, :password,
-                                                        :created_at, :updated_at]))
+                                     .as_json(except: [:password,
+                                                       :created_at, :updated_at]))
   end
 
   private
-  def join_params
-    params.permit(:token)
-  end
-
   def create_join_assoc
     [sender_id: current_volunteer.id,
      sender_name: current_volunteer.fullname,
