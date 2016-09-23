@@ -49,10 +49,6 @@ class Volunteer < ActiveRecord::Base
     end
   end
 
-  # def set_token
-  #   self.token = self.tokens.values.last[:token] if self.tokens.count > 0 
-  # end
-
   def set_fullname
     self.fullname = self.firstname + " " + self.lastname
   end
