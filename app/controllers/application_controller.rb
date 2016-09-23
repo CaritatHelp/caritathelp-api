@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
 
   before_action :set_locale
   before_filter :cors_preflight_check
-  before_filter :is_swagger_request?
   after_filter :cors_set_access_control_headers
 
   def cors_set_access_control_headers
