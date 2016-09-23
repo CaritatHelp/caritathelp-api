@@ -38,7 +38,7 @@ EventMachine.run do
             
             if json_msg['token'].eql?('token')
               if current_user_uid.eql?(nil)
-                current_user_uid = json_msg['uid_user']
+                current_user_uid = json_msg['user_uid']
                 p "Connection of user with email: " + current_user_uid
                 @channels_list[current_user_uid] = @channel
               end
