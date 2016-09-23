@@ -295,8 +295,4 @@ class VolunteersController < ApplicationController
                   :birthday, :gender, :city, :latitude, :longitude,
                   :allowgps)
   end
-  
-  def generate_token
-    SecureRandom.uuid.gsub(/\-/, '')
-  end
 end

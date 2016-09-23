@@ -6,7 +6,7 @@ class Volunteer < ActiveRecord::Base
 
   has_many :chatrooms, through: :chatroom_volunteers
   has_many :chatroom_volunteers
-
+  
   has_many :notifications, through: :notification_volunteers
   has_many :notification_volunteers
 

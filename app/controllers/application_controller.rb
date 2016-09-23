@@ -46,11 +46,11 @@ class ApplicationController < ActionController::Base
     begin
       concerned_volunteers = Volunteer.joins(:notification_volunteers)
         .where(notification_volunteers: { notification_id: notification.id })
-        .select("volunteers.id, volunteers.token").all
+        .select("volunteers.id, volunteers.uid").all
 
       if concerned_volunteers.empty?
         concerned_volunteers = Volunteer.where(id: notification.receiver_id)
-          .select("volunteers.id, volunteers.token").all
+          .select("volunteers.id, volunteers.uid").all
       end
 
       json_msg = {

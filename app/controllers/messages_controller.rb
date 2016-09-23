@@ -314,8 +314,8 @@ class MessagesController < ApplicationController
     begin
       concerned_volunteers = Volunteer.joins(:chatroom_volunteers)
         .where(chatroom_volunteers: { chatroom_id: chatroom_id })
-        .select("volunteers.id, volunteers.token").all
-
+        .select("volunteers.id, volunteers.uid").all
+      
       json_msg = {
         token: ENV['SEND_MSG_CARITATHELP'],
         chatroom_id: chatroom_id,
