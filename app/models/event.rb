@@ -15,6 +15,10 @@ class Event < ActiveRecord::Base
   validates :begin, presence: true, :on => :create
   validates :end, presence: true, :on => :create
 
+  def public
+    !self.private
+  end
+  
   def set_default_picture
     self.thumb_path = Rails.application.config.logo
   end

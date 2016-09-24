@@ -1,7 +1,10 @@
 class EventsController < ApplicationController
   swagger_controller :events, "Events management"
 
-  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture],
+                unless: :is_swagger_request?
+  before_action :authenticate_volunteer_if_needed,
+                only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
   
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
@@ -11,19 +14,32 @@ class EventsController < ApplicationController
 
   swagger_api :index do
     summary "Get a list of all events"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
-    param :query, :ranger, :string, :optional, "Can be 'past', 'current' or 'futur'"
+    param :header, 'access-token', :string, :optional, "Access token"
+    param :header, :client, :string, :optional, "Client token"
+    param :header, :uid, :string, :optional, "Volunteer's uid (email address)"
+    param :query, :range, :string, :optional, "Can be 'past', 'current' or 'futur'"
     response :ok
   end
   def index
-    events = Event.select("events.*")
-      .select("(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights")
-      .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
-      .where(private: false)
-    render :json => create_response(events)
+    events = Event.all.select { |event|
+      if current_volunteer.blank?
+        event.public
+      else
+        event.public or event.volunteers.include?(current_volunteer)
+      end
+    }.map { |event|
+      if current_volunteer.present?
+        link = event.event_volunteers.find_by(volunteer_id: current_volunteer.id)
+        friends_number = event.volunteers.select { |volunteer|
+          volunteer.volunteers.include?(current_volunteer)
+        }.count
+      end
+      friends_number = 0 if friends_number.blank?
+      event.attributes.merge(rights: link.try(:rights),
+                             nb_guest: event.volunteers.count,
+                             nb_friends_members: friends_number)
+    }
+    render json: create_response(events)
   end
 
   swagger_api :create do
@@ -75,12 +91,16 @@ class EventsController < ApplicationController
   swagger_api :show do
     summary "Returns event's information"
     param :path, :id, :integer, :required, "Event's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :header, 'access-token', :string, :optional, "Access token"
+    param :header, :client, :string, :optional, "Client token"
+    param :header, :uid, :string, :optional, "Volunteer's uid (email address)"
     response :ok
   end
   def show
+    if current_volunteer.blank?
+      render json: create_response(@event) and return
+    end
+
     if @link != nil
       render :json => create_response(@event.as_json.merge('rights' => @link.rights)) and return
     end
@@ -208,9 +228,6 @@ class EventsController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all event's pictures paths"
     param :path, :id, :integer, :required, "Event's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def pictures
@@ -222,9 +239,6 @@ class EventsController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Event's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def main_picture
@@ -274,12 +288,15 @@ class EventsController < ApplicationController
   end
 
   def set_link
+    return nil if current_volunteer.blank?
     @link = EventVolunteer.where(:volunteer_id => current_volunteer.id).where(:event_id => @event.id).first
   end
 
   def check_privacy
+    render :json => create_error(400, t("events.failure.rights")) and return if current_volunteer.blank? and @event.private
+    return true if current_volunteer.blank? and @event.public
     assoc_link = AvLink.where(volunteer_id: current_volunteer.id).where(assoc_id: @event.assoc_id).first
-    if @event.private.eql?(true) and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
+    if @event.private and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
       render :json => create_error(400, t("events.failure.rights")) and return      
     end
   end
@@ -290,5 +307,11 @@ class EventsController < ApplicationController
       return false
     end
     return true
+  end
+
+  def authenticate_volunteer_if_needed
+    if request.headers["access-token"].present? and request.headers["client"].present? and request.headers["uid"].present?
+      authenticate_volunteer!
+    end    
   end
 end

@@ -1,31 +1,38 @@
 class AssocsController < ApplicationController
   swagger_controller :assocs, "Associations management"
   
-  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture],
+                unless: :is_swagger_request?
+  before_action :authenticate_volunteer_if_needed,
+                only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
   
   before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :events]
-  before_action :check_block, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
+  before_action :check_block, only: [:edit, :update, :notifications, :members, :events, :delete, :news]
   before_action :check_rights, only: [:update, :delete]
 
   swagger_api :index do
     summary "Get a list of all associations"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :header, 'access-token', :string, :optional, "Access token"
+    param :header, :client, :string, :optional, "Client token"
+    param :header, :uid, :string, :optional, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def index    
-    query = "SELECT assocs.id, assocs.name, assocs.city, assocs.description, assocs.thumb_path, " +
-      "(SELECT av_links.rights FROM av_links WHERE av_links.assoc_id=assocs.id " + 
-      "AND av_links.volunteer_id=#{current_volunteer.id}) AS rights, " + 
-      "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
-      "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
-      "av_links.volunteer_id=v_friends.friend_volunteer_id " +
-      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members" +
-      " FROM assocs"
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    associations = Assoc.all.map { |assoc|
+      if current_volunteer.present?
+        link = assoc.av_links.find_by(volunteer_id: current_volunteer.id)
+        friends_number = assoc.volunteers.select { |volunteer|
+          volunteer.volunteers.include?(current_volunteer)
+        }.count
+      end
+      friends_number = 0 if friends_number.blank?
+      assoc.attributes.merge(rights: link.try(:rights),
+                             nb_members: assoc.volunteers.count,
+                             nb_friends_members: friends_number)
+    }
+    render json: create_response(associations)
   end
 
   swagger_api :create do
@@ -63,13 +70,19 @@ class AssocsController < ApplicationController
   swagger_api :show do
     summary "Get associations information by its id"
     param :path, :id, :integer, :required, "Association's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :header, 'access-token', :string, :optional, "Access token"
+    param :header, :client, :string, :optional, "Client token"
+    param :header, :uid, :string, :optional, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def show
+    p "$$$"
+    p current_volunteer
+    p "$$$"
+    if current_volunteer.blank?
+      render json: create_response(@assoc) and return
+    end
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
     if link != nil
       render :json => create_response(@assoc.as_json.merge('rights' => link.rights)) and return
@@ -216,9 +229,6 @@ class AssocsController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all association's pictures paths"
     param :path, :id, :integer, :required, "Association's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -231,9 +241,6 @@ class AssocsController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Association's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -287,5 +294,11 @@ class AssocsController < ApplicationController
       return false
     end
     return true
+  end
+
+  def authenticate_volunteer_if_needed
+    if request.headers["access-token"].present? and request.headers["client"].present? and request.headers["uid"].present?
+      authenticate_volunteer!
+    end    
   end
 end
