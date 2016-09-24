@@ -20,7 +20,7 @@ EventMachine.run do
   EventMachine::WebSocket.start(host: "172.31.31.97", port: 8080, debug: true) do |ws|
     ws.onopen do
       begin
-        current_user_token = nil
+        current_user_uid = nil
         @channel = EM::Channel.new
         
         sid = @channel.subscribe { |msg|
@@ -37,10 +37,10 @@ EventMachine.run do
             json_msg = JSON.parse(msg)
             
             if json_msg['token'].eql?('token')
-              if current_user_token.eql?(nil)
-                current_user_token = json_msg['token_user']
-                p "Connection of user with token: " + current_user_token
-                @channels_list[current_user_token] = @channel
+              if current_user_uid.eql?(nil)
+                current_user_uid = json_msg['user_uid']
+                p "Connection of user with email: " + current_user_uid
+                @channels_list[current_user_uid] = @channel
               end
               
             elsif @tokens_types.key?(json_msg['token'])
@@ -53,9 +53,9 @@ EventMachine.run do
               
               if concerned_volunteers != nil and concerned_volunteers.count > 0
                 concerned_volunteers.each do |volunteer|
-                  if @channels_list[volunteer['token']] != nil
-                    p "send to volunteer with token: " + volunteer['token']
-                    @channels_list[volunteer['token']]
+                  if @channels_list[volunteer['uid']] != nil
+                    p "send to volunteer with email: " + volunteer['uid']
+                    @channels_list[volunteer['uid']]
                       .push(json_msg.to_json)
                   end
                 end
@@ -70,7 +70,7 @@ EventMachine.run do
           # unsubsribe the disconnected user from the channel
           # delete the channel from the channels_list
           begin
-            @channels_list.delete(current_user_token).unsubscribe(sid)
+            @channels_list.delete(current_user_uid).unsubscribe(sid)
           rescue => e
             p "On close:" + e.message.to_s
           end

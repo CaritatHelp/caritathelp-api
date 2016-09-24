@@ -9,10 +9,10 @@ class New < ActiveRecord::Base
   validates :group, presence: true, on: :create
   validates_inclusion_of :news_type, in: ["Status"]
   validates_inclusion_of :group_type, in: ["Assoc", "Event", "Volunteer"]
-  
+
   before_create :set_thumb_path
   before_create :set_name
-
+  
   def public
     !self.private
   end

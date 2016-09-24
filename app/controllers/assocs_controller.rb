@@ -1,8 +1,8 @@
 class AssocsController < ApplicationController
   swagger_controller :assocs, "Associations management"
   
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+  
   before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :events]
   before_action :check_block, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news]
@@ -10,25 +10,29 @@ class AssocsController < ApplicationController
 
   swagger_api :index do
     summary "Get a list of all associations"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def index    
     query = "SELECT assocs.id, assocs.name, assocs.city, assocs.description, assocs.thumb_path, " +
       "(SELECT av_links.rights FROM av_links WHERE av_links.assoc_id=assocs.id " + 
-      "AND av_links.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "AND av_links.volunteer_id=#{current_volunteer.id}) AS rights, " + 
       "(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members, " +
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
-      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members" +
       " FROM assocs"
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
   end
 
   swagger_api :create do
     summary "Allow volunteer to create an association"
-    param :query, :token, :string, :required, "Creator's token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :name, :string, :required, "Association's name"
     param :query, :description, :string, :required, "Association's description"
     param :query, :birthday, :date, :optional, "Date of creation"
@@ -47,7 +51,7 @@ class AssocsController < ApplicationController
       new_assoc = Assoc.create!(assoc_params)
       
       link = AvLink.create!(assoc_id: new_assoc.id,
-                            volunteer_id: @volunteer.id, rights: 'owner')
+                            volunteer_id: current_volunteer.id, rights: 'owner')
 
       render :json => create_response(new_assoc.as_json.merge('rights' => 'owner'))
     rescue ActiveRecord::RecordInvalid => e
@@ -59,24 +63,26 @@ class AssocsController < ApplicationController
   swagger_api :show do
     summary "Get associations information by its id"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def show
-    link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
+    link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
     if link != nil
       render :json => create_response(@assoc.as_json.merge('rights' => link.rights)) and return
     end
     rights = nil
 
     notif = Notification.where(notif_type: 'InviteMember').where(assoc_id: @assoc.id)
-      .where(receiver_id: @volunteer.id).first
+      .where(receiver_id: current_volunteer.id).first
     if notif != nil
       rights = 'invited'
     end
 
-    notif = Notification.where(notif_type: 'JoinAssoc').where(sender_id: @volunteer.id)
+    notif = Notification.where(notif_type: 'JoinAssoc').where(sender_id: current_volunteer.id)
       .where(assoc_id: @assoc.id).first
     if notif != nil
       rights = 'waiting'
@@ -88,12 +94,14 @@ class AssocsController < ApplicationController
   swagger_api :members do
     summary "Get a list of all members"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def members
-    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, volunteers.thumb_path, av_links.rights"
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.email, volunteers.thumb_path, av_links.rights"
     render :json => create_response(Volunteer.joins(:av_links)
                                       .where(av_links: { assoc_id: @assoc.id })
                                       .select(query).limit(100))
@@ -102,7 +110,9 @@ class AssocsController < ApplicationController
   swagger_api :events do
     summary "Get a list of all association's events"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -114,11 +124,11 @@ class AssocsController < ApplicationController
 
     query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, events.thumb_path, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" + 
-      "events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights, " + 
+      "events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights, " + 
       "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
-      "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
+      "WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members" +
       " FROM events WHERE events.assoc_id=#{@assoc.id}" + privacy
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
@@ -127,7 +137,9 @@ class AssocsController < ApplicationController
   swagger_api :update do
     summary "Update association"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Creator's token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :name, :string, :optional, "Association's name"
     param :query, :description, :string, :optional, "Association's description"
     param :query, :birthday, :date, :optional, "Date of creation"
@@ -155,7 +167,9 @@ class AssocsController < ApplicationController
   swagger_api :delete do
     summary "Deletes association (needs to be owner)"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -171,17 +185,19 @@ class AssocsController < ApplicationController
 
   swagger_api :invited do
     summary "Get all associations where you're invited"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def invited
     assocs = Assoc.select(:id, :name, :city, :thumb_path)
       .select("(SELECT COUNT(*) FROM av_links WHERE av_links.assoc_id=assocs.id) AS nb_members")
-      .select("(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON av_links.volunteer_id=v_friends.friend_volunteer_id WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .select("(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON av_links.volunteer_id=v_friends.friend_volunteer_id WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
       .joins("INNER JOIN notifications ON notifications.assoc_id=assocs.id")
       .select("notifications.id AS notif_id")
-      .where("notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteMember'")
+      .where("notifications.receiver_id=#{current_volunteer.id} AND notifications.notif_type='InviteMember'")
     render :json => create_response(assocs)
   end
 
@@ -193,14 +209,16 @@ class AssocsController < ApplicationController
     response 400
   end
   def invitable_volunteers
-    volunteers = @volunteer.volunteers.select { |volunteer| volunteer.assocs.exclude?(@assoc) }
+    volunteers = current_volunteer.volunteers.select { |volunteer| volunteer.assocs.exclude?(@assoc) }
     render json: create_response(volunteers)
   end
   
   swagger_api :pictures do
     summary "Returns a list of all association's pictures paths"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -213,7 +231,9 @@ class AssocsController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
@@ -226,12 +246,14 @@ class AssocsController < ApplicationController
   swagger_api :news do
     summary "Returns association's news"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
   def news
-    rights = @volunteer.av_links.find_by(assoc_id: @assoc.id).try(:level)
+    rights = current_volunteer.av_links.find_by(assoc_id: @assoc.id).try(:level)
     render json: create_response(@assoc.news.select { |new| (new.private and rights.present? and rights >= AvLink.levels["member"]) or new.public })
   end
 
@@ -244,12 +266,8 @@ class AssocsController < ApplicationController
     end
   end
 
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def set_link
-    @link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id).first
+    @link = AvLink.where(:volunteer_id => current_volunteer.id).where(:assoc_id => @assoc.id).first
   end
 
   def assoc_params
@@ -257,7 +275,7 @@ class AssocsController < ApplicationController
   end
 
   def check_block
-    link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
+    link = AvLink.where(volunteer_id: current_volunteer.id).where(assoc_id: @assoc.id).first
     if !link.eql?(nil) and link.level.eql?(AvLink.levels["block"])
       render :json => create_error(400, t("follower.failure.blocked"))      
     end

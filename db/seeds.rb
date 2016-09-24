@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 #
@@ -10,17 +9,17 @@
 # Volunteers
 
 robin = Volunteer.create([firstname: 'Robin', lastname: 'Vasseur',
-                  mail: 'robin@root.com', password: 'root']).first
+                  email: 'robin@root.com', password: 'root1234']).first
 pierre = Volunteer.create([firstname: 'Pierre', lastname: 'Enjalbert',
-                  mail: 'pierre@root.com', password: 'root']).first
+                  email: 'pierre@root.com', password: 'root1234']).first
 aude = Volunteer.create([firstname: 'Aude', lastname: 'Sikorav',
-                  mail: 'aude@root.com', password: 'root']).first
+                  email: 'aude@root.com', password: 'root1234']).first
 jeremy = Volunteer.create([firstname: 'Jeremy', lastname: 'Gros',
-                  mail: 'jeremy@root.com', password: 'root']).first
+                  email: 'jeremy@root.com', password: 'root1234']).first
 nicolas = Volunteer.create([firstname: 'Nicolas', lastname: 'Temenides',
-                  mail: 'nicolas@root.com', password: 'root']).first
+                  email: 'nicolas@root.com', password: 'root1234']).first
 jerome = Volunteer.create([firstname: 'Jerome', lastname: 'Caudoux',
-                  mail: 'jerome@root.com', password: 'root']).first
+                  email: 'jerome@root.com', password: 'root1234']).first
 
 # VFriends
 

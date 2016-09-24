@@ -17,9 +17,9 @@ fr:
 
   volunteers:
     failure:
-      mail:
-        unavailable: "Ce mail n'est pas disponible"
-        invalid: "Ce mail n'est pas valide"
+      email:
+        unavailable: "Ce email n'est pas disponible"
+        invalid: "Ce email n'est pas valide"
 
       update: "Erreur lors de la modification du profil"
       id: "Id de bénévole inconnu"
@@ -40,9 +40,9 @@ fr:
         password:
           wrong: "Mauvais mot de passe"
           missing: "Mot de passe manquant"
-        mail:
-          wrong: "Mail inconnu"
-          missing: "Mail manquant"
+        email:
+          wrong: "Email inconnu"
+          missing: "Email manquant"
 
   logout:
     success: "L'utilisateur s'est deconnecté"

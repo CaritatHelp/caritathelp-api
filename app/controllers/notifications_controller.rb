@@ -1,16 +1,20 @@
 class NotificationsController < ApplicationController
   swagger_controller :notifications, "Notifications management"
 
-  before_filter :check_token
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+
   before_action :set_notification
   
   swagger_api :read do
     summary "Set a notification as read"
     param :path, :id, :integer, :required, "Notification's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
-  end
+  end  
   def read
+    # modify to handle authorization
     @notification.read = true
     @notification.save
     render :json => create_response(@notification)

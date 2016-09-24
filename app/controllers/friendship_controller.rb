@@ -2,31 +2,32 @@ class FriendshipController < ApplicationController
   swagger_controller :friendship, "Friendship management"
   
   skip_before_filter :verify_authenticity_token
-  before_filter :check_token
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   swagger_api :add do
     summary "Sends a friend request"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to invite"
-    response :ok
+    response :ok    
   end
   def add
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @friend = Volunteer.find_by!(id: params[:volunteer_id])
-
-      if ((VFriend.where(volunteer_id: @volunteer.id)
-            .where(friend_volunteer_id: @friend.id).first != nil))
+      
+      if ((VFriend.where(volunteer_id: current_volunteer.id)
+             .where(friend_volunteer_id: @friend.id).first != nil))
         render :json => create_error(400, t("notifications.failure.addfriend.exist")) and return
-      elsif ((Notification.where(notif_type: 'AddFriend').where(sender_id: @volunteer.id)
-               .where(receiver_id: @friend.id).first != nil) ||
-             (Notification.where(notif_type: 'AddFriend').where(sender_id: @friend.id)
-               .where(receiver_id: @volunteer.id).first != nil))
+      elsif ((Notification.where(notif_type: 'AddFriend').where(sender_id: current_volunteer.id)
+             .where(receiver_id: @friend.id).first != nil) ||
+          (Notification.where(notif_type: 'AddFriend').where(sender_id: @friend.id)
+             .where(receiver_id: current_volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.addfriend.pending_invitation"))
         return
       end
-
-      if @volunteer.id == @friend.id
+      
+      if current_volunteer.id == @friend.id
         render :json => create_error(400, t("notifications.failure.addfriend.self"))
         return
       end
@@ -44,17 +45,18 @@ class FriendshipController < ApplicationController
 
   swagger_api :reply do
     summary "Reply to a friend request"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
   end
   def reply
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @notif = Notification.find_by!(id: params[:notif_id])
       
-      if @volunteer.id != @notif.receiver_id
+      if current_volunteer.id != @notif.receiver_id
         render :json => create_error(400, t("notifications.failure.rights")) and return
       end
 
@@ -80,19 +82,20 @@ class FriendshipController < ApplicationController
 
   swagger_api :remove do
     summary "Remove friendship"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to remove from friends"
     response :ok
   end
   def remove
     begin
-      @volunteer = Volunteer.find_by!(token: params[:token])
       @friend = Volunteer.find_by!(id: params[:id])
 
-      link1 = VFriend.where(volunteer_id: @volunteer.id)
+      link1 = VFriend.where(volunteer_id: current_volunteer.id)
         .where(friend_volunteer_id: @friend.id).first 
       link2 = VFriend.where(volunteer_id: @friend.id)
-        .where(friend_volunteer_id: @volunteer.id).first 
+        .where(friend_volunteer_id: current_volunteer.id).first 
       if link1 == nil || link2 == nil
         render :json => create_error(400, t("volunteers.failure.unfriend"))
         return
@@ -113,8 +116,8 @@ class FriendshipController < ApplicationController
     response :ok
   end
   def cancel_request
-    @volunteer = Volunteer.find_by(token: params[:token])
-    link = @volunteer.notifications.find_by(id: params[:notif_id])
+    current_volunteer = Volunteer.find_by(token: params[:token])
+    link = current_volunteer.notifications.find_by(id: params[:notif_id])
 
     if link.present?
       link.destroy
@@ -126,25 +129,25 @@ class FriendshipController < ApplicationController
   
   swagger_api :received_invitations do
     summary "List all pending friends' invitations"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def received_invitations
-    @volunteer = Volunteer.find_by!(token: params[:token])
-
     volunteers = Volunteer
                  .select(:id, :firstname, :lastname, :city, :thumb_path)
                  .joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
                  .select("notifications.id AS notif_id")
-                 .where("notifications.receiver_id=#{@volunteer.id}")
+                 .where("notifications.receiver_id=#{current_volunteer.id}")
     render :json => create_response(volunteers)
   end
   
   private
   def create_add_friend
-    {sender_id: @volunteer.id,
-     sender_name: @volunteer.fullname,
-     sender_thumb_path: @volunteer.thumb_path,
+    {sender_id: current_volunteer.id,
+     sender_name: current_volunteer.fullname,
+     sender_thumb_path: current_volunteer.thumb_path,
      receiver_thumb_path: @friend.thumb_path,
      receiver_id: @friend.id,
      receiver_name: @friend.fullname,
