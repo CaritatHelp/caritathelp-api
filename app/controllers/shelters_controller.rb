@@ -1,7 +1,9 @@
 class SheltersController < ApplicationController
   swagger_controller :shelters, "Shelters management"
 
-  before_action :authenticate_volunteer!, except: [:index, :show, :search], unless: :is_swagger_request?
+  before_action :authenticate_volunteer!,
+                except: [:index, :show, :search, :pictures, :main_picture],
+                unless: :is_swagger_request?
 
   before_action :set_assoc, except: [:index, :show, :search, :pictures, :main_picture]
   before_action :set_shelter, only: [:show, :update, :delete, :pictures, :main_picture]
@@ -137,9 +139,6 @@ class SheltersController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all shelter's pictures path"
     param :path, :id, :integer, :required, "Shelter's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def pictures
@@ -151,9 +150,6 @@ class SheltersController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Shelter's id"
-    param :header, 'access-token', :string, :required, "Access token"
-    param :header, :client, :string, :required, "Client token"
-    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def main_picture
