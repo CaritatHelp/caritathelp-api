@@ -1,6 +1,6 @@
 class New < ActiveRecord::Base
   belongs_to :group, polymorphic: true
-  has_many :comments
+  has_many :comments, dependent: :destroy
   
   validates :volunteer_id, presence: true, on: :create
   validates :news_type, presence: true, on: :create
@@ -17,6 +17,17 @@ class New < ActiveRecord::Base
     !self.private
   end
 
+  def concerns_user?(volunteer)
+    return true unless self.private
+
+    class_type = self.group_type.classify.safe_constantize
+    if class_type.present?
+      group = class_type.find_by(id: self.group_id)
+      return true if group.present? and group.volunteers.include?(volunteer)
+    end
+    return false
+  end
+  
   private
 
   # The field is called thumb_path in all models

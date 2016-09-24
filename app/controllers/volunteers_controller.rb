@@ -134,11 +134,10 @@ class VolunteersController < ApplicationController
     response :ok
   end
   def notifications  
-    notifs = Notification.select("notifications.*")
-      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{current_volunteer.id}")
-      .where("notifications.receiver_id=#{current_volunteer.id} OR notification_volunteers.volunteer_id=#{current_volunteer.id}").order(created_at: :desc)
-
-    render :json => create_response(notifs)    
+    n1 = Notification.select { |notification| notification.receiver_id == current_volunteer.id }
+    n2 = NotificationVolunteer.select { |link| link.volunteer_id == current_volunteer.id }
+         .map { |link| link.notification }
+    render json: create_response((n1 + n2).sort { |a, b| a.created_at <=> b.created_at })
   end
 
   swagger_api :friends do

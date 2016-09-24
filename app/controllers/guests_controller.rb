@@ -155,18 +155,16 @@ class GuestsController < ApplicationController
       event_id = @notif.event_id
       acceptance = params[:acceptance]
  
-      # modify the notification if there is a clear answer
-      if acceptance != nil
+      if acceptance != nil and acceptance == true
         @notif.notif_type = 'NewGuest'
         @notif.save!
         send_notif_to_socket(@notif)
-      end
-      
-      if acceptance.eql? 'true'
         create_guest_link(guest_id, event_id)
+      else
+        @notif.destroy
       end
       
-      render :json => create_response(nil, 200, t("events.success.reply_guest"))
+      render :json => create_response(t("events.success.reply_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -356,7 +354,8 @@ class GuestsController < ApplicationController
   def create_join_event
     [sender_id: current_volunteer.id,
      sender_name: current_volunteer.fullname,
-     thumb_path: current_volunteer.thumb_path,
+     sender_thumb_path: current_volunteer.thumb_path,
+     receiver_thumb_path: @event.thumb_path,
      event_id: @event.id,
      event_name: @event.title,
      notif_type: 'JoinEvent']
@@ -365,7 +364,8 @@ class GuestsController < ApplicationController
   def create_invite_guest
     [event_id: @event.id,
      event_name: @event.title,
-     thumb_path: @event.thumb_path,
+     sender_thumb_path: @event.thumb_path,
+     receiver_thumb_path: current_volunteer.thumb_path,
      sender_id: current_volunteer.id,
      sender_name: current_volunteer.fullname,
      receiver_id: @target_volunteer.id,

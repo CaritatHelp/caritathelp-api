@@ -109,6 +109,24 @@ class FriendshipController < ApplicationController
     end
   end
 
+  swagger_api :cancel_request do
+    summary "Cancel a previoulsy sent friend request"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :notif_id, :integer, :required, "Notification's id"
+    response :ok
+  end
+  def cancel_request
+    current_volunteer = Volunteer.find_by(token: params[:token])
+    link = current_volunteer.notifications.find_by(id: params[:notif_id])
+
+    if link.present?
+      link.destroy
+      render :json => create_response(nil, 200, t("volunteers.success.cancel_request"))
+    else
+      render :json => create_error(400, t("volunteers.failure.notification_not_found"))
+    end
+  end
+  
   swagger_api :received_invitations do
     summary "List all pending friends' invitations"
     param :header, 'access-token', :string, :required, "Access token"
@@ -129,7 +147,8 @@ class FriendshipController < ApplicationController
   def create_add_friend
     {sender_id: current_volunteer.id,
      sender_name: current_volunteer.fullname,
-     thumb_path: current_volunteer.thumb_path,
+     sender_thumb_path: current_volunteer.thumb_path,
+     receiver_thumb_path: @friend.thumb_path,
      receiver_id: @friend.id,
      receiver_name: @friend.fullname,
      notif_type: 'AddFriend'}

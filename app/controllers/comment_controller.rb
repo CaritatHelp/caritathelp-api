@@ -5,7 +5,7 @@ class CommentController < ApplicationController
 
   before_action :set_new, only: [:create]
   before_action :set_comment, only: [:update, :delete, :show]
-  before_action :check_rights
+  before_action :check_rights, except: [:create]
 
   swagger_api :create do
     summary "Creates a comment linked to the new"
@@ -19,6 +19,9 @@ class CommentController < ApplicationController
   end
   def create
     begin
+      unless @new.concerns_user?(current_volunteer)
+        render :json => create_error(400, t("comments.failure.rights")) and return
+      end
       new_comment = Comment.create!([new_id: @new.id, volunteer_id: current_volunteer.id,
                                      content: params[:content]]).first
       render :json => create_response(new_comment.as_json.merge(
@@ -47,7 +50,9 @@ class CommentController < ApplicationController
       end
       # changer le permit
       @comment.update!(params.permit(:content))
-      render :json => create_response(@comment.as_json.merge(thumb_path: current_volunteer.thumb_path))
+      render :json => create_response(@comment.as_json.merge(thumb_path: current_volunteer.thumb_path,
+                                                             firstname: current_volunteer.firstname,
+                                                             lastname: current_volunteer.lastname))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -63,7 +68,10 @@ class CommentController < ApplicationController
     response 400
   end
   def show
-    render :json => create_response(@comment)
+    render :json => create_response(@comment.as_json
+                                     .merge(thumb_path: @comment.volunteer.thumb_path,
+                                            firstname: @comment.volunteer.firstname,
+                                            lastname: @comment.volunteer.lastname))
   end
 
   swagger_api :delete do
@@ -76,9 +84,10 @@ class CommentController < ApplicationController
     response 400
   end
   def delete
-    # permettre au owner d'une actu de delete un comment
-    if @comment.volunteer_id != current_volunteer.id
-      render :json => create_error(400, t("comments.failure.rights")) and return        
+    unless @comment.new.volunteer_id == current_volunteer.id # allow new's creator to remove all comments
+      if @comment.volunteer_id != current_volunteer.id
+        render :json => create_error(400, t("comments.failure.rights")) and return        
+      end
     end
     @comment.destroy
     render :json => create_response(t("comments.success.deleted"))
