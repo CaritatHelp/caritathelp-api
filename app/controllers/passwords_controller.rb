@@ -14,4 +14,45 @@ class PasswordsController < DeviseTokenAuth::PasswordsController
   def update
     super
   end
+
+  protected
+  def render_update_error_unauthorized
+    render json: {
+             status: 401,
+             message: "Unauthorized",
+             response: nil
+           }, status: 401
+  end
+
+  def render_update_error_password_not_required
+    render json: {
+             status: 422,
+             message: "Password not required",
+             response: nil
+           }, status: 422
+  end
+
+  def render_update_error_missing_password
+    render json: {
+             status: 422,
+             message: "Missing password",
+             response: nil
+           }, status: 422
+  end
+
+  def render_update_success
+    render json: {
+             status: 200,
+             message: "ok",
+             response: resource_data,
+           }
+  end
+
+  def render_update_error
+    return render json: {
+                    status: 422,
+                    message: resource_errors[:full_messages].to_sentence,
+                    response: nil
+                  }, status: 422
+  end
 end

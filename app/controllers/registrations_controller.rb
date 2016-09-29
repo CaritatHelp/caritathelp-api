@@ -41,7 +41,16 @@ class RegistrationsController < DeviseTokenAuth::RegistrationsController
     response 400
   end
   def update
-    super
+    if @resource
+      if @resource.send(resource_update_method, account_update_params)
+        yield @resource if block_given?
+        render_update_success
+      else
+        render_update_error
+      end
+    else
+      render_update_error_user_not_found
+    end
   end
   
   def sign_up_params
@@ -52,5 +61,46 @@ class RegistrationsController < DeviseTokenAuth::RegistrationsController
   def account_update_params
     params.permit(:firstname, :lastname, :email, :birthday, :gender, :city, :latitude, :longitude,
                   :allowgps, :allow_notifications)
+  end
+
+  protected
+  def render_create_success
+    render json: {
+             status: 200,
+             message: "ok",
+             response: resource_data
+           }
+  end
+
+  def render_create_error
+    render json: {
+             status: 400,
+             message: resource_errors[:full_messages].to_sentence,
+             response: nil
+           }
+  end
+
+  def render_update_success
+    render json: {
+             status: 200,
+             message: "ok",
+             response: resource_data
+           }
+  end
+
+  def render_update_error
+    render json: {
+             status: 400,
+             message: resource_errors[:full_messages].to_sentence,
+             response: nil
+           }
+  end
+
+  def render_update_error_user_not_found
+    render json: {
+             status: 400,
+             message: "User not found",
+             response: nil
+           }
   end
 end

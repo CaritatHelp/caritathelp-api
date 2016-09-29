@@ -30,6 +30,7 @@ class Volunteer < ActiveRecord::Base
 
   before_create :set_default_picture
   before_save :set_fullname
+  before_update :check_email
   # before_save :set_token
   
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
@@ -42,6 +43,20 @@ class Volunteer < ActiveRecord::Base
   validates_inclusion_of :allowgps, :in => [true, false], :allow_nil => true
   validates_inclusion_of :allow_notifications, :in => [true, false], :allow_nil => true
 
+  def check_email
+    user = self.class.find_by(email: self.email)
+    if user.present? and user.id != self.id
+      errors.add(:email, "already in use")
+      return false
+    end
+    return true
+  end
+  
+  def token_validation_response
+    self.as_json(except: [:tokens, :created_at, :updated_at, :nickname])
+      .merge(notifications_number:  self.notifications.count)
+  end
+  
   def set_default_picture
     if self.gender.eql?('f') and self.thumb_path.eql?(nil)
       self.thumb_path = Rails.application.config.default_thumb_female
