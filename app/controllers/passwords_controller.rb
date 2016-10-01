@@ -45,7 +45,7 @@ class PasswordsController < DeviseTokenAuth::PasswordsController
              status: 200,
              message: "ok",
              response: resource_data,
-           }
+           }, status: 200
   end
 
   def render_update_error
