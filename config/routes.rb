@@ -98,6 +98,7 @@ Rails.application.routes.draw do
   scope '/associations' do
     get '/', to: 'assocs#index'
     get '/invited', to: 'assocs#invited'
+    get '/joining', to: 'assocs#joining'
     get '/:id', to: 'assocs#show'
     get '/:id/members', to: 'assocs#members'
     get '/:id/notifications', to: 'assocs#notifications'
@@ -117,8 +118,9 @@ Rails.application.routes.draw do
 
   scope '/events' do
     get '/', to: 'events#index'
-    get '/owned', to: 'events#owned'
+    get '/owned', to: 'events#owned' 
     get '/invited', to: 'events#invited'
+    get '/joining', to: 'events#joining'
     get '/:id', to: 'events#show'
     get '/:id/guests', to: 'events#guests'
     get '/:id/notifications', to: 'events#notifications'

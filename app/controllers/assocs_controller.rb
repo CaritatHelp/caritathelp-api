@@ -213,7 +213,22 @@ class AssocsController < ApplicationController
       .where("notifications.receiver_id=#{current_volunteer.id} AND notifications.notif_type='InviteMember'")
     render :json => create_response(assocs)
   end
-
+  
+  swagger_api :joining do
+    summary "Get all associations you're joining"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    response :ok
+    response 400
+  end
+  def joining
+    associations = current_volunteer.notifications.select(&:is_join_assoc?).select { |notification|
+      notification.sender_id == current_volunteer.id
+    }.map { |notification| Assoc.find(notification.assoc_id) }
+    render json: create_response(associations)
+  end
+  
   swagger_api :invitable_volunteers do
     summary "Get a list of all invitable volunteers"
     param :path, :id, :integer, :required, "Association's id"

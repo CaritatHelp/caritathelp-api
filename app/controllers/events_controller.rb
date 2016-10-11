@@ -225,6 +225,20 @@ class EventsController < ApplicationController
     render :json => create_response(events)
   end
 
+  swagger_api :joining do
+    summary "Get all event where you're joining"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    response :ok
+  end
+  def joining
+    events = current_volunteer.notifications.select(&:is_join_event?).select { |notification|
+      notification.sender_id == current_volunteer.id
+    }.map { |notification| Event.find(notification.event_id) }
+    render json: create_response(events)
+  end
+  
   swagger_api :pictures do
     summary "Returns a list of all event's pictures paths"
     param :path, :id, :integer, :required, "Event's id"
