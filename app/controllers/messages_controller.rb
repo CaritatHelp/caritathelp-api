@@ -193,7 +193,8 @@ class MessagesController < ApplicationController
 
       send_msg_to_socket(message, @chatroom.id, current_volunteer)
 
-      render :json => create_response(message)
+      render :json => create_response(message.attributes
+                                       .merge(fullname: current_volunteer.fullname))
     rescue => e
       render :json => create_error(400, e.to_s)
     end
