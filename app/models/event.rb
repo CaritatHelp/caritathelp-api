@@ -7,8 +7,8 @@ class Event < ActiveRecord::Base
   belongs_to :assoc
   
   before_create :set_default_picture
-  before_save :are_dates_corrects?
 
+  validate :are_dates_corrects?, on: :create
   validates :title, presence: true, :on => :create
   validates :description, presence: true, :on => :create
   validates :assoc_id, presence: true, :on => :create
