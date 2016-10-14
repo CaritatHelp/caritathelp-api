@@ -213,7 +213,6 @@ class EventsController < ApplicationController
     render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
   end
 
-  # TO TEST
   swagger_api :raise_emergency do
     summary "Raise an emergency to call for volunteers"
     param :path, :id, :integer, :required, "Event's id"
@@ -232,7 +231,7 @@ class EventsController < ApplicationController
 
     volunteers.each do |volunteer|
       notification = Notification.create(create_emergency_notification(volunteer))
-      send_notif_to_socket(notification)
+      # send_notif_to_socket(notification)
     end
     
     render json: volunteers

@@ -100,7 +100,7 @@ event_one = Event.create(title: 'Soignage de gens',
                          place: 'Zimbabwe',
                          begin: 2.days.from_now,
                          end: 3.days.from_now,
-                         latitude: 48.85661400000001,
+                         latitude: 48.85661400000001, # center paris
                          longitude: 2.3522219000000177,
                          assoc_id: 1,
                          assoc_name: croix_rouge[:name])
