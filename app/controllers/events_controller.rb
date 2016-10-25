@@ -292,7 +292,7 @@ class EventsController < ApplicationController
 
     volunteers.each do |volunteer|
       notification = Notification.create(create_emergency_notification(volunteer))
-      # send_notif_to_socket(notification)
+      send_notif_to_socket(notification) unless Rails.env.test?
     end
     
     render json: volunteers
@@ -342,11 +342,12 @@ class EventsController < ApplicationController
   def create_emergency_notification(volunteer)
     {event_id: @event.id,
      event_name: @event.title,
-     thumb_path: @event.thumb_path,
+     sender_thumb_path: @event.thumb_path,
      sender_id: @volunteer.id,
      sender_name: @volunteer.fullname,
      receiver_id: volunteer.id,
      receiver_name: volunteer.fullname,
+     receiver_thumb_path: volunteer.thumb_path,
      notif_type: 'Emergency'}
   end
   
