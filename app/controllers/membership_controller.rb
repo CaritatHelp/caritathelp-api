@@ -2,8 +2,9 @@ class MembershipController < ApplicationController
   swagger_controller :members, "Members management"
   
   skip_before_filter :verify_authenticity_token
-  before_filter :check_token
-  before_action :set_volunteer
+
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+  
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
   before_action :set_assoc, except: [:reply_member, :reply_invite]
   before_action :check_target_follower, only: [:kick, :upgrade]
@@ -11,14 +12,16 @@ class MembershipController < ApplicationController
 
   swagger_api :kick do
     summary "Kick member"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
   def kick
     begin
-      volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
+      volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
       if (volunteer_link == nil)
         render :json => create_error(400, t("assocs.failure.rights")) and return
       end
@@ -41,7 +44,9 @@ class MembershipController < ApplicationController
 
   swagger_api :upgrade do
     summary "Upgrade member"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to upgrade"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :rights, :string, :required, "Rights to apply"
@@ -49,7 +54,7 @@ class MembershipController < ApplicationController
   end
   def upgrade
     begin
-      volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
+      volunteer_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
       if (volunteer_link == nil)
         render :json => create_error(400, t("assocs.failure.rights")) and return
       end
@@ -72,21 +77,23 @@ class MembershipController < ApplicationController
 
   swagger_api :join_assoc do
     summary "Request to join an association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
   def join_assoc
     begin
       # Check if already member or if already applied
-      link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @assoc.id).first
+      link = AvLink.where(volunteer_id: current_volunteer.id).where(assoc_id: @assoc.id).first
       if ((link != nil and !link.level.eql?(AvLink.levels['follower'])) ||
           (Notification.where(notif_type: 'JoinAssoc')
-             .where(sender_id: @volunteer.id)
+             .where(sender_id: current_volunteer.id)
              .where(assoc_id: @assoc.id).first != nil) ||
           (Notification.where(notif_type: 'InviteMember')
              .where(assoc_id: @assoc.id)
-             .where(receiver_id: @volunteer.id).first != nil))
+             .where(receiver_id: current_volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.joinassoc.exist"))
         return
       end
@@ -105,7 +112,7 @@ class MembershipController < ApplicationController
                                       ])
       end
 
-      send_notif_to_socket(notif[0])
+      send_notif_to_socket(notif[0]) unless Rails.env.test?
       
       render :json => create_response(nil, 200, t("notifications.success.joinassoc"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -115,7 +122,9 @@ class MembershipController < ApplicationController
 
   swagger_api :reply_member do
     summary "Respond to a request to join the association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -125,7 +134,7 @@ class MembershipController < ApplicationController
       @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the rights of the person who's trying to accept a member
-      link = AvLink.where(volunteer_id: @volunteer.id)
+      link = AvLink.where(volunteer_id: current_volunteer.id)
              .where(assoc_id: @notif.assoc_id).first
       if ((link.eql? nil) || (link.rights.eql? 'member'))
         render :json => create_error(400, t("assocs.failure.rights")) and return
@@ -153,7 +162,9 @@ class MembershipController < ApplicationController
   
   swagger_api :invite do
     summary "Invite a volunteer to join the association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to invite"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
@@ -185,7 +196,9 @@ class MembershipController < ApplicationController
 
   swagger_api :reply_invite do
     summary "Respond to an invitation"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -195,7 +208,7 @@ class MembershipController < ApplicationController
       @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the right of the person who's trying to accept invitation
-      if @volunteer.id != @notif.receiver_id
+      if current_volunteer.id != @notif.receiver_id
         render :json => create_error(400, t("notifications.failure.rights")) and return        
       end
       
@@ -221,13 +234,15 @@ class MembershipController < ApplicationController
 
   swagger_api :leave_assoc do
     summary "Leave an association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id to leave"
     response :ok
   end
   def leave_assoc
     begin
-      link = AvLink.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id).first
+      link = AvLink.where(:volunteer_id => current_volunteer.id).where(:assoc_id => @assoc.id).first
 
       if link.eql?(nil)
         render :json => create_error(400, t("assocs.failure.notmember")) and return        
@@ -245,7 +260,9 @@ class MembershipController < ApplicationController
 
   swagger_api :invited do
     summary "List all invited volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     response :ok
   end
@@ -255,13 +272,15 @@ class MembershipController < ApplicationController
       .where("notifications.assoc_id=#{@assoc.id}")
       .select("volunteers.*, notifications.created_at AS sending_date")
     render :json => create_response(target_volunteerunteers
-                                      .as_json(except: [:token, :password,
+                                     .as_json(except: [:password,
                                                        :created_at, :updated_at]))
   end
 
   swagger_api :uninvite do
     summary "Cancel an invitation"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id"
     response :ok
@@ -286,7 +305,9 @@ class MembershipController < ApplicationController
 
   swagger_api :waiting do
     summary "List all volunteers waiting to join the association"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :assoc_id, :integer, :required, "Association's id"
   end
   def waiting
@@ -295,19 +316,15 @@ class MembershipController < ApplicationController
       .where("notifications.assoc_id=#{@assoc.id}")
       .select("volunteers.*, notifications.created_at AS sending_date, notifications.id AS notif_id")
     render :json => create_response(waiting_volunteers
-                                      .as_json(except: [:token, :password,
-                                                        :created_at, :updated_at]))
+                                     .as_json(except: [:password,
+                                                       :created_at, :updated_at]))
   end
 
   private
-  def join_params
-    params.permit(:token)
-  end
-
   def create_join_assoc
-    [sender_id: @volunteer.id,
-     sender_name: @volunteer.fullname,
-     sender_thumb_path: @volunteer.thumb_path,
+    [sender_id: current_volunteer.id,
+     sender_name: current_volunteer.fullname,
+     sender_thumb_path: current_volunteer.thumb_path,
      receiver_thumb_path: @assoc.thumb_path,
      assoc_id: @assoc.id,
      assoc_name: @assoc.name,
@@ -318,9 +335,9 @@ class MembershipController < ApplicationController
     [assoc_id: @assoc.id,
      assoc_name: @assoc.name,
      sender_thumb_path: @assoc.thumb_path,
-     receiver_thumb_path: @volunteer.thumb_path,
-     sender_id: @volunteer.id,
-     sender_name: @volunteer.fullname,
+     receiver_thumb_path: current_volunteer.thumb_path,
+     sender_id: current_volunteer.id,
+     sender_name: current_volunteer.fullname,
      receiver_id: @target_volunteer.id,
      receiver_name: @target_volunteer.fullname,
      notif_type: 'InviteMember']
@@ -342,10 +359,6 @@ class MembershipController < ApplicationController
     rescue ActiveRecord::RecordInvalid => e
       return false
     end
-  end
-
-  def set_volunteer
-    @volunteer = Volunteer.find_by!(token: params[:token])
   end
 
   def set_target_volunteer
@@ -372,7 +385,7 @@ class MembershipController < ApplicationController
   end
 
   def check_rights
-    @link = AvLink.where(:volunteer_id => @volunteer.id)
+    @link = AvLink.where(:volunteer_id => current_volunteer.id)
       .where(:assoc_id => @assoc.id).first
     if @link.eql?(nil) || @link.rights.eql?('member') || @link.rights.eql?('follower')
       render :json => create_error(400, t("assocs.failure.rights"))

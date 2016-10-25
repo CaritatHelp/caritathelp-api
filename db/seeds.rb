@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
 #
@@ -9,18 +9,30 @@
 
 # Volunteers
 
-robin = Volunteer.create([firstname: 'Robin', lastname: 'Vasseur',
-                  mail: 'robin@root.com', password: 'root']).first
-pierre = Volunteer.create([firstname: 'Pierre', lastname: 'Enjalbert',
-                  mail: 'pierre@root.com', password: 'root']).first
-aude = Volunteer.create([firstname: 'Aude', lastname: 'Sikorav',
-                  mail: 'aude@root.com', password: 'root']).first
-jeremy = Volunteer.create([firstname: 'Jeremy', lastname: 'Gros',
-                  mail: 'jeremy@root.com', password: 'root']).first
-nicolas = Volunteer.create([firstname: 'Nicolas', lastname: 'Temenides',
-                  mail: 'nicolas@root.com', password: 'root']).first
-jerome = Volunteer.create([firstname: 'Jerome', lastname: 'Caudoux',
-                  mail: 'jerome@root.com', password: 'root']).first
+robin = Volunteer.create(firstname: 'Robin',
+                         lastname: 'Vasseur',
+                         email: 'robin@root.com',
+                         password: 'root1234')
+pierre = Volunteer.create(firstname: 'Pierre',
+                          lastname: 'Enjalbert',
+                          email: 'pierre@root.com',
+                          password: 'root1234')
+aude = Volunteer.create(firstname: 'Aude',
+                        lastname: 'Sikorav',
+                        email: 'aude@root.com',
+                        password: 'root1234')
+jeremy = Volunteer.create(firstname: 'Jeremy',
+                          lastname: 'Gros',
+                          email: 'jeremy@root.com',
+                          password: 'root1234')
+nicolas = Volunteer.create(firstname: 'Nicolas',
+                           lastname: 'Temenides',
+                           email: 'nicolas@root.com',
+                           password: 'root1234')
+jerome = Volunteer.create(firstname: 'Jerome',
+                          lastname: 'Caudoux',
+                          email: 'jerome@root.com',
+                          password: 'root1234')
 
 # VFriends
 
@@ -31,12 +43,18 @@ VFriend.create([volunteer_id: nicolas[:id], friend_volunteer_id: robin[:id]])
 
 # Assocs
 
-croix_rouge = Assoc.create([name: 'Croix verte', description: 'Croix verte du swag',
-                           birthday: '02/12/2015', city: 'Paris',
-                           latitude: 9.99, longitude: 9.99]).first
-resto  = Assoc.create([name: "Les resto de l'estomac", description: 'Pour se remplir le bide',
-                           birthday: '02/12/2015', city: 'Là-bas',
-                           latitude: 9.99, longitude: 9.99]).first
+croix_rouge = Assoc.create(name: 'Croix verte',
+                           description: 'Croix verte du swag',
+                           birthday: '02/12/2015',
+                           city: 'Paris',
+                           latitude: 9.99,
+                           longitude: 9.99)
+resto  = Assoc.create(name: "Les resto de l'estomac",
+                      description: 'Pour se remplir le bide',
+                      birthday: '02/12/2015',
+                      city: 'Là-bas',
+                      latitude: 9.99,
+                      longitude: 9.99)
 
 # AvLinks
 
@@ -123,35 +141,33 @@ Message.create([chatroom_id: chatroom_two[:id], volunteer_id: robin[:id],
 Message.create([chatroom_id: chatroom_two[:id], volunteer_id: nicolas[:id],
                 content: "Ouais et toi?"])
 Message.create([chatroom_id: chatroom_two[:id], volunteer_id: robin[:id],
-                content: "Tranquille, j'ai vu ta mère hier"])
+                content: "Tranquille"])
 Message.create([chatroom_id: chatroom_two[:id], volunteer_id: nicolas[:id],
-                content: "Où ça?"])
-Message.create([chatroom_id: chatroom_two[:id], volunteer_id: robin[:id],
-                content: "Dans mon lit, LOL !"])
+                content: "Cool"])
 
 # Shelters
 
-Shelter.create([name: 'Super shelter de la mort', address: 'Rue du swag',
+Shelter.create([name: 'Un toit pour toi', address: 'Rue de Paris',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 1])
-Shelter.create([name: 'Shelter de la mort', address: 'Rue du swag',
+               description: "Dormir à l'abris toute l'année", assoc_id: 1])
+Shelter.create([name: 'Secours populaire', address: 'Rue voltaire',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 1])
-Shelter.create([name: 'Auberge de jeunesse', address: 'Rue du swag',
+               description: "", assoc_id: 1])
+Shelter.create([name: 'Auberge de la charité', address: 'Rue du chariton',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 1])
-Shelter.create([name: 'Shelter du swag', address: 'Rue du swag',
+               description: "Ouvert à tous", assoc_id: 1])
+Shelter.create([name: 'Croix rouge', address: 'Rue du swag',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 1])
-Shelter.create([name: 'Auberge de vieillesse', address: 'Rue du swag',
+               description: "Nourriture et lit gratuit", assoc_id: 1])
+Shelter.create([name: 'Oyé logement', address: 'Rue du swag',
                zipcode: 75000, city: 'Paris', total_places: 200, free_places: 150,
-               description: "Yolo", assoc_id: 1])
+               description: "", assoc_id: 2])
 
 # Notifications
 
 # News
 
-news1 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Toto")
+news1 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Aujourd'hui nous comme venu en aide à 3000 personnes")
 news1.save
-news2 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Toto", private: true)
+news2 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Nous sommes à la recherche de médecins volontaires pour une mission humanitaire de grande ampleur", private: true)
 news2.save

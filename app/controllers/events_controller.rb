@@ -1,8 +1,11 @@
 class EventsController < ApplicationController
   swagger_controller :events, "Events management"
 
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture],
+                unless: :is_swagger_request?
+  before_action :authenticate_volunteer_if_needed,
+                only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
+  
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :show, :invitable_volunteers]
@@ -11,22 +14,39 @@ class EventsController < ApplicationController
 
   swagger_api :index do
     summary "Get a list of all events"
-    param :query, :token, :string, :required, "Your token"
-    param :query, :ranger, :string, :optional, "Can be 'past', 'current' or 'futur'"
+    param :header, 'access-token', :string, :optional, "Access token"
+    param :header, :client, :string, :optional, "Client token"
+    param :header, :uid, :string, :optional, "Volunteer's uid (email address)"
+    param :query, :range, :string, :optional, "Can be 'past', 'current' or 'futur'"
     response :ok
   end
   def index
-    events = Event.select("events.*")
-      .select("(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@volunteer.id}) AS rights")
-      .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
-      .where(private: false)
-    render :json => create_response(events)
+    events = Event.all.select { |event|
+      if current_volunteer.blank?
+        event.public
+      else
+        event.public or event.volunteers.include?(current_volunteer)
+      end
+    }.map { |event|
+      if current_volunteer.present?
+        link = event.event_volunteers.find_by(volunteer_id: current_volunteer.id)
+        friends_number = event.volunteers.select { |volunteer|
+          volunteer.volunteers.include?(current_volunteer)
+        }.count
+      end
+      friends_number = 0 if friends_number.blank?
+      event.attributes.merge(rights: link.try(:rights),
+                             nb_guest: event.volunteers.count,
+                             nb_friends_members: friends_number)
+    }
+    render json: create_response(events)
   end
 
   swagger_api :create do
     summary "Allow an association to create an event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :form, :assoc_id, :integer, :required, "Association's id"
     param :form, :title, :string, :required, "Event's title"
     param :form, :description, :string, :required, "Event's description"
@@ -43,7 +63,7 @@ class EventsController < ApplicationController
         render :json => create_error(400, t("events.failure.wrong_assoc")) and return
       end
 
-      assoc_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @volunteer.id).first
+      assoc_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
 
       if assoc_link == nil or assoc_link.level < AvLink.levels["admin"]
         render :json => create_error(400, t("events.failure.rights")) and return        
@@ -55,7 +75,7 @@ class EventsController < ApplicationController
       end
 
       event_link = EventVolunteer.create!(event_id: new_event.id,
-                                          volunteer_id: @volunteer.id,
+                                          volunteer_id: current_volunteer.id,
                                           rights: 'host')
 
       render :json => create_response(new_event.as_json.merge("rights" => "host"))
@@ -71,10 +91,16 @@ class EventsController < ApplicationController
   swagger_api :show do
     summary "Returns event's information"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :optional, "Access token"
+    param :header, :client, :string, :optional, "Client token"
+    param :header, :uid, :string, :optional, "Volunteer's uid (email address)"
     response :ok
   end
   def show
+    if current_volunteer.blank?
+      render json: create_response(@event) and return
+    end
+
     if @link != nil
       render :json => create_response(@event.as_json.merge('rights' => @link.rights)) and return
     end
@@ -82,7 +108,7 @@ class EventsController < ApplicationController
 
     notif = Notification.where(notif_type: 'InviteGuest')
       .where(event_id: @event.id)
-      .where(receiver_id: @volunteer.id).first
+      .where(receiver_id: current_volunteer.id).first
     
     if notif != nil
       rights = 'invited'
@@ -90,7 +116,7 @@ class EventsController < ApplicationController
 
     notif = Notification.where(notif_type: 'JoinEvent')
       .where(event_id: @event.id)
-      .where(sender_id: @volunteer.id).first
+      .where(sender_id: current_volunteer.id).first
 
     if notif != nil
       rights = 'waiting'
@@ -102,11 +128,13 @@ class EventsController < ApplicationController
   swagger_api :guests do
     summary "Returns a list of all guests"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def guests
-    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.mail, volunteers.thumb_path, event_volunteers.rights"
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.email, volunteers.thumb_path, event_volunteers.rights"
     render :json => create_response(Volunteer.joins(:event_volunteers)
                                       .where(event_volunteers: { event_id: @event.id })
                                       .select(query).limit(100))
@@ -115,7 +143,9 @@ class EventsController < ApplicationController
   swagger_api :update do
     summary "Updates event"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :form, :title, :string, :optional, "Event's title"
     param :form, :description, :string, :optional, "Event's description"
     param :form, :begin, :date, :optional, "Beginning of the event"
@@ -135,7 +165,9 @@ class EventsController < ApplicationController
   swagger_api :delete do
     summary "Deletes event (needs to be host)"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def delete
@@ -161,38 +193,55 @@ class EventsController < ApplicationController
   
   swagger_api :owned do
     summary "Get all event where you're the owner"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def owned
     events = Event.select(:id, :title, :place, :begin, :end, :assoc_id, :thumb_path)
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
       .joins("INNER JOIN event_volunteers ON event_volunteers.event_id=events.id")
       .select("event_volunteers.rights AS rights")
-      .where("event_volunteers.volunteer_id=#{@volunteer.id} AND event_volunteers.rights='host'")
+      .where("event_volunteers.volunteer_id=#{current_volunteer.id} AND event_volunteers.rights='host'")
     render :json => create_response(events)
   end
 
   swagger_api :invited do
     summary "Get all event where you're invited"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def invited
     events = Event.select(:id, :title, :place, :begin, :end, :assoc_id, :thumb_path)
       .select("(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest")
-      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members")
+      .select("(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON event_volunteers.volunteer_id=v_friends.friend_volunteer_id WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members")
       .joins("INNER JOIN notifications ON notifications.event_id=events.id")
       .select("notifications.id AS notif_id")
-      .where("notifications.receiver_id=#{@volunteer.id} AND notifications.notif_type='InviteGuest'")
+      .where("notifications.receiver_id=#{current_volunteer.id} AND notifications.notif_type='InviteGuest'")
     render :json => create_response(events)
   end
 
+  swagger_api :joining do
+    summary "Get all event where you're joining"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    response :ok
+  end
+  def joining
+    events = current_volunteer.notifications.select(&:is_join_event?).select { |notification|
+      notification.sender_id == current_volunteer.id
+    }.map { |notification| Event.find(notification.event_id) }
+    render json: create_response(events)
+  end
+  
   swagger_api :pictures do
     summary "Returns a list of all event's pictures paths"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
     response :ok
   end
   def pictures
@@ -204,7 +253,6 @@ class EventsController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
     response :ok
   end
   def main_picture
@@ -216,19 +264,17 @@ class EventsController < ApplicationController
   swagger_api :news do
     summary "Returns event's news"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def news
-    rights = @volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
+    rights = current_volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
     render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
   end
 
   private
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
-  end
-
   def set_event
     begin
       @event = Event.find(params[:id])
@@ -256,12 +302,15 @@ class EventsController < ApplicationController
   end
 
   def set_link
-    @link = EventVolunteer.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id).first
+    return nil if current_volunteer.blank?
+    @link = EventVolunteer.where(:volunteer_id => current_volunteer.id).where(:event_id => @event.id).first
   end
 
   def check_privacy
-    assoc_link = AvLink.where(volunteer_id: @volunteer.id).where(assoc_id: @event.assoc_id).first
-    if @event.private.eql?(true) and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
+    render :json => create_error(400, t("events.failure.rights")) and return if current_volunteer.blank? and @event.private
+    return true if current_volunteer.blank? and @event.public
+    assoc_link = AvLink.where(volunteer_id: current_volunteer.id).where(assoc_id: @event.assoc_id).first
+    if @event.private and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
       render :json => create_error(400, t("events.failure.rights")) and return      
     end
   end
@@ -272,5 +321,11 @@ class EventsController < ApplicationController
       return false
     end
     return true
+  end
+
+  def authenticate_volunteer_if_needed
+    if request.headers["access-token"].present? and request.headers["client"].present? and request.headers["uid"].present?
+      authenticate_volunteer!
+    end    
   end
 end
