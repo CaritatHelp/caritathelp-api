@@ -2,9 +2,9 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :volunteers, join_table: :event_volunteers
   has_many :event_volunteers, dependent: :destroy
 
-  has_many :news, as: :group, class_name: 'New', dependent: :destroy
-
   belongs_to :assoc
+  
+  has_many :news, as: :group, class_name: 'New'
   
   before_create :set_default_picture
 

@@ -7,10 +7,10 @@ class EventsController < ApplicationController
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
   
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
-  before_action :set_link, only: [:update, :delete, :show, :invitable_volunteers]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency]
+  before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
-  before_action :check_rights, only: [:update, :delete, :invitable_volunteers]
+  before_action :check_rights, only: [:update, :delete, :raise_emergency]
 
   swagger_api :index do
     summary "Get a list of all events"
@@ -274,6 +274,30 @@ class EventsController < ApplicationController
     render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
   end
 
+  swagger_api :raise_emergency do
+    summary "Raise an emergency to call for volunteers"
+    param :path, :id, :integer, :required, "Event's id"
+    param :query, :token, :string, :required, "Your token"
+    param :query, :number_volunteers, :integer, :required, "Number of volunteers you need"
+    param :query, :zone, :integer, :optional, "Size (in km) of the zone, default: 50km"
+    response :ok
+  end
+  def raise_emergency
+    zone = 50.to_f
+    zone = params[:zone].to_f if params[:zone].present?
+
+    volunteers = @event.assoc.volunteers.select { |volunteer|
+      volunteer.allowgps and volunteer.distance_from_event_in_km(@event) < zone
+    }
+
+    volunteers.each do |volunteer|
+      notification = Notification.create(create_emergency_notification(volunteer))
+      send_notif_to_socket(notification) unless Rails.env.test?
+    end
+    
+    render json: volunteers
+  end
+  
   private
   def set_event
     begin
@@ -315,6 +339,18 @@ class EventsController < ApplicationController
     end
   end
 
+  def create_emergency_notification(volunteer)
+    {event_id: @event.id,
+     event_name: @event.title,
+     sender_thumb_path: @event.thumb_path,
+     sender_id: @volunteer.id,
+     sender_name: @volunteer.fullname,
+     receiver_id: volunteer.id,
+     receiver_name: volunteer.fullname,
+     receiver_thumb_path: volunteer.thumb_path,
+     notif_type: 'Emergency'}
+  end
+  
   def check_rights
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("events.failure.rights"))

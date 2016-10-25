@@ -130,7 +130,8 @@ Rails.application.routes.draw do
     get '/:id/invitable_volunteers', to: 'events#invitable_volunteers'
     
     post '/', to: 'events#create'
-
+    post '/:id/raise_emergency', to: 'events#raise_emergency'
+    
     put '/:id', to: 'events#update'
 
     delete '/:id', to: 'events#delete'

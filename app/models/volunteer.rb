@@ -68,6 +68,18 @@ class Volunteer < ActiveRecord::Base
   def set_fullname
     self.fullname = self.firstname + " " + self.lastname
   end
+
+  def distance_from_event_in_km(event)
+    distance = Haversine.distance(event.latitude, event.longitude,
+                                  self.latitude, self.longitude)
+    Haversine.to_km(distance)
+  end
+
+  def distance_from_event_in_miles(event)
+    distance = Haversine.distance(event.latitude, event.longitude,
+                                  self.latitude, self.longitude)
+    Haversine.to_miles(distance)
+  end
   
   def self.exist?(email)
     if Volunteer.find_by(email: email).eql? nil
