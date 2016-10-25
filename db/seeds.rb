@@ -11,7 +11,7 @@
 
 robin = Volunteer.create(firstname: 'Robin',
                          lastname: 'Vasseur',
-                         mail: 'robin@root.com',
+                         email: 'robin@root.com',
                          allowgps: true,
                          latitude: 49.00841620000001, # home
                          longitude: 2.045980600000007,
@@ -19,7 +19,7 @@ robin = Volunteer.create(firstname: 'Robin',
 
 pierre = Volunteer.create(firstname: 'Pierre',
                           lastname: 'Enjalbert',
-                          mail: 'pierre@root.com',
+                          email: 'pierre@root.com',
                           allowgps: true,
                           latitude: 48.8066706, # kremlin
                           longitude: 2.3654136000000108,
@@ -27,7 +27,7 @@ pierre = Volunteer.create(firstname: 'Pierre',
 
 aude = Volunteer.create(firstname: 'Aude',
                         lastname: 'Sikorav',
-                        mail: 'aude@root.com',
+                        email: 'aude@root.com',
                         allowgps: true,
                         latitude: 37.7749295, # SF
                         longitude: -122.41941550000001,
@@ -35,7 +35,7 @@ aude = Volunteer.create(firstname: 'Aude',
 
 jeremy = Volunteer.create(firstname: 'Jeremy',
                           lastname: 'Gros',
-                          mail: 'jeremy@root.com',
+                          email: 'jeremy@root.com',
                           allowgps: true,
                           latitude: 48.801408, # Versaille
                           longitude: 2.1301220000000285,
@@ -43,7 +43,7 @@ jeremy = Volunteer.create(firstname: 'Jeremy',
 
 nicolas = Volunteer.create(firstname: 'Nicolas',
                            lastname: 'Temenides',
-                           mail: 'nicolas@root.com',
+                           email: 'nicolas@root.com',
                            allowgps: true,
                            latitude: 43.296482, # Marseille
                            longitude: 5.369779999999992,
@@ -51,7 +51,7 @@ nicolas = Volunteer.create(firstname: 'Nicolas',
 
 jerome = Volunteer.create(firstname: 'Jerome',
                           lastname: 'Caudoux', 
-                          mail: 'jerome@root.com',
+                          email: 'jerome@root.com',
                           allowgps: true,
                           latitude: 20.593684, # Inde
                           longitude: 78.96288000000004,
