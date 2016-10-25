@@ -15,7 +15,7 @@ robin = Volunteer.create(firstname: 'Robin',
                          allowgps: true,
                          latitude: 49.00841620000001, # home
                          longitude: 2.045980600000007,
-                         password: 'root')
+                         password: 'root1234')
 
 pierre = Volunteer.create(firstname: 'Pierre',
                           lastname: 'Enjalbert',
@@ -23,7 +23,7 @@ pierre = Volunteer.create(firstname: 'Pierre',
                           allowgps: true,
                           latitude: 48.8066706, # kremlin
                           longitude: 2.3654136000000108,
-                          password: 'root')
+                          password: 'root1234')
 
 aude = Volunteer.create(firstname: 'Aude',
                         lastname: 'Sikorav',
@@ -31,7 +31,7 @@ aude = Volunteer.create(firstname: 'Aude',
                         allowgps: true,
                         latitude: 37.7749295, # SF
                         longitude: -122.41941550000001,
-                        password: 'root')
+                        password: 'root1234')
 
 jeremy = Volunteer.create(firstname: 'Jeremy',
                           lastname: 'Gros',
@@ -39,7 +39,7 @@ jeremy = Volunteer.create(firstname: 'Jeremy',
                           allowgps: true,
                           latitude: 48.801408, # Versaille
                           longitude: 2.1301220000000285,
-                          password: 'root')
+                          password: 'root1234')
 
 nicolas = Volunteer.create(firstname: 'Nicolas',
                            lastname: 'Temenides',
@@ -47,7 +47,7 @@ nicolas = Volunteer.create(firstname: 'Nicolas',
                            allowgps: true,
                            latitude: 43.296482, # Marseille
                            longitude: 5.369779999999992,
-                           password: 'root')
+                           password: 'root1234')
 
 jerome = Volunteer.create(firstname: 'Jerome',
                           lastname: 'Caudoux', 
@@ -55,7 +55,7 @@ jerome = Volunteer.create(firstname: 'Jerome',
                           allowgps: true,
                           latitude: 20.593684, # Inde
                           longitude: 78.96288000000004,
-                          password: 'root')
+                          password: 'root1234')
 
 # VFriends
 
