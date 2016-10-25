@@ -9,11 +9,6 @@ class Comment < ActiveRecord::Base
 
   after_create :increment_news_number_comments
   before_destroy :decrement_news_number_comments
-  
-  def complete_description
-    {'id' => self.id, 'volunteer_id' => self.volunteer_id,
-      'new_id' => self.new_id, 'content' => self.content}
-  end
 
   private
 

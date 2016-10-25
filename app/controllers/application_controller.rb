@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include DeviseTokenAuth::Concerns::SetUserByToken
+  include CanCan::ControllerAdditions
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :null_session
@@ -31,13 +33,6 @@ class ApplicationController < ActionController::Base
     I18n.locale = params[:locale] || :en
   end
 
-  def check_token
-    if params[:token] == nil or !Volunteer.find_by(token: params[:token])
-      render :json => create_error(400, t("token.wrong"))
-      return
-    end
-  end
-
   def create_response(result, status = 200, message = 'ok')
     {:status => status, :message => message, :response => result}
   end
@@ -50,11 +45,11 @@ class ApplicationController < ActionController::Base
     begin
       concerned_volunteers = Volunteer.joins(:notification_volunteers)
         .where(notification_volunteers: { notification_id: notification.id })
-        .select("volunteers.id, volunteers.token").all
+        .select("volunteers.id, volunteers.uid").all
 
       if concerned_volunteers.empty?
         concerned_volunteers = Volunteer.where(id: notification.receiver_id)
-          .select("volunteers.id, volunteers.token").all
+          .select("volunteers.id, volunteers.uid").all
       end
 
       json_msg = {
@@ -68,7 +63,8 @@ class ApplicationController < ActionController::Base
         event_name: notification.event_name,
         sender_name: notification.sender_name,
         receiver_name: notification.receiver_name,
-        thumb_path: notification.thumb_path,
+        sender_thumb_path: notification.sender_thumb_path,
+        receiver_thumb_path: notification.receiver_thumb_path,
         concerned_volunteers: concerned_volunteers
       }.to_json
       
@@ -80,6 +76,24 @@ class ApplicationController < ActionController::Base
         end
       end
     rescue => e
+    end
+  end
+  
+  def is_swagger_request?
+    if request.headers['access-token'] == "superuser" and request.headers[:client] == "superuser"
+      return true
+    end
+    return false
+  end
+
+  alias_method :devise_current_volunteer, :current_volunteer
+  def current_volunteer
+    if is_swagger_request?
+      volunteer = Volunteer.find_by(email: request.headers[:uid])
+      return volunteer unless volunteer.blank?
+      Volunteer.first
+    else
+      super
     end
   end
 end

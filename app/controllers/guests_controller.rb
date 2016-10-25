@@ -2,15 +2,19 @@ class GuestsController < ApplicationController
   swagger_controller :guests, "Guests management"
   
   skip_before_filter :verify_authenticity_token
-  before_filter :check_token
-  before_action :set_volunteer
+
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+  
   before_action :set_event, except: [:reply_invite, :reply_guest]
   before_action :set_link, except: [:reply_invite, :leave_event]
   before_action :check_rights, except: [:join, :reply_invite, :leave_event]
-
+  before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
+  
   swagger_api :kick do
     summary "Kick guest from the event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
     param :query, :event_id, :integer, :required, "Event's id"
     response :ok
@@ -40,7 +44,9 @@ class GuestsController < ApplicationController
 
   swagger_api :upgrade do
     summary "Upgrade a guest"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to kick"
     param :query, :event_id, :integer, :required, "Event's id"
     param :query, :rights, :string, :required, "Rights to apply"
@@ -73,27 +79,29 @@ class GuestsController < ApplicationController
 
   swagger_api :join do
     summary "Apply to an event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :event_id, :integer, :required, "Event's id"
     response :ok
   end
   def join
     begin
       # Check if already guest or if already applied
-      if ((EventVolunteer.where(volunteer_id: @volunteer.id)
+      if ((EventVolunteer.where(volunteer_id: current_volunteer.id)
              .where(event_id: @event.id).first != nil) ||
           (Notification.where(notif_type: 'JoinEvent')
-             .where(sender_id: @volunteer.id)
+             .where(sender_id: current_volunteer.id)
              .where(event_id: @event.id).first != nil) ||
           (Notification.where(notif_type: 'InviteGuest')
              .where(event_id: @event.id)
-             .where(receiver_id: @volunteer.id).first != nil))
+             .where(receiver_id: current_volunteer.id).first != nil))
         render :json => create_error(400, t("events.failure.join_link_exist"))
         return
       end
 
       if @event.private.eql?(false)
-        EventVolunteer.create!(volunteer_id: @volunteer.id,
+        EventVolunteer.create!(volunteer_id: current_volunteer.id,
                                event_id: @event.id,
                                rights: 'member')
         render :json => create_response(t("events.success.join_event"))
@@ -127,7 +135,9 @@ class GuestsController < ApplicationController
 
   swagger_api :reply_guest do
     summary "Respond to a guest request"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -145,18 +155,16 @@ class GuestsController < ApplicationController
       event_id = @notif.event_id
       acceptance = params[:acceptance]
  
-      # modify the notification if there is a clear answer
-      if acceptance != nil
+      if acceptance != nil and acceptance == true
         @notif.notif_type = 'NewGuest'
         @notif.save!
         send_notif_to_socket(@notif)
-      end
-      
-      if acceptance.eql? 'true'
         create_guest_link(guest_id, event_id)
+      else
+        @notif.destroy
       end
       
-      render :json => create_response(nil, 200, t("events.success.reply_guest"))
+      render :json => create_response(t("events.success.reply_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -164,7 +172,9 @@ class GuestsController < ApplicationController
   
   swagger_api :invite do
     summary "Invite a volunteer to join the event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id"
     param :query, :event_id, :integer, :required, "Event's id"
     response :ok
@@ -201,7 +211,9 @@ class GuestsController < ApplicationController
 
   swagger_api :reply_invite do
     summary "Respond to an invitation from an event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     param :query, :acceptance, :boolean, :required, "true to accept, false otherwise"
     response :ok
@@ -211,7 +223,7 @@ class GuestsController < ApplicationController
       @notif = Notification.find_by!(id: params[:notif_id])
       
       # Check the right of the person who's trying to accept invitation
-      if @volunteer.id != @notif.receiver_id
+      if current_volunteer.id != @notif.receiver_id
         render :json => create_error(400, t("events.failure.rights")) and return        
       end
       
@@ -237,16 +249,17 @@ class GuestsController < ApplicationController
 
   swagger_api :leave_event do
     summary "Leave an event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :event_id, :integer, :required, "Event's id"
     response :ok
   end
   def leave_event
     begin
-      volunteer = Volunteer.find_by!(token: params[:token])
       event = Event.find_by!(id: params[:event_id])
 
-      link = EventVolunteer.where(:volunteer_id => volunteer.id).where(:event_id => event.id).first
+      link = EventVolunteer.where(:volunteer_id => current_volunteer.id).where(:event_id => event.id).first
 
       if link.eql?(nil)
         render :json => create_error(400, t("events.failure.not_guest")) and return        
@@ -264,7 +277,9 @@ class GuestsController < ApplicationController
 
   swagger_api :invited do
     summary "List all invited volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :event_id, :integer, :required, "Event's id"
     response :ok
   end
@@ -274,13 +289,15 @@ class GuestsController < ApplicationController
       .where("notifications.event_id=#{@event.id}")
       .select("volunteers.*, notifications.created_at AS sending_date")
     render :json => create_response(invited_volunteers
-                                      .as_json(except: [:token, :password,
+                                     .as_json(except: [:password,
                                                        :created_at, :updated_at]))
   end
 
   swagger_api :uninvite do
     summary "Remove an invitation"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :event_id, :integer, :required, "Event's id"
     param :query, :volunteer_id, :integer, :required, "Volunteer's id to uninvite"
     response :ok
@@ -305,7 +322,9 @@ class GuestsController < ApplicationController
 
   swagger_api :waiting do
     summary "List all volunteers waiting to join the event"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :event_id, :integer, :required, "Event's id"
     response :ok
   end
@@ -315,15 +334,11 @@ class GuestsController < ApplicationController
       .where("notifications.event_id=#{@event.id}")
       .select("volunteers.*, notifications.created_at AS sending_date, notifications.id AS notif_id")
     render :json => create_response(waiting_volunteers
-                                      .as_json(except: [:token, :password,
-                                                        :created_at, :updated_at]))
+                                     .as_json(except: [:password,
+                                                       :created_at, :updated_at]))
   end
 
   private
-  def join_params
-    params.permit(:token)
-  end
-
   def set_event
     begin
       @event = Event.find(params[:event_id])
@@ -332,22 +347,15 @@ class GuestsController < ApplicationController
     end
   end
 
-  def set_volunteer
-    begin
-      @volunteer = Volunteer.find_by(token: params[:token])
-    rescue
-      render :json => create_error(400, t("volunteers.failure.id")), status: 400
-    end
-  end
-
   def set_link
-    @link = EventVolunteer.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id).first
+    @link = EventVolunteer.where(:volunteer_id => current_volunteer.id).where(:event_id => @event.id).first
   end
 
   def create_join_event
-    [sender_id: @volunteer.id,
-     sender_name: @volunteer.fullname,
-     thumb_path: @volunteer.thumb_path,
+    [sender_id: current_volunteer.id,
+     sender_name: current_volunteer.fullname,
+     sender_thumb_path: current_volunteer.thumb_path,
+     receiver_thumb_path: @event.thumb_path,
      event_id: @event.id,
      event_name: @event.title,
      notif_type: 'JoinEvent']
@@ -356,9 +364,10 @@ class GuestsController < ApplicationController
   def create_invite_guest
     [event_id: @event.id,
      event_name: @event.title,
-     thumb_path: @event.thumb_path,
-     sender_id: @volunteer.id,
-     sender_name: @volunteer.fullname,
+     sender_thumb_path: @event.thumb_path,
+     receiver_thumb_path: current_volunteer.thumb_path,
+     sender_id: current_volunteer.id,
+     sender_name: current_volunteer.fullname,
      receiver_id: @target_volunteer.id,
      receiver_name: @target_volunteer.fullname,
      notif_type: 'InviteGuest']

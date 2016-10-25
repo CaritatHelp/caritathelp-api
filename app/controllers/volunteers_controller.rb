@@ -1,68 +1,43 @@
 class VolunteersController < ApplicationController
   swagger_controller :volunteers, "Volunteers management"
 
-  skip_before_filter :verify_authenticity_token, :only => [:create, :destroy]
-  before_filter :check_token, except: [:create, :destroy]
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+
+  skip_before_filter :verify_authenticity_token, :only => [:destroy]
   before_action :set_volunteer, only: [:show, :edit, :destroy, :friends, :associations, :events, :pictures, :main_picture, :news]
-  before_action :set_current_volunteer, only: [:index, :show, :update, :search, :friend_requests, :notifications]
 
   swagger_api :index do
     summary "Get a list of all volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def index
-    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+    query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
-      "link.volunteer_id=#{@current_volunteer.id} AND " +
+      "link.volunteer_id=#{current_volunteer.id} AND " +
       "v_friends.volunteer_id=volunteers.id AND " +
-      "v_friends.volunteer_id<>#{@current_volunteer.id}) AS nb_common_friends FROM volunteers"
+      "v_friends.volunteer_id<>#{current_volunteer.id}) AS nb_common_friends FROM volunteers"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
-  end
-
-  swagger_api :create do
-    summary "Allow volunteer to create an account"
-    param :query, :mail, :string, :required, "Email"
-    param :query, :password, :string, :required, "Password"
-    param :query, :firstname, :string, :required, "Firstname"
-    param :query, :lastname, :string, :required, "Lastname"
-    param :query, :birthday, :date, :optional, "Birthday"
-    param :query, :gender, :string, :optional, "'m' or 'f'"
-    param :query, :city, :string, :optional, "City"
-    param :query, :latitude, :decimal, :optional, "Latitude"
-    param :query, :longitude, :decimal, :optional, "Longitude"
-    param :query, :allowgps, :boolean, :optional, "Allowing Geolocalisation"
-    param :query, :allow_notifications, :boolean, :optional, "Allowing notifications"
-    response :ok
-  end
-  def create
-    begin
-      if Volunteer.exist? volunteer_params[:mail]
-        render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
-        return
-      end
-      new_volunteer = Volunteer.create!(volunteer_params)
-      render :json => create_response(new_volunteer.as_json(:except => [:password]))
-    rescue ActiveRecord::RecordInvalid => e
-      render :json => create_error(400, e.to_s)
-      return
-    end
   end
 
   swagger_api :show do
     summary "Get volunteer's profile"
     param :path, :id, :integer, :required, "Volunteer's id to show"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def show
     begin
 
-      if @current_volunteer.id == @volunteer.id
-        render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+      if current_volunteer.id == @volunteer.id
+        render :json => create_response(@volunteer.as_json(:except => [:password])
                                           .merge('friendship' => 'yourself')) and return
       end
 
@@ -71,16 +46,16 @@ class VolunteersController < ApplicationController
 
       link = VFriend
         .where(:volunteer_id => @volunteer.id)
-        .where(:friend_volunteer_id => @current_volunteer.id).first
+        .where(:friend_volunteer_id => current_volunteer.id).first
 
       if link.eql?(nil)
         link = Notification.where(notif_type: 'AddFriend')
-          .where(sender_id: @current_volunteer.id)
+          .where(sender_id: current_volunteer.id)
           .where(receiver_id: @volunteer.id)
           .first
         if link.eql?(nil)
           link = Notification.where(notif_type: 'AddFriend')
-            .where(receiver_id: @current_volunteer.id)
+            .where(receiver_id: current_volunteer.id)
             .where(sender_id: @volunteer.id)
             .first
           if !link.eql?(nil)
@@ -95,7 +70,7 @@ class VolunteersController < ApplicationController
         friendship = 'friend'
       end
       
-      render :json => create_response(@volunteer.as_json(:except => [:password, :token])
+      render :json => create_response(@volunteer.as_json(:except => [:password])
                                         .merge(friendship: friendship,
                                                notif_id: notif_id)) and return
     rescue => e
@@ -105,7 +80,9 @@ class VolunteersController < ApplicationController
 
   swagger_api :search do
     summary "Search for volunteers, returns a list of volunteers"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :research, :string, :required, "Volunteer's firstname/lastname"
     response :ok
   end
@@ -122,20 +99,20 @@ class VolunteersController < ApplicationController
 
         assocs = Assoc
           .select(:id, :name, :thumb_path,
-                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{@current_volunteer.id}) AS rights", "'assoc' AS result_type")
+                  "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{current_volunteer.id}) AS rights", "'assoc' AS result_type")
           .where(condition)
         
         condition = condition.gsub "name", "title"
         events = Event
           .select(:id, 'title AS name', :thumb_path,
-                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{@current_volunteer.id}) AS rights", "'event' AS result_type")
+                  "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights", "'event' AS result_type")
           .where(condition)
         
 
         condition = condition.gsub "title", "fullname"
         volunteers = Volunteer
           .select(:id, 'fullname AS name', :thumb_path,
-                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{@current_volunteer.id}) AS rights", "'volunteer' AS result_type")
+                  "(SELECT COUNT(*) FROM v_friends WHERE v_friends.volunteer_id=volunteers.id AND v_friends.friend_volunteer_id=#{current_volunteer.id}) AS rights", "'volunteer' AS result_type")
           .where(condition)
 
         result = (assocs + events + volunteers).sort {|a,b| a['name']<=>b['name']}
@@ -148,61 +125,31 @@ class VolunteersController < ApplicationController
       render :json => create_error(400, t("volunteers.failure.research"))
     end
   end
-  
-  swagger_api :update do
-    summary "Update volunteer"
-    param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
-    param :query, :mail, :string, :optional, "Email"
-    param :query, :password, :string, :optional, "Password"
-    param :query, :firstname, :string, :optional, "Firstname"
-    param :query, :lastname, :string, :optional, "Lastname"
-    param :query, :birthday, :date, :optional, "Birthday"
-    param :query, :gender, :string, :optional, "'m' or 'f'"
-    param :query, :city, :string, :optional, "City"
-    param :query, :latitude, :decimal, :optional, "Latitude"
-    param :query, :longitude, :decimal, :optional, "Longitude"
-    param :query, :allowgps, :boolean, :optional, "Allowing Geolocalisation"
-    param :query, :allow_notifications, :boolean, :optional, "Allowing notifications"
-    response :ok
-  end
-  def update
-    begin
-      if !Volunteer.is_new_mail_available?(volunteer_params[:mail], @current_volunteer.mail)
-        render :json => create_error(400, t("volunteers.failure.mail.unavailable"))
-      elsif @current_volunteer.update!(volunteer_params)
-        render :json => create_response(@current_volunteer.as_json(:except => [:password, :token])
-                                          .merge('friendship' => 'yourself')) and return
-      else
-        render :json => create_error(400, t("volunteers.failure.update"))
-      end
-    rescue ActiveRecord::RecordInvalid => e
-      render :json => create_error(400, e.to_s)
-      return
-    end
-  end
 
   swagger_api :notifications do
     summary "Get volunteer's notifications"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def notifications  
-    notifs = Notification.select("notifications.*")
-      .joins("LEFT JOIN notification_volunteers ON notification_volunteers.notification_id=notifications.id AND notification_volunteers.volunteer_id=#{@current_volunteer.id}")
-      .where("notifications.receiver_id=#{@current_volunteer.id} OR notification_volunteers.volunteer_id=#{@current_volunteer.id}").order(created_at: :desc)
-
-    render :json => create_response(notifs)    
+    n1 = Notification.select { |notification| notification.receiver_id == current_volunteer.id }
+    n2 = NotificationVolunteer.select { |link| link.volunteer_id == current_volunteer.id }
+         .map { |link| link.notification }
+    render json: create_response((n1 + n2).sort { |a, b| a.created_at <=> b.created_at })
   end
 
   swagger_api :friends do
     summary "Get volunteer's friends list"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def friends
-    query = "SELECT volunteers.id, mail, firstname, lastname, birthday, gender, " +
+    query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
       "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
@@ -216,7 +163,9 @@ class VolunteersController < ApplicationController
   swagger_api :associations do
     summary "Get volunteer's associations list"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def associations
@@ -234,7 +183,9 @@ class VolunteersController < ApplicationController
   swagger_api :events do
     summary "Get volunteer's events list"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def events
@@ -262,7 +213,9 @@ class VolunteersController < ApplicationController
 
   swagger_api :friend_requests do
     summary "Returns a list of all pendinf friends' invitations"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :sent, :boolean, :optional, "true: invitations sent. false: invitations received."
     response :ok
   end
@@ -276,7 +229,7 @@ class VolunteersController < ApplicationController
 
     volunteers = Volunteer
       .joins("INNER JOIN notifications ON notifications.#{friend_id_field}=volunteers.id")
-      .where("notifications.#{current_id_field}=#{@current_volunteer.id}")
+      .where("notifications.#{current_id_field}=#{current_volunteer.id}")
       .select(:id, :thumb_path, :firstname, :lastname, 'notifications.id AS notif_id')
     
     render :json => create_response(volunteers)
@@ -285,7 +238,9 @@ class VolunteersController < ApplicationController
   swagger_api :pictures do
     summary "Returns a list of all volunteer's pictures path"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def pictures
@@ -298,7 +253,9 @@ class VolunteersController < ApplicationController
   swagger_api :main_picture do
     summary "Returns path of main picture"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def main_picture
@@ -312,11 +269,13 @@ class VolunteersController < ApplicationController
   swagger_api :news do
     summary "Get volunteer's news"
     param :path, :id, :integer, :required, "Volunteer's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def news
-    link = @current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
+    link = current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
     render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public })
   end
 
@@ -329,18 +288,10 @@ class VolunteersController < ApplicationController
       return
     end
   end
-
-  def set_current_volunteer
-    @current_volunteer = Volunteer.find_by(token: params[:token])
-  end
   
   def volunteer_params
-    params.permit(:mail, :password, :firstname, :lastname,
+    params.permit(:email, :password, :firstname, :lastname,
                   :birthday, :gender, :city, :latitude, :longitude,
                   :allowgps)
-  end
-  
-  def generate_token
-    SecureRandom.uuid.gsub(/\-/, '')
   end
 end

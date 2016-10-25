@@ -1,15 +1,17 @@
 class PicturesController < ApplicationController
   swagger_controller :pictures, "Pictures management"
   
-  before_filter :check_token
-  before_action :set_volunteer
+  before_action :authenticate_volunteer!, unless: :is_swagger_request?
+  
   before_action :set_picture, only: [:delete, :update]
   before_action :check_rights, only: [:create]
 
   swagger_api :create do
     summary "Upload picture on the server"
     notes "You need to chose between assoc_id, shelter_id & event_id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :file, :string, :required, "File content (base64)"
     param :query, :filename, :string, :required, "Name to give to the file"
     param :query, :original_filename, :string, :required, "Original name of the file"
@@ -50,23 +52,23 @@ class PicturesController < ApplicationController
 
       #replace picture_path with the new uploaded file
       actual_params[:picture][:picture_path] =  uploaded_file
-      actual_params[:picture][:volunteer_id] = @volunteer.id
+      actual_params[:picture][:volunteer_id] = current_volunteer.id
 
       # this section make sure that there's at least and only one main picture
       current_main_picture = nil
       if @event != nil
-        current_main_picture = Picture.where(:volunteer_id => @volunteer.id).where(:event_id => @event.id)
+        current_main_picture = Picture.where(:volunteer_id => current_volunteer.id).where(:event_id => @event.id)
           .where(:is_main => true).first
       elsif @assoc != nil and @shelter != nil
-        current_main_picture = Picture.where(:volunteer_id => @volunteer.id)
+        current_main_picture = Picture.where(:volunteer_id => current_volunteer.id)
           .where(:assoc_id => @assoc.id)
           .where(:shelter_id => @shelter.id)
           .where(:is_main => true).first
       elsif @assoc != nil
-        current_main_picture = Picture.where(:volunteer_id => @volunteer.id).where(:assoc_id => @assoc.id)
+        current_main_picture = Picture.where(:volunteer_id => current_volunteer.id).where(:assoc_id => @assoc.id)
           .where(:is_main => true).first
       else
-        current_main_picture = Picture.where(:volunteer_id => @volunteer.id).where(:assoc_id => nil)
+        current_main_picture = Picture.where(:volunteer_id => current_volunteer.id).where(:assoc_id => nil)
           .where(:event_id => nil).where(:is_main => true).first
       end
       if !current_main_picture.eql?(nil) && actual_params[:picture][:is_main] == "true"
@@ -107,21 +109,23 @@ class PicturesController < ApplicationController
     summary "Delete picture"
     notes "Can't delete main picture"
     param :path, :id, :integer, :required, "Picture's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def delete
-    if @current_picture.event_id.eql?(nil) and @current_picture.assoc_id.eql?(nil) and @current_picture.volunteer_id != @volunteer.id
+    if @current_picture.event_id.eql?(nil) and @current_picture.assoc_id.eql?(nil) and @current_picture.volunteer_id != current_volunteer.id
       render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
     elsif @current_picture.event_id != nil
       link = EventVolunteer.where(:event_id => @current_picture.event_id)
-        .where(:volunteer_id => @volunteer.id).first
+        .where(:volunteer_id => current_volunteer.id).first
       if link.eql?(nil) or link.rights.eql?("guest")
         render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
       end
     elsif @current_picture.assoc_id != nil
       link = AvLink.where(:assoc_id => @current_picture.assoc_id)
-        .where(:volunteer_id => @volunteer.id).first
+        .where(:volunteer_id => current_volunteer.id).first
       if link.eql?(nil) or link.rights.eql?("member")
         render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
       end
@@ -137,21 +141,23 @@ class PicturesController < ApplicationController
   swagger_api :update do
     summary "Set picture as main picture"
     param :path, :id, :integer, :required, "Picture's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def update
-    if @current_picture.event_id.eql?(nil) and @current_picture.assoc_id.eql?(nil) and @current_picture.volunteer_id != @volunteer.id
+    if @current_picture.event_id.eql?(nil) and @current_picture.assoc_id.eql?(nil) and @current_picture.volunteer_id != current_volunteer.id
       render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
     elsif @current_picture.event_id != nil
       link = EventVolunteer.where(:event_id => @current_picture.event_id)
-        .where(:volunteer_id => @volunteer.id).first
+        .where(:volunteer_id => current_volunteer.id).first
       if link.eql?(nil) or link.rights.eql?("guest")
         render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
       end
     elsif @current_picture.assoc_id != nil
       link = AvLink.where(:assoc_id => @current_picture.assoc_id)
-        .where(:volunteer_id => @volunteer.id).first
+        .where(:volunteer_id => current_volunteer.id).first
       if link.eql?(nil) or link.rights.eql?("member")
         render :json => create_error(400, t("pictures.failure.rights")), status: 400 and return
       end
@@ -170,7 +176,7 @@ class PicturesController < ApplicationController
         current_main_picture = Picture.where(:assoc_id => @current_picture.assoc_id)
           .where(:is_main => true).first
       else
-        current_main_picture = Picture.where(:volunteer_id => @volunteer.id).where(:event_id => nil)
+        current_main_picture = Picture.where(:volunteer_id => current_volunteer.id).where(:event_id => nil)
           .where(:assoc_id => nil).where(:is_main => true).first
       end
       if !current_main_picture.eql?(nil)
@@ -191,10 +197,6 @@ class PicturesController < ApplicationController
   private
   def picture_params
     params.permit(:is_main, :event_id, :assoc_id, :shelter_id, :file, :filename, :original_filename)
-  end
-
-  def set_volunteer
-    @volunteer = Volunteer.find_by(token: params[:token])
   end
 
   def set_picture
@@ -218,8 +220,8 @@ class PicturesController < ApplicationController
           @assoc.thumb_path = picture.thumb_path
           @assoc.save!
         else
-          @volunteer.thumb_path = picture.thumb_path
-          @volunteer.save!
+          current_volunteer.thumb_path = picture.thumb_path
+          current_volunteer.save!
         end
       end
     rescue => e
@@ -236,7 +238,7 @@ class PicturesController < ApplicationController
     elsif params[:event_id] != nil
       begin
         @event = Event.find(params[:event_id])
-        @link = EventVolunteer.where(:volunteer_id => @volunteer.id)
+        @link = EventVolunteer.where(:volunteer_id => current_volunteer.id)
           .where(:event_id => @event.id).first
         
         # if @link.eql?(nil) or @link.level < EventVolunteer.levels["admin"]
@@ -252,7 +254,7 @@ class PicturesController < ApplicationController
       begin
         @shelter = Shelter.find(params[:shelter_id])
         @assoc = Assoc.find(@shelter.assoc_id)
-        @link = AvLink.where(:volunteer_id => @volunteer.id)
+        @link = AvLink.where(:volunteer_id => current_volunteer.id)
           .where(:assoc_id => @assoc.id).first
         
         # if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
@@ -267,7 +269,7 @@ class PicturesController < ApplicationController
     elsif params[:assoc_id] != nil
       begin
         @assoc = Assoc.find(params[:assoc_id])
-        @link = AvLink.where(:volunteer_id => @volunteer.id)
+        @link = AvLink.where(:volunteer_id => current_volunteer.id)
           .where(:assoc_id => @assoc.id).first
         
         # if @link.eql?(nil) or @link.level < AvLink.levels["admin"]

@@ -49,18 +49,20 @@ en:
       
   volunteers:
     failure:
-      mail:
-        unavailable: 'Unavailable mail'
-        invalid: 'Invalid mail'
+      email:
+        unavailable: 'Unavailable email'
+        invalid: 'Invalid email'
 
       rights: 'Permission denied'
       update: 'Could not update profil'
       id: 'Unknown volunteer id'
       research: 'Research field is missing'
       unfriend: 'No such friendship'
+      notification_not_found: 'Could not find notification'
     success:
       deleted: 'Successfuly deleted volunteer'
       unfriend: 'Successfuly deleted friendship'
+      cancel_request: 'Successfuly canceled friendship request'
 
 
   events:
@@ -106,10 +108,13 @@ en:
       replyfriend: 'You successfuly replied to this friend request'
       joinassoc: 'You successfuly applied to this association'
       addmember: 'Member successfuly added'
+      refused_member: 'Member successfuly refused'
       invitemember: 'Member successfuly invited'
       acceptinvite: 'You successfuly answered to the invitation'
 
   news:
+    success:
+      destroyed: 'New successfuly destroyed'
     failure:
       id: 'Unknown new id'
       rights: 'Permission denied'
@@ -153,6 +158,7 @@ en:
       id: 'Unknown chatroom id'
       min_two: "You must be at least 2 to create a chatroom"
       not_found: 'This volunteer is not in the chatroom'
+      unknown_volunteer_id: 'One of the ids you provided is wrong'
 
     success:
       kicked: 'Volunteer has been kicked from chatroom'
@@ -164,9 +170,9 @@ en:
         password:
           wrong: 'Wrong password'
           missing: 'Password is missing'
-        mail:
-          wrong: 'Unknown mail'
-          missing: 'Mail is missing'
+        email:
+          wrong: 'Unknown email'
+          missing: 'Email is missing'
 
   logout:
     success: 'User logged out'

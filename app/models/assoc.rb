@@ -1,10 +1,13 @@
 class Assoc < ActiveRecord::Base
   has_and_belongs_to_many :volunteers, join_table: :av_links
+
   has_many :av_links
 
   has_many :events
   
-  has_many :news, as: :group, class_name: 'New'
+  has_many :news, as: :group, class_name: 'New', dependent: :destroy
+
+  has_many :events
   
   before_create :set_default_picture
 
