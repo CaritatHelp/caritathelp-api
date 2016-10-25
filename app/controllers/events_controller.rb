@@ -277,8 +277,10 @@ class EventsController < ApplicationController
   swagger_api :raise_emergency do
     summary "Raise an emergency to call for volunteers"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
-    param :query, :number_volunteers, :integer, :required, "Number of volunteers you need"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :query, :number_volunteers, :integer, :optional, "Number of volunteers you need"
     param :query, :zone, :integer, :optional, "Size (in km) of the zone, default: 50km"
     response :ok
   end
