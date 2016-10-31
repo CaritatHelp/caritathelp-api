@@ -77,7 +77,7 @@ class MessagesController < ApplicationController
     response :ok
   end
   def index
-    render json: create_response(current_volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname)) })
+    render json: create_response(current_volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), read: chatroom.read_by?(current_volunteer)) })
   end
 
   swagger_api :participants do
@@ -110,6 +110,8 @@ class MessagesController < ApplicationController
                .select("(SELECT volunteers.thumb_path thumb_path FROM volunteers WHERE volunteers.id=messages.volunteer_id)")
                .where(chatroom_id: @chatroom.id)
                .order(created_at: :asc)
+
+    @chatroom.set_as_read_by current_volunteer
 
     render :json => create_response(messages)
   end
@@ -197,6 +199,8 @@ class MessagesController < ApplicationController
       message = Message.create!(:content => params[:content],
                                 :volunteer_id => current_volunteer.id,
                                 :chatroom_id => @chatroom.id)
+      @chatroom.set_as_unread
+      @chatroom.set_as_read_by current_volunteer
       @chatroom.number_messages += 1
       @chatroom.save!
 
