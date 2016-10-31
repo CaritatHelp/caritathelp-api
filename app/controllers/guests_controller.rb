@@ -7,7 +7,7 @@ class GuestsController < ApplicationController
   
   before_action :set_event, except: [:reply_invite, :reply_guest]
   before_action :set_link, except: [:reply_invite, :leave_event]
-  before_action :check_rights, except: [:join, :reply_invite, :leave_event]
+  before_action :check_rights, except: [:join, :reply_invite, :leave_event, :unjoin]
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
   
   swagger_api :kick do
@@ -106,7 +106,7 @@ class GuestsController < ApplicationController
                                rights: 'member')
         render :json => create_response(t("events.success.join_event"))
         return
-      elsif @link != nil
+      elsif @link.blank?
         # create a notification for the event receiving the request
         notif = Notification.create!(create_join_event)
         
@@ -124,7 +124,7 @@ class GuestsController < ApplicationController
         
         send_notif_to_socket(notif[0])
         
-        render :json => create_response(nil, 200, t("events.success.apply_event"))
+        render :json => create_response(nil, 200, t("events.success.apply_event")) and return
       end
 
       render :json => create_error(400, t("events.failure.rights")) and return
@@ -315,6 +315,30 @@ class GuestsController < ApplicationController
       notif.destroy 
       
       render :json => create_response(t("events.success.uninvited"))
+    rescue => e
+      render :json => create_error(400, e.to_s)
+    end
+  end
+
+  swagger_api :unjoin do
+    summary "Cancel a joining request"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :query, :event_id, :integer, :required, "Event's id"
+    response :ok
+  end
+  def unjoin
+    begin
+      notif = current_volunteer.notifications.select(&:is_join_event?).select { |notification| notification.event_id == @event.id }.first
+
+      if notif.blank?
+        render json: create_error(400, t("events.failure.unjoin")) and return
+      end
+
+      notif.destroy
+
+      render json: create_response(t("events.success.unjoin"))
     rescue => e
       render :json => create_error(400, e.to_s)
     end

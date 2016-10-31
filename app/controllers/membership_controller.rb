@@ -8,7 +8,7 @@ class MembershipController < ApplicationController
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
   before_action :set_assoc, except: [:reply_member, :reply_invite]
   before_action :check_target_follower, only: [:kick, :upgrade]
-  before_action :check_rights, except: [:join_assoc, :reply_invite, :reply_member, :leave_assoc]
+  before_action :check_rights, except: [:join_assoc, :reply_invite, :reply_member, :leave_assoc, :unjoin]
 
   swagger_api :kick do
     summary "Kick member"
@@ -112,7 +112,7 @@ class MembershipController < ApplicationController
                                       ])
       end
 
-      send_notif_to_socket(notif[0]) unless Rails.env.test?
+      #send_notif_to_socket(notif[0]) unless Rails.env.test?
       
       render :json => create_response(nil, 200, t("notifications.success.joinassoc"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -298,6 +298,30 @@ class MembershipController < ApplicationController
       notif.destroy 
       
       render :json => create_response(t("assocs.success.uninvited"))
+    rescue => e
+      render :json => create_error(400, e.to_s)
+    end
+  end
+
+  swagger_api :unjoin do
+    summary "Cancel a joining request"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :query, :assoc_id, :integer, :required, "Association's id"
+    response :ok
+  end
+  def unjoin
+    begin
+      notif = current_volunteer.notifications.select(&:is_join_assoc?).select { |notification| notification.assoc_id == @assoc.id }.first
+
+      if notif.blank?
+        render json: create_error(400, t("assocs.failure.unjoin")) and return
+      end
+
+      notif.destroy
+
+      render json: create_response(t("assocs.success.unjoin"))
     rescue => e
       render :json => create_error(400, e.to_s)
     end

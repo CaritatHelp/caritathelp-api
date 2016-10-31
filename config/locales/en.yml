@@ -33,6 +33,7 @@ en:
       id: 'Unknown assoc id'
       rights: 'Permission denied'
       notmember: 'This volunteer is not a member of this association'
+      unjoin: "No joining request pending for this association"
       owner: "You can't leave this association because you are the owner"
       research: 'Research field is missing'
       uninvite: "No such invitation"
@@ -46,6 +47,7 @@ en:
       leaved: 'You successfuly leaved this association'
       deleted: 'You successfuly deleted this association'
       uninvited: "Volunteer successfuly uninvited"
+      unjoin: "You successfuly canceled your joining request"
       
   volunteers:
     failure:
@@ -76,6 +78,7 @@ en:
       host: "You can't leave the event because you are the host"
       research: 'Research field is missing'
       uninvite: "No such invitation"
+      unjoin: "No joining request pending for this event"
 
     success:
       kicked: 'Guest has been kicked'
@@ -88,6 +91,7 @@ en:
       leaved: 'You successfuly leaved this event'
       deleted: 'You successfuly deleted this event'
       uninvited: "Volunteer successfuly uninvited"
+      unjoin: "You successfuly canceled your joining request"
 
   notifications:
     failure:

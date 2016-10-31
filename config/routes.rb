@@ -79,6 +79,7 @@ Rails.application.routes.draw do
     delete '/kick', to: 'membership#kick'
     delete '/leave', to: 'membership#leave_assoc'
     delete '/uninvite', to: 'membership#uninvite'
+    delete '/unjoin', to: 'membership#unjoin'
   end
 
   scope '/volunteers' do
@@ -151,6 +152,7 @@ Rails.application.routes.draw do
     delete '/kick', to: 'guests#kick'    
     delete '/leave', to: 'guests#leave_event'
     delete '/uninvite', to: 'guests#uninvite'
+    delete '/unjoin', to: 'guests#unjoin'
   end
 
   scope '/chatrooms' do
