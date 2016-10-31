@@ -162,6 +162,7 @@ Rails.application.routes.draw do
     get '/:id', to: 'messages#show'
     get '/:id/volunteers', to: 'messages#participants'
 
+    put '/:id', to: 'messages#update'
     put '/:id/set_name', to: 'messages#set_name'
     put '/:id/add_volunteers', to: 'messages#add_volunteers'
     put '/:id/new_message', to: 'messages#new_message'

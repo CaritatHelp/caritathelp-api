@@ -133,43 +133,51 @@ class MessagesController < ApplicationController
     end
   end
 
-  swagger_api :add_volunteers do
-    summary "Add volunteers to the chatroom"
+  swagger_api :update do
+    summary "Add volunteers to the chatroom and/or rename it"
     param :path, :id, :integer, :required, "Chatroom's id"
     param :header, 'access-token', :string, :required, "Access token"
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
-    param :form, 'volunteers[]', :string, :required, "Volunteers' ids to add"
+    param :form, 'volunteers[]', :string, :optional, "Volunteers' ids to add"
+    param :form, 'name', :string, :optional, "Chatroom's new name"
     response :ok
   end
-  def add_volunteers
+  def update
     begin
-      volunteers_params = params[:volunteers]
-      
-      # handle passing params has volunteers[]=[1, 2, 3] and volunteers[]=1&volunteers[]=2
-      # cannot JSON.parse a string of length <= 1
-      if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
-        volunteers_params = JSON.parse(volunteers_params.first)
+      if params[:name].present?
+        @chatroom.name = params[:name]
       end
 
-      volunteers_params.each do |volunteer_id|
-        # check if the volunteer is not already in the chatroom
-        volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)          
+      if params[:volunteers].present?
+        volunteers_params = params[:volunteers]
         
-        if volunteer_to_add.blank?
-          render :json => create_error(400, t("chatrooms.failure.unknown_volunteer_id")) and return
+        # handle passing params has volunteers[]=[1, 2, 3] and volunteers[]=1&volunteers[]=2
+        # cannot JSON.parse a string of length <= 1
+        if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
+          volunteers_params = JSON.parse(volunteers_params.first)
+        end
+
+        volunteers_params.each do |volunteer_id|
+          # check if the volunteer is not already in the chatroom
+          volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)          
+          
+          if volunteer_to_add.blank?
+            render :json => create_error(400, t("chatrooms.failure.unknown_volunteer_id")) and return
+          end
+          
+          unless @chatroom.volunteers.include?(volunteer_to_add)
+            @chatroom.chatroom_volunteers.build(volunteer: volunteer_to_add)
+            @chatroom.number_volunteers += 1
+          end
         end
         
-        unless @chatroom.volunteers.include?(volunteer_to_add)
-          @chatroom.chatroom_volunteers.build(volunteer: volunteer_to_add)
-          @chatroom.number_volunteers += 1
-        end
+        @chatroom.is_private = false
       end
-      
-      @chatroom.is_private = false
+
       @chatroom.save!
 
-      render :json => create_response(@chatroom.volunteers.map { |volunteer| volunteer.fullname }) and return
+      render :json => create_response(@chatroom.attributes.merge(volunteers: @chatroom.volunteers.map(&:fullname))) and return
     rescue => e
       render :json => create_error(400, e.to_s) and return
     end
