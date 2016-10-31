@@ -326,20 +326,20 @@ class MessagesController < ApplicationController
         sender_id: volunteer.id,
         sender_firstname: volunteer.firstname,
         sender_lastname: volunteer.lastname,
-        sender_thumb_path: vounteer.thumb_path,
+        sender_thumb_path: volunteer.thumb_path,
         content: message['content'],
         created_at: message['created_at'],
         concerned_volunteers: concerned_volunteers
       }.to_json
 
-      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" +
-                                        Rails.application.config.port_websocket.to_s) do |ws|
+      WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip) do |ws|
         ws.on :open do
           ws.send(json_msg)
           ws.close
         end
       end
-    rescue
+    rescue => e
+      p e
     end
   end
 
