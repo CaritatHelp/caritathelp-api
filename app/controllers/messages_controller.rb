@@ -120,6 +120,7 @@ class MessagesController < ApplicationController
     param :header, 'access-token', :string, :required, "Access token"
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :form, :name, :string, :required, "Chatroom's new name"
     response :ok
   end
   def set_name
