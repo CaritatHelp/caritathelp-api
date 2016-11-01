@@ -23,4 +23,10 @@ class Chatroom < ActiveRecord::Base
   		link.save
   	end
   end
+
+  def default_name volunteer
+    names = self.volunteers.map(&:firstname)
+    names.delete_at(names.find_index(volunteer.firstname))
+    names.join(", ")
+  end
 end

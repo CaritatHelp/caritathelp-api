@@ -60,6 +60,7 @@ class MessagesController < ApplicationController
         volunteers.each do |volunteer|
           ChatroomVolunteer.create!(chatroom_id: new_chatroom.id, volunteer_id: volunteer.id)
         end
+        new_chatroom.name = new_chatroom.default_name(current_volunteer) if new_chatroom.name.blank?
         render :json => create_response(new_chatroom) and return
       else
         render :json => create_error(400, new_chatroom.errors) and return
@@ -77,7 +78,13 @@ class MessagesController < ApplicationController
     response :ok
   end
   def index
-    render json: create_response(current_volunteer.chatrooms.order(updated_at: :desc).map { |chatroom| chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), read: chatroom.read_by?(current_volunteer)) })
+    render json: create_response(current_volunteer.chatrooms.order(updated_at: :desc).map { |chatroom|
+      if chatroom.name.present?
+        chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), read: chatroom.read_by?(current_volunteer)) 
+      else
+        chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), name: chatroom.default_name(current_volunteer), read: chatroom.read_by?(current_volunteer)) 
+      end
+    })
   end
 
   swagger_api :participants do
@@ -129,6 +136,7 @@ class MessagesController < ApplicationController
     begin
       @chatroom.name = params[:name]
       @chatroom.save!
+      @chatroom.name = @chatroom.default_name(current_volunteer) if @chatroom.name.blank?
       render :json => create_response(@chatroom) and return
     rescue => e
       render :json => create_error(400, e.to_s) and return      
@@ -178,6 +186,8 @@ class MessagesController < ApplicationController
       end
 
       @chatroom.save!
+
+      @chatroom.name = @chatroom.default_name(current_volunteer) if @chatroom.name.blank?
 
       render :json => create_response(@chatroom.attributes.merge(volunteers: @chatroom.volunteers.map(&:fullname))) and return
     rescue => e
