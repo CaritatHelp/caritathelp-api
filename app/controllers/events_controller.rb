@@ -297,7 +297,7 @@ class EventsController < ApplicationController
       send_notif_to_socket(notification) unless Rails.env.test?
     end
     
-    render json: volunteers
+    render json: create_response(volunteers)
   end
   
   private
