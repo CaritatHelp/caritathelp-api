@@ -336,6 +336,7 @@ class MessagesController < ApplicationController
         created_at: message['created_at'],
         updated_at: message['updated_at'],
         fullname: volunteer.fullname,
+        thumb_path: volunteer.thumb_path,
         volunteer_id: volunteer.id,
         id: message['id'],
         token: ENV['SEND_MSG_CARITATHELP'],
