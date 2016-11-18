@@ -77,15 +77,12 @@ class AssocsController < ApplicationController
     response 400
   end
   def show
-    p "$$$"
-    p current_volunteer
-    p "$$$"
     if current_volunteer.blank?
-      render json: create_response(@assoc) and return
+      render json: create_response(@assoc.as_json.merge(shelters: @assoc.shelters.count)) and return
     end
     link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
     if link != nil
-      render :json => create_response(@assoc.as_json.merge('rights' => link.rights)) and return
+      render :json => create_response(@assoc.as_json.merge(rights: link.rights, shelters: @assoc.shelters.count)) and return
     end
     rights = nil
 
@@ -101,7 +98,7 @@ class AssocsController < ApplicationController
       rights = 'waiting'
     end
     
-    render :json => create_response(@assoc.as_json.merge('rights' => rights)) and return
+    render :json => create_response(@assoc.as_json.merge(rights: rights, shelters: @assoc.shelters.count)) and return
   end
 
   swagger_api :members do

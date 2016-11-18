@@ -1,6 +1,8 @@
 class Shelter < ActiveRecord::Base
   serialize :tags, Array
 
+  belongs_to :assoc
+
   before_create :set_default_picture
   
   validates :name, presence: true, :on => :create
