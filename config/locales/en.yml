@@ -79,6 +79,7 @@ en:
       research: 'Research field is missing'
       uninvite: "No such invitation"
       unjoin: "No joining request pending for this event"
+      no_position: "Event must be located (latitude/longitude) to raise an emergency"
 
     success:
       kicked: 'Guest has been kicked'

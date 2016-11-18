@@ -283,18 +283,22 @@ class EventsController < ApplicationController
     param :query, :number_volunteers, :integer, :optional, "Number of volunteers you need"
     param :query, :zone, :integer, :optional, "Size (in km) of the zone, default: 50km"
     response :ok
+    response 400, "Event must be located (latitude/longitude) to raise an emergency"
   end
   def raise_emergency
     zone = 50.to_f
     zone = params[:zone].to_f if params[:zone].present?
 
+    if @event.latitude.blank? or @event.longitude.blank?
+      render json: create_error(400, t("events.failure.no_position")) and return
+    end
     volunteers = @event.assoc.volunteers.select { |volunteer|
       volunteer.allowgps and volunteer.distance_from_event_in_km(@event) < zone
     }
 
     volunteers.each do |volunteer|
       notification = Notification.create(create_emergency_notification(volunteer))
-      send_notif_to_socket(notification) unless Rails.env.test?
+      # send_notif_to_socket(notification) unless Rails.env.test?
     end
     
     render json: create_response(volunteers)
