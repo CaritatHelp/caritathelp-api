@@ -41,4 +41,12 @@ class Notification < ActiveRecord::Base
   def is_emergency?
     self.notif_type == "Emergency"
   end
+
+  def accepted_emergency?
+    self.notif_type == "AcceptedEmergency"
+  end
+
+  def refused_emergency?
+    self.notif_type == "RefusedEmergency"
+  end
 end

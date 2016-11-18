@@ -7,7 +7,7 @@ class EventsController < ApplicationController
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
   
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency]
   before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete, :raise_emergency]
@@ -293,7 +293,7 @@ class EventsController < ApplicationController
       render json: create_error(400, t("events.failure.no_position")) and return
     end
     volunteers = @event.assoc.volunteers.select { |volunteer|
-      volunteer.allowgps and volunteer.distance_from_event_in_km(@event) < zone
+      volunteer.allowgps and volunteer.distance_from_event_in_km(@event) < zone and @event.volunteers.exclude? volunteer
     }
 
     volunteers.each do |volunteer|
@@ -304,6 +304,20 @@ class EventsController < ApplicationController
     render json: create_response(volunteers)
   end
   
+  swagger_api :volunteers_from_emergency do
+    summary "Returns a list of volunteers who accepted to join the event from emergency"
+    param :path, :id, :integer, :required, "Event's id"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    response :ok
+  end
+  def volunteers_from_emergency
+    render json: create_response(Notification.select(&:accepted_emergency?).select { |notif|
+                                  notif.accepted_emergency? and notif.sender_id == @event.id
+                                }.map { |notif| Volunteer.find(notif.receiver_id) })
+  end
+
   private
   def set_event
     begin

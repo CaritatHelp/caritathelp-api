@@ -98,6 +98,7 @@ en:
     failure:
       id: "Unknown notification id"
       rights: 'Permission denied'
+      reply_emergency: 'An error occured while replying to emergency'
       addfriend:
         self: 'Cannot add yourself as friend'
         exist: "Already friend"
@@ -109,6 +110,7 @@ en:
         exist: 'This volunteer already applied or received an invitation'
         
     success:
+      reply_emergency: 'You successfuly replied to this emergency'
       invitefriend: 'You successfuly sent a friend request'
       replyfriend: 'You successfuly replied to this friend request'
       joinassoc: 'You successfuly applied to this association'

@@ -25,6 +25,7 @@ Rails.application.routes.draw do
 
   scope 'notifications' do
     put '/:id/read', to: 'notifications#read'
+    put '/:id/reply_emergency', to: 'notifications#reply_emergency'
   end
 
   scope '/news' do
@@ -130,6 +131,8 @@ Rails.application.routes.draw do
     get '/:id/main_picture', to: 'events#main_picture'
     get '/:id/news', to: 'events#news'
     get '/:id/invitable_volunteers', to: 'events#invitable_volunteers'
+    get '/:id/volunteers_from_emergency', to: 'events#volunteers_from_emergency'
+
     
     post '/', to: 'events#create'
     post '/:id/raise_emergency', to: 'events#raise_emergency'
