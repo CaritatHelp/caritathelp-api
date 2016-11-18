@@ -1,12 +1,12 @@
 class AssocsController < ApplicationController
   swagger_controller :assocs, "Associations management"
   
-  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture],
+  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture, :shelters],
                 unless: :is_swagger_request?
   before_action :authenticate_volunteer_if_needed,
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
   
-  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers]
+  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers, :shelters]
   before_action :set_link, only: [:update, :delete, :events]
   before_action :check_block, only: [:edit, :update, :notifications, :members, :events, :delete, :news]
   before_action :check_rights, only: [:update, :delete]
@@ -274,6 +274,16 @@ class AssocsController < ApplicationController
   def news
     rights = current_volunteer.av_links.find_by(assoc_id: @assoc.id).try(:level)
     render json: create_response(@assoc.news.select { |new| (new.private and rights.present? and rights >= AvLink.levels["member"]) or new.public })
+  end
+
+  swagger_api :shelters do
+    summary "Returns association's shelters"
+    param :path, :id, :integer, :required, "Association's id"
+    response :ok
+    response 400
+  end  
+  def shelters
+    render json: create_response(@assoc.shelters)
   end
 
   private

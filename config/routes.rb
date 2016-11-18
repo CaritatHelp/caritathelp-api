@@ -108,6 +108,7 @@ Rails.application.routes.draw do
     get '/:id/main_picture', to: 'assocs#main_picture'
     get '/:id/news', to: 'assocs#news'
     get '/:id/invitable_volunteers', to: 'assocs#invitable_volunteers'
+    get '/:id/shelters', to: 'assocs#shelters'
 
     post '/', to: 'assocs#create'
 
