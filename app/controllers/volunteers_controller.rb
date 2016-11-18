@@ -150,7 +150,7 @@ class VolunteersController < ApplicationController
   end
   def friends
     query = "SELECT volunteers.id, email, firstname, lastname, birthday, gender, " +
-      "city, latitude, longitude, allowgps, allow_notifications, thumb_path, " +
+      "city, latitude, longitude, allowgps, allow_notifications, thumb_path, fullname, " +
       "(SELECT COUNT(*) FROM v_friends AS link INNER JOIN v_friends " +
       "ON link.friend_volunteer_id=v_friends.friend_volunteer_id WHERE " +
       "link.volunteer_id=#{@volunteer.id} AND " +
