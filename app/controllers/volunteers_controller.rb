@@ -230,7 +230,7 @@ class VolunteersController < ApplicationController
     volunteers = Volunteer
       .joins("INNER JOIN notifications ON notifications.#{friend_id_field}=volunteers.id")
       .where("notifications.#{current_id_field}=#{current_volunteer.id}")
-      .select(:id, :thumb_path, :firstname, :lastname, 'notifications.id AS notif_id')
+      .select(:id, :thumb_path, :firstname, :lastname, :fullname, 'notifications.id AS notif_id')
     
     render :json => create_response(volunteers)
   end
