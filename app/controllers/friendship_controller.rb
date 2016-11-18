@@ -90,7 +90,7 @@ class FriendshipController < ApplicationController
   end
   def remove
     begin
-      @friend = Volunteer.find_by!(id: params[:id])
+      @friend = Volunteer.find_by!(id: params[:volunteer_id])
 
       link1 = VFriend.where(volunteer_id: current_volunteer.id)
         .where(friend_volunteer_id: @friend.id).first 
