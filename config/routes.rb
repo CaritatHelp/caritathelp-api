@@ -4,12 +4,6 @@ Rails.application.routes.draw do
                                 sessions: 'sessions',
                                 passwords: 'passwords'}
   
-  get 'pictures/create'
-
-  get 'pictures/delete'
-
-  get 'pictures/update'
-
   scope '/' do
     get '/search', to: 'volunteers#search'
     get '/friend_requests', to: 'volunteers#friend_requests'
@@ -23,6 +17,14 @@ Rails.application.routes.draw do
     put '/block', to: 'followers#block'
   end
 
+  scope 'pictures' do
+    post '/', to: 'pictures#create'
+    
+    put '/:id', to: 'pictures#update'
+    
+    delete '/:id', to: 'pictures#delete'
+  end
+  
   scope 'notifications' do
     put '/:id/read', to: 'notifications#read'
     put '/:id/reply_emergency', to: 'notifications#reply_emergency'
