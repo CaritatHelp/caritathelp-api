@@ -111,7 +111,7 @@ class AssocsController < ApplicationController
     response 400
   end
   def members
-    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.email, volunteers.thumb_path, av_links.rights"
+    query = "volunteers.id, volunteers.firstname, volunteers.lastname, volunteers.fullname, volunteers.email, volunteers.thumb_path, av_links.rights"
     render :json => create_response(Volunteer.joins(:av_links)
                                       .where(av_links: { assoc_id: @assoc.id })
                                       .select(query).limit(100))

@@ -136,7 +136,7 @@ class FriendshipController < ApplicationController
   end
   def received_invitations
     volunteers = Volunteer
-                 .select(:id, :firstname, :lastname, :city, :thumb_path)
+                 .select(:id, :firstname, :lastname, :fullname, :city, :thumb_path)
                  .joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
                  .select("notifications.id AS notif_id")
                  .where("notifications.receiver_id=#{current_volunteer.id}")
