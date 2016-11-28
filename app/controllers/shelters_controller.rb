@@ -112,7 +112,7 @@ class SheltersController < ApplicationController
         .where(:city => @shelter.city)
         .where(:address => @shelter.address)
         .first
-      if existing_shelter.present?
+      if existing_shelter.present? and existing_shelter.id != @shelter.id
         render :json => create_error(400, t("shelters.failure.name")) and return        
       end
       @shelter.update!(shelter_params)
