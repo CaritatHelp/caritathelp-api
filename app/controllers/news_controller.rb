@@ -84,7 +84,9 @@ class NewsController < ApplicationController
   swagger_api :update do
     summary "Update new"
     param :path, :id, :integer, :required, "New's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :title, :string, :optional, "New's title"
     param :query, :content, :string, :optional, "New's content"
     param :query, :private, :boolean, :optional, "New's privacy"
@@ -105,7 +107,9 @@ class NewsController < ApplicationController
   swagger_api :destroy do
     summary "Destroy new"
     param :path, :id, :integer, :required, "New's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def destroy
