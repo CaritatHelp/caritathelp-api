@@ -137,7 +137,7 @@ class VolunteersController < ApplicationController
     n1 = Notification.select { |notification| notification.receiver_id == current_volunteer.id }
     n2 = NotificationVolunteer.select { |link| link.volunteer_id == current_volunteer.id }
          .map { |link| link.notification }
-    render json: create_response((n1 + n2).sort { |a, b| a.created_at <=> b.created_at })
+    render json: create_response((n1 + n2).sort { |a, b| b.created_at <=> a.created_at })
   end
 
   swagger_api :friends do

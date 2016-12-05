@@ -213,6 +213,13 @@ Shelter.create([name: 'Oyé logement', address: 'Rue du swag',
 
 # Notifications
 
+Notification.create(sender_id: robin[:id], sender_name: robin[:fullname], sender_thumb_path: robin[:thumb_path],
+                    receiver_id: jerome[:id], receiver_name: jerome[:fullname], receiver_thumb_path: jerome[:thumb_path],
+                    notif_type: "AddFriend")
+Notification.create(sender_id: pierre[:id], sender_name: pierre[:fullname], sender_thumb_path: pierre[:thumb_path],
+                    receiver_id: jerome[:id], receiver_name: jerome[:fullname], receiver_thumb_path: jerome[:thumb_path],
+                    notif_type: "AddFriend")
+
 # News
 
 news1 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Aujourd'hui nous comme venu en aide à 3000 personnes")
