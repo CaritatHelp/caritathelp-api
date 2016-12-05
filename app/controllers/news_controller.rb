@@ -19,7 +19,7 @@ class NewsController < ApplicationController
     assocs_news = current_volunteer.assocs.map { |assoc| assoc.news.select{ |new| (new.private and current_volunteer.av_links.find_by(assoc_id: assoc.id).level >= AvLink.levels["member"]) or new.public } }.flatten
     events_news = current_volunteer.events.map { |event| event.news.select { |new| (new.private and current_volunteer.event_volunteers.find_by(event_id: event.id).level >= EventVolunteer.levels["member"]) or new.public} }.flatten
 
-    render json: create_response((volunteer_news + friends_news + assocs_news + events_news).sort{ |a, b| b.updated_at <=> a.updated_at })
+    render json: create_response((volunteer_news + friends_news + assocs_news + events_news).sort{ |a, b| b.updated_at <=> a.updated_at }.uniq)
   end
 
   swagger_api :wall_message do
