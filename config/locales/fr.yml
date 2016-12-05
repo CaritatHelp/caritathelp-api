@@ -1,52 +1,238 @@
 fr:
   token:
-    wrong: "Mauvais token"
+    wrong: 'Mauvais token'
 
   assocs:
     failure:
       name:
-        unavailable: "Ce nom n'est pas disponible"
-        invalid: "Ce nom n'est pas valide"
+        unavailable: 'Nom indisponible'
+        invalid: 'Nom invalide'
 
-        update: "Erreur lors de la modification de l'association"
-        id: "Id d'association inconnu"
-        rights: "Permission refusée"
+      update: "Une erreur est survenue lors de la mise à jour de l'association"
+      id: 'Association introuvable'
+      rights: "Vous n'avez pas les droits nécessaires"
+      notmember: "Ce bénévole n'est pas membre de l'association"
+      unjoin: "Aucune requête pour joindre l'assocation trouvée"
+      owner: "Vous ne pouvez quitter une association dont vous être le propriétaire"
+      research: "Recherche manquante"
+      uninvite: "Invitation introuvable"
+      follower: "Opération interdite sur un follower"
+      blocked: "Ce bénévole à été bloqué"
 
     success:
-      deleted: "Association supprimée"
-
+      deleted: "L'association a été supprimée"
+      kicked: "Le membre a été renvoyé"
+      upgraded: "Le membre a été promu"
+      leaved: "Vous avez quitté l'association"
+      uninvited: "Invitation annulée"
+      unjoin: "Demande d'invitation annulée"
+      
   volunteers:
     failure:
       email:
-        unavailable: "Ce email n'est pas disponible"
-        invalid: "Ce email n'est pas valide"
+        unavailable: 'Email indisponible'
+        invalid: 'Email invalide'
 
-      update: "Erreur lors de la modification du profil"
-      id: "Id de bénévole inconnu"
+      rights: "Vous n'avez pas les droits nécessaires"
+      update: "Une erreur est survenue lors de la mise à jour du profil"
+      id: "Bénévole introuvable"
+      research: "Recherche manquante"
+      unfriend: "Lien d'amitié introuvable"
+      notification_not_found: "Notification introuvable"
+    success:
+      deleted: "Le bénévole a été supprimé"
+      unfriend: "Ami supprimé"
+      cancel_request: "Demande d'ami supprimée"
+
+
+  events:
+    failure:
+      id: "Evenement introuvable"
+      rights: "Vous n'avez pas les droits nécessaires"
+      wrong_assoc: "Association introuvable"
+      not_guest: "Ce bénévole n'est pas membre de l'événement"
+      join_link_exist: "Vous avez déjà demandé ou reçu une invitation pour cet événement"
+      invite_link_exist: "Ce bénévole a déjà demandé ou reçu une invitation"
+      host: "Vous ne pouvez quitter un événement dont vous êtes le propriétaire"
+      research: "Recherche manquante"
+      uninvite: "Invitation introuvable"
+      unjoin: "Aucune requête pour joindre l'événement trouvée"
+      no_position: "L'événement doit être localisé (latitude/longitude) pour pouvoir lancer une alerte"
 
     success:
-      deleted: "Bénévole supprimé"
+      kicked: "L'invité a été supprimé"
+      upgraded: "L'invité a été promu"
+      join_event: "Vous avez rejoint l'événement"
+      apply_event: "Demande d'invitation envoyée"
+      reply_guest: "Réponse enregistrée"
+      invite_guest: "Le bénévole a été invité"
+      reply_invite: "Réponse enregistrée"
+      leaved: "Vous avez quitté l'événement"
+      deleted: "Evénement supprimé"
+      uninvited: "Invitation annulée"
+      unjoin: "Demande d'invitation annulée"
 
   notifications:
     failure:
+      id: "Notification introuvable"
+      rights: "Vous n'avez pas les droits nécessaires"
+      reply_emergency: "Une erreur s'est produite lors de la réponse à l'urgence"
       addfriend:
-        self: "Impossible de s'ajouter sois-même en ami"
-      responsefriend:
-        right: "Permission refusée"
+        self: "Vous ne pouvez pas vous ajouter vous-même en ami"
+        exist: "Vous êtes déjà amis"
+        pending_invitation: "Une invitation a déjà été envoyée"
+        error: "Vous ne pouvez pas faire ça"
+      joinassoc:
+        exist: "Vous avez déjà envoyé une demande ou reçu une invitation"
+      invitemember:
+        exist: "Ce bénévole a déjà envoyé une demande ou reçu une invitation"
+        
+    success:
+      reply_emergency: "Vous avez bien répondu à l'urgence"
+      invitefriend: "Demande d'ami envoyée"
+      replyfriend: "Vous avez bien répondu à cette demande d'ami"
+      joinassoc: "Demande d'invitation envoyée"
+      addmember: "Le bénévole a été ajouté"
+      refused_member: "Le bénévole a été refusé"
+      invitemember: "Invitation envoyée"
+      acceptinvite: "Vous avez bien répondu à l'invitation"
+
+  news:
+    success:
+      destroyed: "Actualité supprimée"
+    failure:
+      id: "Actualité introuvable"
+      rights: "Vous n'avez pas les droits nécessaires"
+      args: "Vous devez spécifier soit un friend_id, soit un assoc_id soit un event_id"
+
+  comments:
+    failure:
+      id: "Commentaire introuvable"
+      rights: "Vous n'avez pas les droits nécessaires"
+
+    success:
+      deleted: "Commentaire supprimé"
+
+  follower:
+    success:
+      following: "Vous suivez désormais cette association"
+      unfollowing: "Vous ne suivez plus cette association"
+      blocked: "Vous avez bloqué ce bénévole"
+
+    failure:
+      blocked: "Vous avez été bloqué par cette association"
+      target_blocked: "Ce bénévole est déjà bloqué"
+      exists: "Vous suivez déjà cette association"
+      nil: "Vous ne suivez pas cette association"
+      target_nil: "Ce bénévole de suit pas l'association"
+      high_level: "Vous êtes membre, pour arrêter de suivre l'association, veuillez la quitter"
+      target_high_level: "Ce bénévole est membre, veuillez le supprimer de l'association avant de le bloquer"
+      rights: "Vous n'avez pas les droits nécessaires"
+
+  messages:
+    failure:
+      id: "Message introuvable"
+      rights: "Vous n'avez pas les droits nécessaires"
+
+    success:
+      deleted: "Message supprimé"
+
+  chatrooms:
+    failure:
+      rights: "Vous n'avez pas les droits nécessaires"
+      id: 'Discussion introuvable'
+      min_two: "Vous devez être au moins deux pour créer une discussion"
+      not_found: "Ce bénévole n'est pas dans la discussion"
+      unknown_volunteer_id: "Un des bénévoles est introuvable"
+
+    success:
+      kicked: "Vous avez supprimé ce bénévole de la discussion"
+      leave: "Vous avez quitté la discussion"
 
   login:
     failure:
       params:
         password:
-          wrong: "Mauvais mot de passe"
-          missing: "Mot de passe manquant"
+          wrong: "Mot de passe incorrect"
+          missing: "Mot de passe requis"
         email:
           wrong: "Email inconnu"
-          missing: "Email manquant"
+          missing: "Email requis"
 
   logout:
-    success: "L'utilisateur s'est deconnecté"
+    success: "Déconnexion réussie"
+
+  pictures:
+    failure:
+      id: "Image introuvable"
+      is_main: "Une erreur s'est produite, veuillez recommencer plus tard"
+      not_deleted: "Vous ne pouvez pas supprimer l'image principale"
+      rights: "Vous n'avez pas les droits nécessaires"
+      specify: "Veuillez spécifier soit event_id soit assoc_id"
+
+    success:
+      deleted: "Image supprimée"
+
+  shelters:
+    failure:
+      exist: "Cet hébergement existe déjà"
+      id: "Hébergement introuvable"
+      name: "Nom indisponible, un hébergement a déjà le même nom à la même adresse"
+      research: "Recherche manquante"
+
+    success:
+      deleted: "Hébergement supprimé"
 
   doc:
     url: "Adresse introuvable"
-    response: "Voir documentation: /swagger/index"
+    response: 'Voir la documentation: /swagger/index'
+
+# Devise token auth fr
+  devise_token_auth:
+    sessions:
+      not_confirmed: "Un e-mail de confirmation de votre compte a été envoyé à '%{email}'. Merci de suivre les instructions afin de valider votre compte"
+      bad_credentials: "Mot de passe ou identifiant invalide."
+      not_supported: "Utilisez POST /sign_in pour la connexion. GET n'est pas supporté."
+      user_not_found: "L'utilisateur est inconnu ou n'est pas connecté."
+    token_validations:
+      invalid: "Mot de passe ou identifiant invalide."
+    registrations:
+      missing_confirm_success_url: "Le paramètre 'confirm_success_url' est manquant."
+      redirect_url_not_allowed: "Redirection vers '%{redirect_url}' n'est pas autorisée."
+      email_already_exists: "Un compte existe déjà avec l'adresse e-mail suivante '%{email}'"
+      account_with_uid_destroyed: "Le compte avec l'identifiant '%{uid}' a été supprimé."
+      account_to_destroy_not_found: "Le compte à supprimer est introuvable."
+      user_not_found: "Utilisateur introuvable."
+    passwords:
+      missing_email: "Vous devez soumettre un e-mail."
+      missing_redirect_url: "URL de redirection manquante."
+      not_allowed_redirect_url: "Redirection vers '%{redirect_url}' n'est pas autorisée."
+      sended: "Un e-mail a été envoyé à '%{email}' avec les instructions de réinitialisation du mot de passe."
+      user_not_found: "Impossible de trouver l'utilisateur avec l'adresse e-mail suivante '%{email}'."
+      password_not_required: "Ce compte ne demande pas de mot de passe. Connectez vous en utilisant '%{provider}'."
+      missing_passwords: "Vous devez remplir les champs 'Mot de passe' et 'Confirmation de mot de passe'."
+      successfully_updated: "Votre mot de passe a été correctement mis à jour."
+  errors:
+    messages:
+      validate_sign_up_params: "Les données d'inscription dans le corps de la requête ne sont pas valides."
+      validate_account_update_params: "Les données de mise à jour dans le corps de la requête ne sont pas valides."
+      not_email: "n'est pas une adresse e-mail"
+  devise:
+    mailer:
+      confirmation_instructions:
+        subject: "Instructions de confirmation"
+        confirm_link_msg: "Vous pouvez confirmer votre compte e-mail via le lien ci-dessous :"
+        confirm_account_link: "Confirmer mon compte"
+      reset_password_instructions:
+        subject: "Instructions de récupération de mot de passe"
+        request_reset_link_msg: "Quelqu'un a demandé un lien pour changer votre mot de passe. Pour procéder ainsi, suivez le lien ci-dessous."
+        password_change_link: "Changer mon mot de passe"
+        ignore_mail_msg: "Si vous n'avez pas demandé cela, veuillez ignorer cet e-mail."
+        no_changes_msg: "Votre mot de passe ne changera pas tant que vous n'accédez pas au lien ci-dessus pour en créer un nouveau."
+      unlock_instructions:
+        subject: "Instructions de déblocage"
+        account_lock_msg: "Votre compte a été bloqué en raison de nombreuses tentatives de connexion erronées."
+        unlock_link_msg: "Cliquez sur le lien ci-dessous pour déverrouiller votre compte:"
+        unlock_link: "Déverrouiller mon compte"
+  hello: "bonjour"
+welcome: "bienvenue"
