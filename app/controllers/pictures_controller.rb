@@ -12,13 +12,12 @@ class PicturesController < ApplicationController
     param :header, 'access-token', :string, :required, "Access token"
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
-    param :query, :file, :string, :required, "File content (base64)"
-    param :query, :filename, :string, :required, "Name to give to the file"
-    param :query, :original_filename, :string, :required, "Original name of the file"
-    param :query, :assoc_id, :integer, :optional, "Assoc's id"
-    param :query, :shelter_id, :integer, :optional, "Shelter's id"
-    param :query, :event_id, :integer, :optional, "Event's id"
-    param :query, :is_main, :boolean, :optional, "true to make it the main picture"
+    param :form, :file, :string, :required, "File content (base64)"
+    param :form, :filename, :string, :required, "Name to give to the file"
+    param :form, :original_filename, :string, :required, "Original name of the file"
+    param :form, :assoc_id, :integer, :optional, "Assoc's id"
+    param :form, :event_id, :integer, :optional, "Event's id"
+    param :form, :is_main, :boolean, :optional, "true to make it the main picture"
     response :ok
   end
   def create

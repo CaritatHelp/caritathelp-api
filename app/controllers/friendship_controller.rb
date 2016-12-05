@@ -111,12 +111,13 @@ class FriendshipController < ApplicationController
 
   swagger_api :cancel_request do
     summary "Cancel a previoulsy sent friend request"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     param :query, :notif_id, :integer, :required, "Notification's id"
     response :ok
   end
   def cancel_request
-    current_volunteer = Volunteer.find_by(token: params[:token])
     link = current_volunteer.notifications.find_by(id: params[:notif_id])
 
     if link.present?
