@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     I18n.available_locales = [:en, :fr]
-    I18n.locale = params[:locale] || :en
+    I18n.locale = params[:locale] || :fr
   end
 
   def create_response(result, status = 200, message = 'ok')
