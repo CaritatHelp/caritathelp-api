@@ -13,7 +13,7 @@ fr:
       rights: "Vous n'avez pas les droits nécessaires"
       notmember: "Ce bénévole n'est pas membre de l'association"
       unjoin: "Aucune requête pour joindre l'assocation trouvée"
-      owner: "Vous ne pouvez quitter une association dont vous être le propriétaire"
+      owner: "Vous ne pouvez quitter une association dont vous êtes le propriétaire"
       research: "Recherche manquante"
       uninvite: "Invitation introuvable"
       follower: "Opération interdite sur un follower"
