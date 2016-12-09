@@ -183,10 +183,14 @@ class PicturesController < ApplicationController
         current_main_picture.save!
       end
       
+      p "#######"
+      p "update"
       @current_picture.update!({:is_main => true})
 
+      p "set thumb_path"
       set_main_picture(@current_picture)
       
+      p "#######"
       render :json => create_response(@current_picture)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
       render :json => create_error(400, e.to_s), status: 400 and return
@@ -209,15 +213,15 @@ class PicturesController < ApplicationController
   def set_main_picture(picture)
     begin
       if picture.is_main.eql?(true)
-        if !@event.eql?(nil)
-          @event.thumb_path = picture.thumb_path
-          @event.save!
-        elsif !@assoc.eql?(nil) and !@shelter.eql?(nil)
-          @shelter.thumb_path = picture.thumb_path
-          @shelter.save!
-        elsif !@assoc.eql?(nil)
-          @assoc.thumb_path = picture.thumb_path
-          @assoc.save!
+        if picture.event_id.present?
+          event = Event.find(picture.shelter_id)
+          event.update(thumb_path: picture.thumb_path) unless event.blank?
+        elsif picture.assoc_id.present? and picture.shelter_id.present?
+          shelter = Shelter.find(picture.shelter_id)
+          shelter.update(thumb_path: picture.thumb_path) unless shelter.blank?
+        elsif picture.assoc_id.present?
+          assoc = Assoc.find(picture.assoc_id)
+          assoc.update(thumb_path: picture.thumb_path) unless assoc.blank?
         else
           current_volunteer.thumb_path = picture.thumb_path
           current_volunteer.save!
