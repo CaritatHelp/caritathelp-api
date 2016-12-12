@@ -183,14 +183,10 @@ class PicturesController < ApplicationController
         current_main_picture.save!
       end
       
-      p "#######"
-      p "update"
       @current_picture.update!({:is_main => true})
 
-      p "set thumb_path"
       set_main_picture(@current_picture)
       
-      p "#######"
       render :json => create_response(@current_picture)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
       render :json => create_error(400, e.to_s), status: 400 and return
