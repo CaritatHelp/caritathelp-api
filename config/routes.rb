@@ -103,6 +103,7 @@ Rails.application.routes.draw do
     get '/', to: 'assocs#index'
     get '/invited', to: 'assocs#invited'
     get '/joining', to: 'assocs#joining'
+    get '/search', to: 'assocs#search'
     get '/:id', to: 'assocs#show'
     get '/:id/members', to: 'assocs#members'
     get '/:id/notifications', to: 'assocs#notifications'

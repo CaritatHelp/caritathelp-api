@@ -1,7 +1,7 @@
 class AssocsController < ApplicationController
   swagger_controller :assocs, "Associations management"
   
-  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture, :shelters],
+  before_action :authenticate_volunteer!, except: [:index, :show, :pictures, :main_picture, :shelters, :search],
                 unless: :is_swagger_request?
   before_action :authenticate_volunteer_if_needed,
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
@@ -284,6 +284,36 @@ class AssocsController < ApplicationController
   end  
   def shelters
     render json: create_response(@assoc.shelters)
+  end
+
+  swagger_api :search do
+    summary "Returns a list of matching associations"
+    param :query, :research, :string, :required, "Association's name"
+    response :ok
+    response 400
+  end  
+  def search
+    begin
+      words = params[:research].downcase.split(/\W+/)
+
+      if words.size > 0
+        condition = "lower(name) LIKE '%#{words[0]}%'"
+
+        words.drop(1).each do |word|
+          condition += " AND lower(name) LIKE '%#{word}%'"
+        end
+
+        assocs = Assoc.select(:id, :name, :thumb_path).where(condition)
+
+        result = assocs.sort {|a,b| a['name'] <=> b['name']}
+        
+        render :json => create_response(result) and return
+      end
+
+      render :json => create_error(400, t("assocs.failure.research"))
+    rescue => e
+      render :json => create_error(400, t("assocs.failure.research"))
+    end
   end
 
   private
