@@ -214,13 +214,13 @@ class PicturesController < ApplicationController
     begin
       if picture.is_main.eql?(true)
         if picture.event_id.present?
-          event = Event.find(picture.shelter_id)
+          event = Event.find_by(id: picture.event_id)
           event.update(thumb_path: picture.thumb_path) unless event.blank?
         elsif picture.assoc_id.present? and picture.shelter_id.present?
-          shelter = Shelter.find(picture.shelter_id)
+          shelter = Shelter.find_by(id: picture.shelter_id)
           shelter.update(thumb_path: picture.thumb_path) unless shelter.blank?
         elsif picture.assoc_id.present?
-          assoc = Assoc.find(picture.assoc_id)
+          assoc = Assoc.find_by(id: picture.assoc_id)
           assoc.update(thumb_path: picture.thumb_path) unless assoc.blank?
         else
           current_volunteer.thumb_path = picture.thumb_path
