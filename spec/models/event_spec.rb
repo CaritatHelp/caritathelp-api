@@ -49,40 +49,40 @@ RSpec.describe Event, type: :model do
 
 	describe "event links" do
 		assoc = FactoryGirl.create(:assoc)
-    	event = FactoryGirl.create(:event, assoc_id: assoc.id)
+			event = FactoryGirl.create(:event, assoc_id: assoc.id)
 		host = FactoryGirl.create(:volunteer)
 		guest = FactoryGirl.create(:volunteer)
-    	link_host = FactoryGirl.create(:event_volunteer, event_id: event.id, volunteer_id: host.id, rights: "host", level: 10)
-    	link_guest = FactoryGirl.create(:event_volunteer, event_id: event.id, volunteer_id: guest.id, rights: "member", level: 5)
+			link_host = FactoryGirl.create(:event_volunteer, event_id: event.id, volunteer_id: host.id, rights: "host", level: 10)
+			link_guest = FactoryGirl.create(:event_volunteer, event_id: event.id, volunteer_id: guest.id, rights: "member", level: 5)
 
-    	new1 = FactoryGirl.create(:news, volunteer_id: host.id,
-    									group_id: event.id,
-    									group_name: event.title,
-    									group_type: "Event",
-    									group_thumb_path: event.thumb_path,
-    									as_group: true,
-    									volunteer_name: host.fullname,
-    									volunteer_thumb_path: host.thumb_path)
+			new1 = FactoryGirl.create(:news, volunteer_id: host.id,
+											group_id: event.id,
+											group_name: event.title,
+											group_type: "Event",
+											group_thumb_path: event.thumb_path,
+											as_group: true,
+											volunteer_name: host.fullname,
+											volunteer_thumb_path: host.thumb_path)
 
-    	new2 = FactoryGirl.create(:news, volunteer_id: host.id,
-    									group_id: event.id,
-    									group_name: event.title,
-    									group_type: "Event",
-    									group_thumb_path: event.thumb_path,
-    									as_group: true,
-    									volunteer_name: host.fullname,
-    									volunteer_thumb_path: host.thumb_path)
+			new2 = FactoryGirl.create(:news, volunteer_id: host.id,
+											group_id: event.id,
+											group_name: event.title,
+											group_type: "Event",
+											group_thumb_path: event.thumb_path,
+											as_group: true,
+											volunteer_name: host.fullname,
+											volunteer_thumb_path: host.thumb_path)
 
-    	it "get the event's volunteers" do
-    		expect(event.volunteers.count).to eq(2)
-    	end
+			it "get the event's volunteers" do
+				expect(event.volunteers.count).to eq(2)
+			end
 
-    	it "get the event's association" do
-    		expect(event.assoc.id).to eq(assoc.id)
-    	end
+			it "get the event's association" do
+				expect(event.assoc.id).to eq(assoc.id)
+			end
 
-    	it "get the event's news" do
-    		expect(event.news.count).to eq(2)
-    	end
+			it "get the event's news" do
+				expect(event.news.count).to eq(2)
+			end
 	end
 end

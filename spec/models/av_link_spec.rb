@@ -4,7 +4,7 @@ RSpec.describe AvLink, type: :model do
 	describe "link between volunteer and association" do
 		assoc = FactoryGirl.create(:assoc)
 		member = FactoryGirl.create(:volunteer)
-    	link_member = FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: member.id, rights: "member", level: 5)
+			link_member = FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: member.id, rights: "member", level: 5)
 
 		it "upgrade volunteer" do
 			link_member.rights = "admin"

@@ -5,7 +5,7 @@ RSpec.describe EventVolunteer, type: :model do
 		assoc = FactoryGirl.create(:assoc)
 		event = FactoryGirl.create(:event, assoc_id: assoc.id)
 		guest = FactoryGirl.create(:volunteer)
-    	link_guest = FactoryGirl.create(:event_volunteer, event_id: event.id, volunteer_id: guest.id, rights: "member", level: 5)
+			link_guest = FactoryGirl.create(:event_volunteer, event_id: event.id, volunteer_id: guest.id, rights: "member", level: 5)
 
 		it "upgrade volunteer" do
 			link_guest.rights = "admin"
