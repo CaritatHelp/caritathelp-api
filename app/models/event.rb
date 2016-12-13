@@ -8,12 +8,12 @@ class Event < ActiveRecord::Base
   
   before_create :set_default_picture
 
-  validate :are_dates_corrects?, on: :create
   validates :title, presence: true, :on => :create
   validates :description, presence: true, :on => :create
   validates :assoc_id, presence: true, :on => :create
   validates :begin, presence: true, :on => :create
   validates :end, presence: true, :on => :create
+  validate :are_dates_corrects?, if: lambda { |event| event.begin.present? and event.end.present? }
 
   def public
     !self.private

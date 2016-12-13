@@ -1,5 +1,9 @@
 class EventVolunteer < ActiveRecord::Base
   enum levels: { host: 10, admin: 8, member: 5} 
+
+  belongs_to :event
+  belongs_to :volunteer
+
   before_save :check_nil
   before_save :set_level
 

@@ -31,7 +31,6 @@ class Volunteer < ActiveRecord::Base
   before_create :set_default_picture
   before_save :set_fullname
   before_update :check_email
-  # before_save :set_token
   
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
   validates :firstname, presence: true, :on => :create
