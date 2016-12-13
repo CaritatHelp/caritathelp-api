@@ -5,6 +5,6 @@ FactoryGirl.define do
     zipcode Faker::Address.zip
     city Faker::Address.city
     total_places Faker::Number.number(3)
-	free_places Faker::Number.number(2)
+		free_places Faker::Number.number(2)
   end
 end
