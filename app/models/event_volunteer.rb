@@ -1,5 +1,5 @@
 class EventVolunteer < ActiveRecord::Base
-  enum levels: { host: 10, admin: 8, member: 5} 
+  enum levels: { host: 10, admin: 8, member: 5}
 
   belongs_to :event
   belongs_to :volunteer

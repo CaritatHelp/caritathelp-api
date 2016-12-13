@@ -4,7 +4,7 @@ class Shelter < ActiveRecord::Base
   belongs_to :assoc
 
   before_create :set_default_picture
-  
+
   validates :name, presence: true, :on => :create
   validates :address, presence: true, :on => :create
   validates :zipcode, presence: true, :on => :create
@@ -16,12 +16,12 @@ class Shelter < ActiveRecord::Base
   validate :if_free_correct
   validates_format_of :phone, with: /\A0[1-7]([-\/. ]?[0-9]{2}){4}\Z/i, allow_blank: true
   validates_format_of :mail, with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i, allow_blank: true
-  
+
   def set_default_picture
     self.thumb_path = Rails.application.config.default_shelter
   end
 
-  private 
+  private
 
   def if_free_correct
     errors.add(:free_places, "free_places value must be lower or equal to total_places") unless

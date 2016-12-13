@@ -14,7 +14,7 @@ RSpec.describe MembershipController, type: :controller do
                                            rights: "member", level: 5) }
     let(:link_follow) { FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: follower.id,
                                            rights: "follower", level: 0) }
-    
+
     before do
       set_header(link_owner.volunteer.create_new_auth_token)
     end
@@ -38,7 +38,7 @@ RSpec.describe MembershipController, type: :controller do
     let(:member) { FactoryGirl.create(:volunteer) }
     let(:link_member) { FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: member.id,
                                            rights: "member", level: 5) }
-    
+
     it "ask to join association" do
       set_header(non_member.create_new_auth_token)
       expect { post :join_assoc, { assoc_id: assoc.id } }.to change { Notification.count }.by(1)
@@ -63,9 +63,9 @@ RSpec.describe MembershipController, type: :controller do
                                            rights: "follower", level: 0) }
 
     before do
-      set_header(link_owner.volunteer.create_new_auth_token)      
+      set_header(link_owner.volunteer.create_new_auth_token)
     end
-    
+
     it "fails to kick a follower" do
       delete :kick, { assoc_id: assoc.id, volunteer_id: link_follow.volunteer.id }
       body = JSON.parse(response.body)
@@ -77,5 +77,5 @@ RSpec.describe MembershipController, type: :controller do
       body = JSON.parse(response.body)
       expect(body["status"]).to eql(200)
     end
-  end  
+  end
 end

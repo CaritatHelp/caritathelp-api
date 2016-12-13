@@ -69,7 +69,7 @@ class VolunteersController < ApplicationController
       else
         friendship = 'friend'
       end
-      
+
       render :json => create_response(@volunteer.as_json(:except => [:password])
                                         .merge(friendship: friendship,
                                                notif_id: notif_id)) and return
@@ -101,13 +101,13 @@ class VolunteersController < ApplicationController
           .select(:id, :name, :thumb_path,
                   "(SELECT rights FROM av_links WHERE av_links.assoc_id=assocs.id AND av_links.volunteer_id=#{current_volunteer.id}) AS rights", "'assoc' AS result_type")
           .where(condition)
-        
+
         condition = condition.gsub "name", "title"
         events = Event
           .select(:id, 'title AS name', :thumb_path,
                   "(SELECT rights FROM event_volunteers WHERE event_volunteers.event_id=events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights", "'event' AS result_type")
           .where(condition)
-        
+
 
         condition = condition.gsub "title", "fullname"
         volunteers = Volunteer
@@ -116,7 +116,7 @@ class VolunteersController < ApplicationController
           .where(condition)
 
         result = (assocs + events + volunteers).sort {|a,b| a['name']<=>b['name']}
-        
+
         render :json => create_response(result) and return
       end
 
@@ -133,7 +133,7 @@ class VolunteersController < ApplicationController
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
-  def notifications  
+  def notifications
     n1 = Notification.select { |notification| notification.receiver_id == current_volunteer.id }
     n2 = NotificationVolunteer.select { |link| link.volunteer_id == current_volunteer.id }
          .map { |link| link.notification }
@@ -174,7 +174,7 @@ class VolunteersController < ApplicationController
       "(SELECT COUNT(*) FROM av_links INNER JOIN v_friends ON " +
       "av_links.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE assoc_id=assocs.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM assocs INNER JOIN av_links ON av_links.assoc_id=assocs.id " + 
+      " FROM assocs INNER JOIN av_links ON av_links.assoc_id=assocs.id " +
       "WHERE av_links.volunteer_id=#{@volunteer.id}"
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
@@ -195,7 +195,7 @@ class VolunteersController < ApplicationController
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{@volunteer.id}) AS nb_friends_members" +
-      " FROM events INNER JOIN event_volunteers ON event_volunteers.event_id=events.id " + 
+      " FROM events INNER JOIN event_volunteers ON event_volunteers.event_id=events.id " +
       "WHERE event_volunteers.volunteer_id=#{@volunteer.id}"
 
     range = params[:range]
@@ -231,10 +231,10 @@ class VolunteersController < ApplicationController
       .joins("INNER JOIN notifications ON notifications.#{friend_id_field}=volunteers.id")
       .where("notifications.#{current_id_field}=#{current_volunteer.id}")
       .select(:id, :thumb_path, :firstname, :lastname, :fullname, 'notifications.id AS notif_id')
-    
+
     render :json => create_response(volunteers)
   end
-  
+
   swagger_api :pictures do
     summary "Returns a list of all volunteer's pictures path"
     param :path, :id, :integer, :required, "Volunteer's id"
@@ -288,7 +288,7 @@ class VolunteersController < ApplicationController
       return
     end
   end
-  
+
   def volunteer_params
     params.permit(:email, :password, :firstname, :lastname,
                   :birthday, :gender, :city, :latitude, :longitude,

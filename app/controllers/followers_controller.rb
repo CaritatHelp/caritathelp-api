@@ -1,10 +1,10 @@
 class FollowersController < ApplicationController
   swagger_controller :followers, "Followers management"
-  
+
   skip_before_filter :verify_authenticity_token
 
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
-  
+
   before_action :set_assoc
   before_action :set_target_volunteer, only: [:block]
   before_action :check_rights, only: [:block]
@@ -92,7 +92,7 @@ class FollowersController < ApplicationController
     end
   end
 
-  private  
+  private
   def set_assoc
     begin
       @assoc = Assoc.find_by!(id: params[:assoc_id])
@@ -112,7 +112,7 @@ class FollowersController < ApplicationController
   def check_rights
     link = AvLink.where(volunteer_id: current_volunteer.id, assoc_id: @assoc.id).first
     if link.eql?(nil) or link.level < 2
-      render :json => create_error(400, t("follower.failure.rights")) and return      
+      render :json => create_error(400, t("follower.failure.rights")) and return
     end
   end
 end

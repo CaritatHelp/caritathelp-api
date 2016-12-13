@@ -1,15 +1,15 @@
 class GuestsController < ApplicationController
   swagger_controller :guests, "Guests management"
-  
+
   skip_before_filter :verify_authenticity_token
 
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
-  
+
   before_action :set_event, except: [:reply_invite, :reply_guest]
   before_action :set_link, except: [:reply_invite, :leave_event]
   before_action :check_rights, except: [:join, :reply_invite, :leave_event, :unjoin]
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
-  
+
   swagger_api :kick do
     summary "Kick guest from the event"
     param :header, 'access-token', :string, :required, "Access token"
@@ -57,7 +57,7 @@ class GuestsController < ApplicationController
       if (@link == nil)
         render :json => create_error(400, t("events.failure.rights")) and return
       end
-      
+
       to_up_link = EventVolunteer.where(event_id: @event.id)
         .where(volunteer_id: @target_volunteer.id).first
       if (to_up_link == nil)
@@ -65,7 +65,7 @@ class GuestsController < ApplicationController
       end
 
       if @link.level <= to_up_link.level
-        render :json => create_error(400, t("events.failure.rights")) and return        
+        render :json => create_error(400, t("events.failure.rights")) and return
       end
 
       # il se passe quoi si je mets des wrong rights?
@@ -109,7 +109,7 @@ class GuestsController < ApplicationController
       elsif @link.blank?
         # create a notification for the event receiving the request
         notif = Notification.create!(create_join_event)
-        
+
         # create a link between the notification and each admin of the event
         Volunteer.joins(:event_volunteers)
           .where(event_volunteers: { event_id: @event.id })
@@ -121,9 +121,9 @@ class GuestsController < ApplicationController
                                          read: false
                                         ])
         end
-        
+
         send_notif_to_socket(notif[0])
-        
+
         render :json => create_response(nil, 200, t("events.success.apply_event")) and return
       end
 
@@ -145,16 +145,16 @@ class GuestsController < ApplicationController
   def reply_guest
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
-      
+
       # Check the rights of the person who's trying to accept a guest
       if ((@link.eql? nil) || (@link.level < EventVolunteer.levels["member"]))
         render :json => create_error(400, t("events.failure.rights")) and return
       end
-      
+
       guest_id = @notif.sender_id
       event_id = @notif.event_id
       acceptance = params[:acceptance]
- 
+
       if acceptance != nil and acceptance == true
         @notif.notif_type = 'NewGuest'
         @notif.save!
@@ -163,13 +163,13 @@ class GuestsController < ApplicationController
       else
         @notif.destroy
       end
-      
+
       render :json => create_response(t("events.success.reply_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
   end
-  
+
   swagger_api :invite do
     summary "Invite a volunteer to join the event"
     param :header, 'access-token', :string, :required, "Access token"
@@ -184,8 +184,8 @@ class GuestsController < ApplicationController
       # Check if volunteer has the permission to invite a guest in event
       if ((@link.eql? nil) || (@link.level < EventVolunteer.levels["member"]))
         render :json => create_error(400, t("events.failure.rights")) and return
-      end      
-      
+      end
+
       # Check if target_volunteer is already guest or if already applied
       if ((EventVolunteer.where(volunteer_id: @target_volunteer.id)
              .where(event_id: @event.id).first != nil) ||
@@ -197,12 +197,12 @@ class GuestsController < ApplicationController
              .where(receiver_id: @target_volunteer.id).first != nil))
         render :json => create_error(400, t("events.failure.invite_link_exist")) and return
       end
-      
+
       # create a notification for volunteer receiving invitation
       notif = Notification.create!(create_invite_guest)
 
       send_notif_to_socket(notif[0])
-      
+
       render :json => create_response(t("events.success.invite_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
@@ -221,21 +221,21 @@ class GuestsController < ApplicationController
   def reply_invite
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
-      
+
       # Check the right of the person who's trying to accept invitation
       if current_volunteer.id != @notif.receiver_id
-        render :json => create_error(400, t("events.failure.rights")) and return        
+        render :json => create_error(400, t("events.failure.rights")) and return
       end
-      
+
       guest_id = @notif.receiver_id
       event_id = @notif.event_id
       acceptance = params[:acceptance]
-      
+
       # destroy the notification if there is a clear answer
       if acceptance != nil
         @notif.destroy
       end
-      
+
       # create guest link if the invited volunteer accept invitation
       if acceptance.eql? 'true'
         create_guest_link(guest_id, event_id)
@@ -262,7 +262,7 @@ class GuestsController < ApplicationController
       link = EventVolunteer.where(:volunteer_id => current_volunteer.id).where(:event_id => event.id).first
 
       if link.eql?(nil)
-        render :json => create_error(400, t("events.failure.not_guest")) and return        
+        render :json => create_error(400, t("events.failure.not_guest")) and return
       elsif link.rights.eql?('host')
         render :json => create_error(400, t("events.failure.host")) and return
       end
@@ -307,13 +307,13 @@ class GuestsController < ApplicationController
       notif = Notification.where(notif_type: "InviteGuest")
         .where(event_id: @event.id)
         .where(receiver_id: @target_volunteer.id).first
-      
+
       if notif.blank?
         render :json => create_error(400, t("events.failure.uninvite")) and return
       end
 
-      notif.destroy 
-      
+      notif.destroy
+
       render :json => create_response(t("events.success.uninvited"))
     rescue => e
       render :json => create_error(400, e.to_s)
@@ -404,7 +404,7 @@ class GuestsController < ApplicationController
       render :json => create_error(400, t("volunteers.failure.id")) and return
     end
   end
-  
+
   def create_guest_link(guest_id, event_id)
     begin
       EventVolunteer.create!([event_id: event_id, volunteer_id: guest_id, rights: 'member'])

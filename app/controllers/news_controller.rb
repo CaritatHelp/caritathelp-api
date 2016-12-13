@@ -52,7 +52,7 @@ class NewsController < ApplicationController
       render json: create_error(400, new.errors), status: :bad_request
     end
   end
-  
+
   swagger_api :show do
     summary "Get new's information"
     param :path, :id, :integer, :required, "New's id"
@@ -117,9 +117,9 @@ class NewsController < ApplicationController
       render json: create_error(400, t("news.failure.rights")) and return
     end
     @new.destroy
-    render json: create_response(t("news.success.destroyed"))    
+    render json: create_response(t("news.success.destroyed"))
   end
-  
+
   private
   def set_new
     begin
@@ -148,7 +148,7 @@ class NewsController < ApplicationController
       end
     end
   end
-  
+
   def check_assoc_rights
     @link = AvLink.where(:volunteer_id => current_volunteer.id)
       .where(:assoc_id => @assoc.id).first

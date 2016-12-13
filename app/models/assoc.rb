@@ -6,9 +6,9 @@ class Assoc < ActiveRecord::Base
   has_many :av_links
 
   has_many :events
-  
+
   has_many :news, as: :group, class_name: 'New', dependent: :destroy
-  
+
   before_create :set_default_picture
 
   validates :name, presence: true, :on => :create

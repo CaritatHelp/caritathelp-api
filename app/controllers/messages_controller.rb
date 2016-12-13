@@ -2,10 +2,10 @@ class MessagesController < ApplicationController
   swagger_controller :messages, "Messages management"
 
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
-  
+
   before_action :set_chatroom, except: [:index, :create, :reset]
   before_action :check_chatroom_rights, except: [:index, :create, :reset]
-  
+
   swagger_api :create do
     summary "Create a chatroom with the list of volunteers provided"
     param :header, 'access-token', :string, :required, "Access token"
@@ -20,22 +20,22 @@ class MessagesController < ApplicationController
       volunteers = []
       volunteers_params = chatroom_params[:volunteers]
       is_private = false
-      
+
       # handle passing params has volunteers[]=[1, 2, 3] and volunteers[]=1&volunteers[]=2
       # cannot JSON.parse a string of length <= 1
       if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
         volunteers_params = JSON.parse(volunteers_params.first)
       end
-      
+
       volunteers_params.each do |volunteer_id|
         volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)
-        
+
         if volunteer_to_add.blank?
           render :json => create_error(400, t("chatrooms.failure.unknown_volunteer_id")) and return
         end
         volunteers.push volunteer_to_add
       end
-      
+
       volunteers.push(current_volunteer) unless volunteers.include?(current_volunteer)
 
       if volunteers.count < 2
@@ -80,9 +80,9 @@ class MessagesController < ApplicationController
   def index
     render json: create_response(current_volunteer.chatrooms.order(updated_at: :desc).map { |chatroom|
       if chatroom.name.present?
-        chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), read: chatroom.read_by?(current_volunteer)) 
+        chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), read: chatroom.read_by?(current_volunteer))
       else
-        chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), name: chatroom.default_name(current_volunteer), read: chatroom.read_by?(current_volunteer)) 
+        chatroom.attributes.merge(volunteers: chatroom.volunteers.map(&:fullname), name: chatroom.default_name(current_volunteer), read: chatroom.read_by?(current_volunteer))
       end
     })
   end
@@ -139,7 +139,7 @@ class MessagesController < ApplicationController
       @chatroom.name = @chatroom.default_name(current_volunteer) if @chatroom.name.blank?
       render :json => create_response(@chatroom) and return
     rescue => e
-      render :json => create_error(400, e.to_s) and return      
+      render :json => create_error(400, e.to_s) and return
     end
   end
 
@@ -161,7 +161,7 @@ class MessagesController < ApplicationController
 
       if params[:volunteers].present?
         volunteers_params = params[:volunteers]
-        
+
         # handle passing params has volunteers[]=[1, 2, 3] and volunteers[]=1&volunteers[]=2
         # cannot JSON.parse a string of length <= 1
         if volunteers_params.count == 1 and is_valid_json?(volunteers_params.first)
@@ -170,18 +170,18 @@ class MessagesController < ApplicationController
 
         volunteers_params.each do |volunteer_id|
           # check if the volunteer is not already in the chatroom
-          volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)          
-          
+          volunteer_to_add = Volunteer.find_by(id: volunteer_id.to_i)
+
           if volunteer_to_add.blank?
             render :json => create_error(400, t("chatrooms.failure.unknown_volunteer_id")) and return
           end
-          
+
           unless @chatroom.volunteers.include?(volunteer_to_add)
             @chatroom.chatroom_volunteers.build(volunteer: volunteer_to_add)
             @chatroom.number_volunteers += 1
           end
         end
-        
+
         @chatroom.is_private = false
       end
 
@@ -236,7 +236,7 @@ class MessagesController < ApplicationController
     begin
       link = ChatroomVolunteer.where(:chatroom_id => @chatroom.id)
         .where(:volunteer_id => params[:volunteer_id]).first
-      
+
       unless link.eql?(nil)
         link.destroy
 
@@ -269,11 +269,11 @@ class MessagesController < ApplicationController
         @chatroom.number_volunteers -= 1
         @chatroom.save!
       end
-      
+
       render :json => create_response(t("chatrooms.success.leave"))
     rescue => e
       render :json => create_error(400, e.to_s)
-    end    
+    end
   end
 
   swagger_api :delete_message do
@@ -291,10 +291,10 @@ class MessagesController < ApplicationController
 
       if message.volunteer_id.eql?(current_volunteer.id)
         message.destroy
-        
+
         @chatroom.number_messages -= 1
         @chatroom.save!
-        
+
         render :json => create_response(t("messages.success.deleted")) and return
       end
       render :json => create_error(400, t("messages.failure.rights"))
@@ -320,7 +320,7 @@ class MessagesController < ApplicationController
     @link = ChatroomVolunteer.where(volunteer_id: current_volunteer.id)
       .where(chatroom_id: @chatroom.id).first
     if @link.eql?(nil)
-      render :json => create_error(400, t("chatrooms.failure.rights")) and return      
+      render :json => create_error(400, t("chatrooms.failure.rights")) and return
     end
   end
 
@@ -329,7 +329,7 @@ class MessagesController < ApplicationController
       concerned_volunteers = Volunteer.joins(:chatroom_volunteers)
         .where(chatroom_volunteers: { chatroom_id: chatroom_id })
         .select("volunteers.id, volunteers.uid").all
-      
+
       json_msg = {
         chatroom_id: chatroom_id,
         content: message['content'],

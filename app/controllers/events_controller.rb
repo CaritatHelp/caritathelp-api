@@ -5,7 +5,7 @@ class EventsController < ApplicationController
                 unless: :is_swagger_request?
   before_action :authenticate_volunteer_if_needed,
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
-  
+
   before_action :set_assoc, only: [:create]
   before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency]
   before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
@@ -66,9 +66,9 @@ class EventsController < ApplicationController
       assoc_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: current_volunteer.id).first
 
       if assoc_link == nil or assoc_link.level < AvLink.levels["admin"]
-        render :json => create_error(400, t("events.failure.rights")) and return        
+        render :json => create_error(400, t("events.failure.rights")) and return
       end
-      
+
       new_event = Event.new(event_params_creation)
       if !new_event.save
         render :json => create_error(400, new_event.errors) and return
@@ -87,7 +87,7 @@ class EventsController < ApplicationController
       render :json => create_error(400, e.to_s) and return
     end
   end
-  
+
   swagger_api :show do
     summary "Returns event's information"
     param :path, :id, :integer, :required, "Event's id"
@@ -109,7 +109,7 @@ class EventsController < ApplicationController
     notif = Notification.where(notif_type: 'InviteGuest')
       .where(event_id: @event.id)
       .where(receiver_id: current_volunteer.id).first
-    
+
     if notif != nil
       rights = 'invited'
     end
@@ -177,7 +177,7 @@ class EventsController < ApplicationController
       @event.destroy
       render :json => create_response(t("events.success.deleted")) and return
     end
-    render :json => create_error(400, t("events.failure.rights"))    
+    render :json => create_error(400, t("events.failure.rights"))
   end
 
   swagger_api :invitable_volunteers do
@@ -190,7 +190,7 @@ class EventsController < ApplicationController
     volunteers = @event.assoc.volunteers.select { |volunteer| volunteer.events.exclude?(@event) }
     render json: create_response(volunteers)
   end
-  
+
   swagger_api :owned do
     summary "Get all event where you're the owner"
     param :header, 'access-token', :string, :required, "Access token"
@@ -238,7 +238,7 @@ class EventsController < ApplicationController
     }.map { |notification| Event.find(notification.event_id) }
     render json: create_response(events)
   end
-  
+
   swagger_api :pictures do
     summary "Returns a list of all event's pictures paths"
     param :path, :id, :integer, :required, "Event's id"
@@ -260,7 +260,7 @@ class EventsController < ApplicationController
     pictures = Picture.where(:event_id => @event.id).where(:is_main => true).select(query).first
     render :json => create_response(pictures)
   end
-  
+
   swagger_api :news do
     summary "Returns event's news"
     param :path, :id, :integer, :required, "Event's id"
@@ -300,10 +300,10 @@ class EventsController < ApplicationController
       notification = Notification.create(create_emergency_notification(volunteer))
       # send_notif_to_socket(notification) unless Rails.env.test?
     end
-    
+
     render json: create_response(volunteers)
   end
-  
+
   swagger_api :volunteers_from_emergency do
     summary "Returns a list of volunteers who accepted to join the event from emergency"
     param :path, :id, :integer, :required, "Event's id"
@@ -355,7 +355,7 @@ class EventsController < ApplicationController
     return true if current_volunteer.blank? and @event.public
     assoc_link = AvLink.where(volunteer_id: current_volunteer.id).where(assoc_id: @event.assoc_id).first
     if @event.private and (assoc_link.eql?(nil) or assoc_link.level < AvLink.levels["member"])
-      render :json => create_error(400, t("events.failure.rights")) and return      
+      render :json => create_error(400, t("events.failure.rights")) and return
     end
   end
 
@@ -370,7 +370,7 @@ class EventsController < ApplicationController
      receiver_thumb_path: volunteer.thumb_path,
      notif_type: 'Emergency'}
   end
-  
+
   def check_rights
     if @link.eql?(nil) || @link.rights.eql?('member')
       render :json => create_error(400, t("events.failure.rights"))
@@ -382,6 +382,6 @@ class EventsController < ApplicationController
   def authenticate_volunteer_if_needed
     if request.headers["access-token"].present? and request.headers["client"].present? and request.headers["uid"].present?
       authenticate_volunteer!
-    end    
+    end
   end
 end

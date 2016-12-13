@@ -8,7 +8,7 @@ class SheltersController < ApplicationController
   before_action :set_assoc, except: [:index, :show, :search, :pictures, :main_picture]
   before_action :set_shelter, only: [:show, :update, :delete, :pictures, :main_picture]
   before_action :check_rights, except: [:index, :show, :search, :pictures, :main_picture]
-  
+
   swagger_api :index do
     summary "Get a list of all existing shelters"
     response :ok
@@ -17,7 +17,7 @@ class SheltersController < ApplicationController
     query = "id, name, address, zipcode, city, total_places, free_places, latitude, longitude, tags, thumb_path"
     render :json => create_response(Shelter.select(query).all)
   end
-  
+
   swagger_api :create do
     summary "Allow an association to add a shelter"
     param :header, 'access-token', :string, :required, "Access token"
@@ -45,7 +45,7 @@ class SheltersController < ApplicationController
         .where(:zipcode => shelter_params[:zipcode])
         .first
       if existing_shelter.present?
-        render :json => create_error(400, t("shelters.failure.exist")) and return        
+        render :json => create_error(400, t("shelters.failure.exist")) and return
       end
 
       new_shelter = Shelter.create!(shelter_params)
@@ -54,13 +54,13 @@ class SheltersController < ApplicationController
       render :json => create_error(400, e.to_s) and return
     end
   end
-  
+
   swagger_api :show do
     summary "Get a list of all existing shelters"
     param :path, :id, :integer, :required, "Shelter's id"
     response :ok
   end
-  def show    
+  def show
     render :json => create_response(@shelter)
   end
 
@@ -74,7 +74,7 @@ class SheltersController < ApplicationController
       name = params[:research].downcase
 
       if name.length.eql?(0)
-        render :json => create_error(400, t('shelters.failure.research')) and return        
+        render :json => create_error(400, t('shelters.failure.research')) and return
       end
       query = "lower(name) LIKE ?"
       render :json => create_response(Shelter.select('id, name, city, total_places, free_places, thumb_path')
@@ -113,7 +113,7 @@ class SheltersController < ApplicationController
         .where(:address => @shelter.address)
         .first
       if existing_shelter.present? and existing_shelter.id != @shelter.id
-        render :json => create_error(400, t("shelters.failure.name")) and return        
+        render :json => create_error(400, t("shelters.failure.name")) and return
       end
       @shelter.update!(shelter_params)
       render :json => create_response(@shelter)
@@ -121,7 +121,7 @@ class SheltersController < ApplicationController
       render :json => create_error(400, e.to_s) and return
     end
   end
-  
+
   swagger_api :delete do
     summary "Allow association to delete a shelter"
     param :path, :id, :integer, :required, "Shelter's id"
@@ -157,9 +157,9 @@ class SheltersController < ApplicationController
     pictures = Picture.where(:shelter_id => @shelter.id).where(:is_main => true).select(query).first
     render :json => create_response(pictures)
   end
- 
+
   private
-  
+
   def shelter_params
     params_shelter = params.permit(:name, :address, :zipcode, :city, :total_places, :description,
                                    :free_places, :tags, :phone, :mail, :latitude, :longitude,
@@ -183,7 +183,7 @@ class SheltersController < ApplicationController
       render :json => create_error(400, t("shelters.failure.id"))
     end
   end
-  
+
   def check_rights
     @link = AvLink.where(:volunteer_id => current_volunteer.id).where(:assoc_id => @assoc.id).first
     if @link.eql?(nil) || @link.rights.eql?('member')

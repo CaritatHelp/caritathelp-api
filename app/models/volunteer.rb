@@ -21,9 +21,9 @@ class Volunteer < ActiveRecord::Base
 
   has_and_belongs_to_many :volunteers, join_table: :v_friends, foreign_key: 'friend_volunteer_id'
   has_many :v_friends, dependent: :destroy
-  
+
   has_many :news, as: :group, class_name: 'New', dependent: :destroy
-  
+
   require 'securerandom'
 
   VALID_EMAIL_REGEX = /\b[A-Z0-9._%a-z\-]+@(?:[A-Z0-9a-z\-]+\.)+[A-Za-z]{2,4}\z/
@@ -31,7 +31,7 @@ class Volunteer < ActiveRecord::Base
   before_create :set_default_picture
   before_save :set_fullname
   before_update :check_email
-  
+
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, :on => :create
   validates :firstname, presence: true, :on => :create
   validates :lastname, presence: true, :on => :create
@@ -50,12 +50,12 @@ class Volunteer < ActiveRecord::Base
     end
     return true
   end
-  
+
   def token_validation_response
     self.as_json(except: [:tokens, :created_at, :updated_at, :nickname])
       .merge(notifications_number:  self.notifications.count)
   end
-  
+
   def set_default_picture
     if self.gender.eql?('f') and self.thumb_path.eql?(nil)
       self.thumb_path = Rails.application.config.default_thumb_female
@@ -79,7 +79,7 @@ class Volunteer < ActiveRecord::Base
                                   self.latitude, self.longitude)
     Haversine.to_miles(distance)
   end
-  
+
   def self.exist?(email)
     if Volunteer.find_by(email: email).eql? nil
       return false

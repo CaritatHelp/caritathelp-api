@@ -3,9 +3,9 @@ class Event < ActiveRecord::Base
   has_many :event_volunteers, dependent: :destroy
 
   belongs_to :assoc
-  
+
   has_many :news, as: :group, class_name: 'New'
-  
+
   before_create :set_default_picture
 
   validates :title, presence: true, :on => :create
@@ -18,7 +18,7 @@ class Event < ActiveRecord::Base
   def public
     !self.private
   end
-  
+
   def set_default_picture
     self.thumb_path = Rails.application.config.logo
   end

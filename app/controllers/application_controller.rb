@@ -67,7 +67,7 @@ class ApplicationController < ActionController::Base
         receiver_thumb_path: notification.receiver_thumb_path,
         concerned_volunteers: concerned_volunteers
       }.to_json
-      
+
       WebSocket::Client::Simple.connect("ws://" + Rails.application.config.ip + ":" +
                                         Rails.application.config.port_websocket.to_s) do |ws|
         ws.on :open do
@@ -78,7 +78,7 @@ class ApplicationController < ActionController::Base
     rescue => e
     end
   end
-  
+
   def is_swagger_request?
     if request.headers['access-token'] == "superuser" and request.headers[:client] == "superuser"
       return true

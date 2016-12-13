@@ -4,7 +4,7 @@ class NotificationsController < ApplicationController
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
   before_action :set_notification
-  
+
   swagger_api :read do
     summary "Set a notification as read"
     param :path, :id, :integer, :required, "Notification's id"
@@ -12,7 +12,7 @@ class NotificationsController < ApplicationController
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
-  end  
+  end
   def read
     # modify to handle authorization
     @notification.read = true
@@ -52,7 +52,7 @@ class NotificationsController < ApplicationController
   end
 
   private
-  
+
   def set_notification
     begin
       @notification = Notification.find(params[:id])

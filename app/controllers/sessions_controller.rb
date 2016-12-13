@@ -1,7 +1,7 @@
 class SessionsController < DeviseTokenAuth::SessionsController
 
   swagger_controller :sessions, "Sessions manager"
-  
+
   swagger_api :create do
     summary "sign_in volunteer"
     param :form, :email, :string, :required, "Your email"

@@ -1,8 +1,8 @@
 class PicturesController < ApplicationController
   swagger_controller :pictures, "Pictures management"
-  
+
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
-  
+
   before_action :set_picture, only: [:delete, :update]
   before_action :check_rights, only: [:create]
 
@@ -83,7 +83,7 @@ class PicturesController < ApplicationController
         actual_params[:picture][:is_main] = false
       end
     end
-    
+
     begin
       @picture = Picture.create!(actual_params[:picture])
 
@@ -103,7 +103,7 @@ class PicturesController < ApplicationController
       render :json => create_error(400, e.to_s), status: 400
     end
   end
-  
+
   swagger_api :delete do
     summary "Delete picture"
     notes "Can't delete main picture"
@@ -182,11 +182,11 @@ class PicturesController < ApplicationController
         current_main_picture.is_main = false
         current_main_picture.save!
       end
-      
+
       @current_picture.update!({:is_main => true})
 
       set_main_picture(@current_picture)
-      
+
       render :json => create_response(@current_picture)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
       render :json => create_error(400, e.to_s), status: 400 and return
@@ -239,7 +239,7 @@ class PicturesController < ApplicationController
         @event = Event.find(params[:event_id])
         @link = EventVolunteer.where(:volunteer_id => current_volunteer.id)
           .where(:event_id => @event.id).first
-        
+
         # if @link.eql?(nil) or @link.level < EventVolunteer.levels["admin"]
         if @link.eql?(nil) or @link.rights.eql?("member")
           render :json => create_error(400, t("events.failure.rights")), status: 400
@@ -255,7 +255,7 @@ class PicturesController < ApplicationController
         @assoc = Assoc.find(@shelter.assoc_id)
         @link = AvLink.where(:volunteer_id => current_volunteer.id)
           .where(:assoc_id => @assoc.id).first
-        
+
         # if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
         if @link.eql?(nil) or @link.rights.eql?("member")
           render :json => create_error(400, t("assocs.failure.rights")), status: 400
@@ -270,7 +270,7 @@ class PicturesController < ApplicationController
         @assoc = Assoc.find(params[:assoc_id])
         @link = AvLink.where(:volunteer_id => current_volunteer.id)
           .where(:assoc_id => @assoc.id).first
-        
+
         # if @link.eql?(nil) or @link.level < AvLink.levels["admin"]
         if @link.eql?(nil) or @link.rights.eql?("member")
           render :json => create_error(400, t("assocs.failure.rights")), status: 400
@@ -279,7 +279,7 @@ class PicturesController < ApplicationController
         return true
       rescue => e
         render :json => create_error(400, e.to_s), status: 400
-      end      
+      end
     end
   end
 end

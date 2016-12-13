@@ -7,7 +7,7 @@ RSpec.describe Shelter, type: :model do
 
     it "creates a new shelter" do
       expect { Shelter.create(
-      	name: Faker::Name.name, 
+      	name: Faker::Name.name,
       	address: Faker::Address.street_address,
       	zipcode: Faker::Address.zip,
       	city: Faker::Address.city,
@@ -17,7 +17,7 @@ RSpec.describe Shelter, type: :model do
 
     it "does not create a new shelter because there are more free_places than total_places" do
       shelter = Shelter.create(
-      	name: Faker::Name.name, 
+      	name: Faker::Name.name,
       	address: Faker::Address.street_address,
       	zipcode: Faker::Address.zip,
       	city: Faker::Address.city,

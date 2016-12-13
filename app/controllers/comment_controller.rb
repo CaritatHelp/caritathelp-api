@@ -46,7 +46,7 @@ class CommentController < ApplicationController
   def update
     begin
       if @comment.volunteer_id != current_volunteer.id
-        render :json => create_error(400, t("comments.failure.rights")) and return        
+        render :json => create_error(400, t("comments.failure.rights")) and return
       end
       # changer le permit
       @comment.update!(params.permit(:content))
@@ -86,7 +86,7 @@ class CommentController < ApplicationController
   def delete
     unless @comment.new.volunteer_id == current_volunteer.id # allow new's creator to remove all comments
       if @comment.volunteer_id != current_volunteer.id
-        render :json => create_error(400, t("comments.failure.rights")) and return        
+        render :json => create_error(400, t("comments.failure.rights")) and return
       end
     end
     @comment.destroy

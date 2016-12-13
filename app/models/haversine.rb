@@ -16,14 +16,14 @@ class Haversine < ActiveRecord::Base
   def self.to_miles(dist)
     dist * 3956
   end
-  
+
   private
 
   def self.calc(lat_diff, lat1, lat2, lng_diff)
     (Math.sin(rad(lat_diff)/2))**2 +
       Math.cos(rad(lat1)) *
       Math.cos((rad(lat2))) *
-      (Math.sin(rad(lng_diff)/2))**2    
+      (Math.sin(rad(lng_diff)/2))**2
   end
 
   def self.rad(nb)

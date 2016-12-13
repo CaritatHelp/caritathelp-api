@@ -1,7 +1,7 @@
 class New < ActiveRecord::Base
   belongs_to :group, polymorphic: true
   has_many :comments, dependent: :destroy
-  
+
   validates :volunteer_id, presence: true, on: :create
   validates :news_type, presence: true, on: :create
   validates :group_id, presence: true, on: :create
@@ -12,7 +12,7 @@ class New < ActiveRecord::Base
 
   before_create :set_thumb_path
   before_create :set_name
-  
+
   def public
     !self.private
   end
@@ -27,7 +27,7 @@ class New < ActiveRecord::Base
     end
     return false
   end
-  
+
   private
 
   # The field is called thumb_path in all models

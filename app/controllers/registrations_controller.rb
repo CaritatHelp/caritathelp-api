@@ -10,11 +10,11 @@ class RegistrationsController < DeviseTokenAuth::RegistrationsController
     param :query, :password, :string, :required, "Volunteer's password"
     param :query, :birthday, :date,  :optional, "Volunteer's birthday"
     param :query, :gender, :string,  :optional, "Volunteer's gender"
-    param :query, :city, :string,  :optional, "Volunteer's city"    
-    param :query, :latitude, :decimal,  :optional, "Volunteer's latitude position"    
-    param :query, :longitude, :decimal,  :optional, "Volunteer's longitude position"    
-    param :query, :allowgps, :boolean,  :optional, "Volunteer allows GPS localisation?"    
-    param :query, :allow_notifications, :boolean,  :optional, "Volunteer allows notifications?"    
+    param :query, :city, :string,  :optional, "Volunteer's city"
+    param :query, :latitude, :decimal,  :optional, "Volunteer's latitude position"
+    param :query, :longitude, :decimal,  :optional, "Volunteer's longitude position"
+    param :query, :allowgps, :boolean,  :optional, "Volunteer allows GPS localisation?"
+    param :query, :allow_notifications, :boolean,  :optional, "Volunteer allows notifications?"
     response :ok
     response 400
   end
@@ -32,11 +32,11 @@ class RegistrationsController < DeviseTokenAuth::RegistrationsController
     param :query, :lastname, :string, :optional, "Volunteer's lastname"
     param :query, :birthday, :date,  :optional, "Volunteer's birthday"
     param :query, :gender, :string,  :optional, "Volunteer's gender"
-    param :query, :city, :string,  :optional, "Volunteer's city"    
-    param :query, :latitude, :decimal,  :optional, "Volunteer's latitude position"    
-    param :query, :longitude, :decimal,  :optional, "Volunteer's longitude position"    
-    param :query, :allowgps, :boolean,  :optional, "Volunteer allows GPS localisation?"    
-    param :query, :allow_notifications, :boolean,  :optional, "Volunteer allows notifications?"    
+    param :query, :city, :string,  :optional, "Volunteer's city"
+    param :query, :latitude, :decimal,  :optional, "Volunteer's latitude position"
+    param :query, :longitude, :decimal,  :optional, "Volunteer's longitude position"
+    param :query, :allowgps, :boolean,  :optional, "Volunteer allows GPS localisation?"
+    param :query, :allow_notifications, :boolean,  :optional, "Volunteer allows notifications?"
     response :ok
     response 400
   end
@@ -52,7 +52,7 @@ class RegistrationsController < DeviseTokenAuth::RegistrationsController
       render_update_error_user_not_found
     end
   end
-  
+
   def sign_up_params
     params.permit(:firstname, :lastname, :email, :password, :password_confirmation, :birthday,
                   :gender, :city, :latitude, :longitude, :allowgps, :allow_notifications)

@@ -1,10 +1,10 @@
 class MembershipController < ApplicationController
   swagger_controller :members, "Members management"
-  
+
   skip_before_filter :verify_authenticity_token
 
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
-  
+
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
   before_action :set_assoc, except: [:reply_member, :reply_invite]
   before_action :check_target_follower, only: [:kick, :upgrade]
@@ -58,14 +58,14 @@ class MembershipController < ApplicationController
       if (volunteer_link == nil)
         render :json => create_error(400, t("assocs.failure.rights")) and return
       end
-      
+
       to_up_link = AvLink.where(assoc_id: @assoc.id).where(volunteer_id: @target_volunteer.id).first
       if (to_up_link == nil)
         render :json => create_error(400, t("assocs.failure.notmember")) and return
       end
 
       if volunteer_link.level <= to_up_link.level
-        render :json => create_error(400, t("assocs.failure.rights")) and return        
+        render :json => create_error(400, t("assocs.failure.rights")) and return
       end
 
       to_up_link.update!({:rights => params[:rights]})
@@ -113,7 +113,7 @@ class MembershipController < ApplicationController
       end
 
       #send_notif_to_socket(notif[0]) unless Rails.env.test?
-      
+
       render :json => create_response(nil, 200, t("notifications.success.joinassoc"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
@@ -132,18 +132,18 @@ class MembershipController < ApplicationController
   def reply_member
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
-      
+
       # Check the rights of the person who's trying to accept a member
       link = AvLink.where(volunteer_id: current_volunteer.id)
              .where(assoc_id: @notif.assoc_id).first
       if ((link.eql? nil) || (link.rights.eql? 'member'))
         render :json => create_error(400, t("assocs.failure.rights")) and return
       end
-            
+
       member_id = @notif.sender_id
       assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
- 
+
       if acceptance != nil and acceptance == 'true'
         @notif.notif_type = 'NewMember'
         @notif.save!
@@ -154,12 +154,12 @@ class MembershipController < ApplicationController
         @notif.destroy
         render :json => create_response(t("notifications.success.refused_member"))
       end
-      
+
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
       render :json => create_error(400, e.to_s) and return
     end
   end
-  
+
   swagger_api :invite do
     summary "Invite a volunteer to join the association"
     param :header, 'access-token', :string, :required, "Access token"
@@ -182,10 +182,10 @@ class MembershipController < ApplicationController
              .where(receiver_id: @target_volunteer.id).first != nil))
         render :json => create_error(400, t("notifications.failure.invitemember.exist")) and return
       end
-      
+
       # create a notification for volunteer receiving invitation
       notif = Notification.create!(create_invite_member)
-      
+
       send_notif_to_socket(notif[0])
 
       render :json => create_response(nil, 200, t("notifications.success.invitemember"))
@@ -206,21 +206,21 @@ class MembershipController < ApplicationController
   def reply_invite
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
-      
+
       # Check the right of the person who's trying to accept invitation
       if current_volunteer.id != @notif.receiver_id
-        render :json => create_error(400, t("notifications.failure.rights")) and return        
+        render :json => create_error(400, t("notifications.failure.rights")) and return
       end
-      
+
       member_id = @notif.receiver_id
       assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
-      
+
       # destroy the notification if there is a clear answer
       if acceptance != nil
         @notif.destroy
       end
-      
+
       # create member link if the invited volunteer accept invitation
       if acceptance.eql? 'true'
         create_member_link(member_id, assoc_id)
@@ -245,7 +245,7 @@ class MembershipController < ApplicationController
       link = AvLink.where(:volunteer_id => current_volunteer.id).where(:assoc_id => @assoc.id).first
 
       if link.eql?(nil)
-        render :json => create_error(400, t("assocs.failure.notmember")) and return        
+        render :json => create_error(400, t("assocs.failure.notmember")) and return
       elsif link.rights.eql?('owner')
         render :json => create_error(400, t("assocs.failure.owner")) and return
       end
@@ -290,13 +290,13 @@ class MembershipController < ApplicationController
       notif = Notification.where(notif_type: "InviteMember")
         .where(assoc_id: @assoc.id)
         .where(receiver_id: @target_volunteer.id).first
-      
+
       if notif.blank?
         render :json => create_error(400, t("assocs.failure.uninvite")) and return
       end
 
-      notif.destroy 
-      
+      notif.destroy
+
       render :json => create_response(t("assocs.success.uninvited"))
     rescue => e
       render :json => create_error(400, e.to_s)
@@ -370,14 +370,14 @@ class MembershipController < ApplicationController
   def create_member_link(member_id, assoc_id)
     begin
       link = AvLink.where(assoc_id: assoc_id).where(volunteer_id: member_id).first
-      
+
       if link.eql?(nil)
         AvLink.create!([assoc_id: assoc_id, volunteer_id: member_id, rights: 'member'])
       elsif link.rights.eql?('follower')
         link.rights = 'member'
         link.save!
       elsif link.rights.eql?('block')
-        render :json => create_error(400, t("assocs.failure.blocked")) and return        
+        render :json => create_error(400, t("assocs.failure.blocked")) and return
       end
       return true
     rescue ActiveRecord::RecordInvalid => e
