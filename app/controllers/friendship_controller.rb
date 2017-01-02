@@ -56,7 +56,7 @@ class FriendshipController < ApplicationController
     begin
       @notif = Notification.find_by!(id: params[:notif_id])
 
-      if current_volunteer.id != @notif.receiver_id
+      if current_volunteer.id != @notif.receiver_id or @notif.notif_type != "AddFriend"
         render :json => create_error(400, t("notifications.failure.rights")) and return
       end
 
