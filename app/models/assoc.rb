@@ -31,4 +31,19 @@ class Assoc < ActiveRecord::Base
     end
     return false
   end
+
+  def update_all
+  	self.news.each do |n|
+  		n.group_name = self.name
+  		n.save
+  	end
+  	Notification.select { |notif| notif.assoc_id == self.id }.each do |n|
+  		n.assoc_name = self.name
+  		n.save
+  	end
+  	self.events.each do |e|
+  		e.assoc_name = self.name
+  		e.save
+  	end
+  end
 end

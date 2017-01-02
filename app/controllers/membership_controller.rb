@@ -103,7 +103,7 @@ class MembershipController < ApplicationController
 
       Volunteer.joins(:av_links)
         .where(av_links: { assoc_id: @assoc.id })
-        .where("av_links.level > ?", 1)
+        .where("av_links.level > ?", 5)
         .select("volunteers.id").all.each do |volunteer|
         NotificationVolunteer.create!([
                                        volunteer_id: volunteer['id'],
@@ -147,7 +147,7 @@ class MembershipController < ApplicationController
       if acceptance != nil and acceptance == 'true'
         @notif.notif_type = 'NewMember'
         @notif.save!
-        send_notif_to_socket(@notif)
+        send_notif_to_socket(@notif) unless Rails.env.test?
         create_member_link(member_id, assoc_id)
         render :json => create_response(t("notifications.success.addmember"))
       else
@@ -186,7 +186,7 @@ class MembershipController < ApplicationController
       # create a notification for volunteer receiving invitation
       notif = Notification.create!(create_invite_member)
 
-      send_notif_to_socket(notif[0])
+      send_notif_to_socket(notif[0]) unless Rails.env.test?
 
       render :json => create_response(nil, 200, t("notifications.success.invitemember"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
