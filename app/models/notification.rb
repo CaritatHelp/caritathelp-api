@@ -34,6 +34,10 @@ class Notification < ActiveRecord::Base
     self.notif_type.eql?('InviteGuest')
   end
 
+  def is_friend_invitation?
+  	self.notif_type == "AddFriend"
+  end
+
   def single_receiver?
     self.notif_type.eql?('InviteMember') or self.notif_type.eql?('InviteGuest') or self.notif_type.eql?('AddFriend')
   end
