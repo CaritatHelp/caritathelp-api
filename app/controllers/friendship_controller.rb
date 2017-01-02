@@ -136,11 +136,8 @@ class FriendshipController < ApplicationController
     response :ok
   end
   def received_invitations
-    volunteers = Volunteer
-                 .select(:id, :firstname, :lastname, :fullname, :city, :thumb_path)
-                 .joins("INNER JOIN notifications ON notifications.sender_id=volunteers.id")
-                 .select("notifications.id AS notif_id")
-                 .where("notifications.receiver_id=#{current_volunteer.id}")
+    notifications = Notification.select { |n| n.is_friend_invitation? and n.receiver_id == current_volunteer.id }
+    volunteers = notifications.map { |n| Volunteer.select(:id, :firstname, :lastname, :fullname, :city, :thumb_path).find(n.sender_id).as_json.merge(notif_id: n.id) }
     render :json => create_response(volunteers)
   end
 
