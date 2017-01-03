@@ -26,7 +26,7 @@ fr:
       leaved: "Vous avez quitté l'association"
       uninvited: "Invitation annulée"
       unjoin: "Demande d'invitation annulée"
-      
+
   volunteers:
     failure:
       email:
@@ -86,7 +86,7 @@ fr:
         exist: "Vous avez déjà envoyé une demande ou reçu une invitation"
       invitemember:
         exist: "Ce bénévole a déjà envoyé une demande ou reçu une invitation"
-        
+
     success:
       reply_emergency: "Vous avez bien répondu à l'urgence"
       invitefriend: "Demande d'ami envoyée"
@@ -186,3 +186,14 @@ fr:
   doc:
     url: "Adresse introuvable"
     response: 'Voir la documentation: /swagger/index'
+
+  activerecord:
+    errors:
+      models:
+        volunteer:
+          attributes:
+            email:
+              blank: "manquant"
+              invalid: "invalide"
+            password:
+              blank: "manquant"
