@@ -16,6 +16,24 @@
 # users commonly want.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+# Methods available in all controller specs
+def log user
+  set_header(user.create_new_auth_token)
+end
+
+def expect_success response
+ 	body = JSON.parse(response.body)
+	expect(body["status"]).to eq(200)
+	body
+end
+
+def expect_failure response
+  body = JSON.parse(response.body)
+	expect(body["status"]).to eq(400)
+	body
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

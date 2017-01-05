@@ -50,7 +50,7 @@ nicolas = Volunteer.create(firstname: 'Nicolas',
                            password: 'root1234')
 
 jerome = Volunteer.create(firstname: 'Jerome',
-                          lastname: 'Caudoux', 
+                          lastname: 'Caudoux',
                           email: 'jerome@root.com',
                           allowgps: true,
                           latitude: 20.593684, # Inde

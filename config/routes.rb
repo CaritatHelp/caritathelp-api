@@ -3,12 +3,12 @@ Rails.application.routes.draw do
                                 registrations: 'registrations',
                                 sessions: 'sessions',
                                 passwords: 'passwords'}
-  
+
   scope '/' do
     get '/search', to: 'volunteers#search'
     get '/friend_requests', to: 'volunteers#friend_requests'
     get '/notifications', to: 'volunteers#notifications'
-    
+
     # followers routes
     post '/follow', to: 'followers#follow'
 
@@ -19,12 +19,12 @@ Rails.application.routes.draw do
 
   scope 'pictures' do
     post '/', to: 'pictures#create'
-    
+
     put '/:id', to: 'pictures#update'
-    
+
     delete '/:id', to: 'pictures#delete'
   end
-  
+
   scope 'notifications' do
     put '/:id/read', to: 'notifications#read'
     put '/:id/reply_emergency', to: 'notifications#reply_emergency'
@@ -116,7 +116,7 @@ Rails.application.routes.draw do
 
     post '/', to: 'assocs#create'
 
-    put '/:id', to: 'assocs#update' 
+    put '/:id', to: 'assocs#update'
 
     delete '/:id', to: 'assocs#delete'
     match '/', to: 'doc#index', via: :all
@@ -124,7 +124,7 @@ Rails.application.routes.draw do
 
   scope '/events' do
     get '/', to: 'events#index'
-    get '/owned', to: 'events#owned' 
+    get '/owned', to: 'events#owned'
     get '/invited', to: 'events#invited'
     get '/joining', to: 'events#joining'
     get '/:id', to: 'events#show'
@@ -136,10 +136,10 @@ Rails.application.routes.draw do
     get '/:id/invitable_volunteers', to: 'events#invitable_volunteers'
     get '/:id/volunteers_from_emergency', to: 'events#volunteers_from_emergency'
 
-    
+
     post '/', to: 'events#create'
     post '/:id/raise_emergency', to: 'events#raise_emergency'
-    
+
     put '/:id', to: 'events#update'
 
     delete '/:id', to: 'events#delete'
@@ -148,7 +148,7 @@ Rails.application.routes.draw do
   scope '/guests' do
     get '/invited', to: 'guests#invited'
     get '/waiting', to: 'guests#waiting'
-    
+
     post '/join', to: 'guests#join'
     post '/reply_guest', to: 'guests#reply_guest'
     post '/invite', to: 'guests#invite'
@@ -156,7 +156,7 @@ Rails.application.routes.draw do
 
     put '/upgrade', to: 'guests#upgrade'
 
-    delete '/kick', to: 'guests#kick'    
+    delete '/kick', to: 'guests#kick'
     delete '/leave', to: 'guests#leave_event'
     delete '/uninvite', to: 'guests#uninvite'
     delete '/unjoin', to: 'guests#unjoin'
