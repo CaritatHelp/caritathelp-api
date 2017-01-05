@@ -5,7 +5,7 @@ class GuestsController < ApplicationController
 
   before_action :authenticate_volunteer!, unless: :is_swagger_request?
 
-  before_action :set_event, except: [:reply_invite, :reply_guest]
+  before_action :set_event
   before_action :set_link, except: [:reply_invite, :leave_event]
   before_action :check_rights, except: [:join, :reply_invite, :leave_event, :unjoin]
   before_action :set_target_volunteer, only: [:kick, :upgrade, :invite, :uninvite]
@@ -113,7 +113,7 @@ class GuestsController < ApplicationController
         # create a link between the notification and each admin of the event
         Volunteer.joins(:event_volunteers)
           .where(event_volunteers: { event_id: @event.id })
-          .where("event_volunteers.level > ?", 1)
+          .where("event_volunteers.level > ?", 5)
           .select("volunteers.id").all.each do |volunteer|
           NotificationVolunteer.create!([
                                          volunteer_id: volunteer['id'],
@@ -122,7 +122,7 @@ class GuestsController < ApplicationController
                                         ])
         end
 
-        send_notif_to_socket(notif[0])
+        send_notif_to_socket(notif[0]) unless Rails.env.test?
 
         render :json => create_response(nil, 200, t("events.success.apply_event")) and return
       end
@@ -158,7 +158,7 @@ class GuestsController < ApplicationController
       if acceptance != nil and acceptance == true
         @notif.notif_type = 'NewGuest'
         @notif.save!
-        send_notif_to_socket(@notif)
+        send_notif_to_socket(@notif) unless Rails.env.test?
         create_guest_link(guest_id, event_id)
       else
         @notif.destroy
@@ -201,7 +201,7 @@ class GuestsController < ApplicationController
       # create a notification for volunteer receiving invitation
       notif = Notification.create!(create_invite_guest)
 
-      send_notif_to_socket(notif[0])
+      send_notif_to_socket(notif[0]) unless Rails.env.test?
 
       render :json => create_response(t("events.success.invite_guest"))
     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
@@ -367,7 +367,12 @@ class GuestsController < ApplicationController
     begin
       @event = Event.find(params[:event_id])
     rescue
-      render :json => create_error(400, t("events.failure.id")), status: 400
+    	begin
+    		notif = Notification.find(params[:notif_id])
+  			@event = Event.find(notif.event_id)
+    	rescue
+	      render :json => create_error(400, t("events.failure.id")), status: 400
+    	end
     end
   end
 
