@@ -34,7 +34,7 @@ class FriendshipController < ApplicationController
 
       @notif = Notification.create!(create_add_friend)
 
-      send_notif_to_socket(@notif)
+      send_notif_to_socket(@notif) unless Rails.env.test?
 
       render :json => create_response(nil, 200, t("notifications.success.invitefriend"))
     rescue => e
