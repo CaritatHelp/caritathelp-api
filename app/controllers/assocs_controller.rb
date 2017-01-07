@@ -250,7 +250,9 @@ class AssocsController < ApplicationController
   swagger_api :invitable_volunteers do
     summary "Get a list of all invitable volunteers"
     param :path, :id, :integer, :required, "Association's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
     response 400
   end
