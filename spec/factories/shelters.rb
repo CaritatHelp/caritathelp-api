@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :shelter do
+  	assoc_id 0
     name Faker::Name.name
     address Faker::Address.street_address
     zipcode Faker::Address.zip
