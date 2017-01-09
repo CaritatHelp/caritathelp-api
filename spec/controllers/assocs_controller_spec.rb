@@ -6,7 +6,7 @@ RSpec.describe AssocsController, type: :controller do
   describe 'index' do
   	FactoryGirl.create(:assoc)
 
-  	it "get a list of the 3 existing associations" do
+  	it "get a list of existing associations" do
   		get :index
   		body = expect_success response
   		expect(body["response"].length).not_to eq(0)
