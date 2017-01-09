@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :new, class: 'New' do
+  factory :news, class: 'New' do
     news_type "Status"
     content Faker::Lorem.sentence
     title Faker::Name.name

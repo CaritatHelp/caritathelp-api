@@ -203,11 +203,11 @@ RSpec.describe EventsController, type: :controller do
   	volunteer = FactoryGirl.create(:volunteer)
 
   	# public news
-  	FactoryGirl.create(:new, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id)
-  	FactoryGirl.create(:new, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id)
+  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id)
+  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id)
 
   	# private news
-  	FactoryGirl.create(:new, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id, private: true)
+  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id, private: true)
 
   	it "returns public & private news" do
   		log host

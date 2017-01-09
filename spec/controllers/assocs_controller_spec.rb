@@ -187,11 +187,11 @@ RSpec.describe AssocsController, type: :controller do
   	volunteer = FactoryGirl.create(:volunteer)
 
   	# public news
-  	FactoryGirl.create(:new, group_id: assoc.id, group_type: "Assoc", group_name: assoc.name, group_thumb_path: assoc.thumb_path, as_group: true, volunteer_name: owner.fullname, volunteer_thumb_path: owner.thumb_path, volunteer_id: owner.id)
-  	FactoryGirl.create(:new, group_id: assoc.id, group_type: "Assoc", group_name: assoc.name, group_thumb_path: assoc.thumb_path, as_group: true, volunteer_name: owner.fullname, volunteer_thumb_path: owner.thumb_path, volunteer_id: owner.id)
+  	FactoryGirl.create(:news, group_id: assoc.id, group_type: "Assoc", group_name: assoc.name, group_thumb_path: assoc.thumb_path, as_group: true, volunteer_name: owner.fullname, volunteer_thumb_path: owner.thumb_path, volunteer_id: owner.id)
+  	FactoryGirl.create(:news, group_id: assoc.id, group_type: "Assoc", group_name: assoc.name, group_thumb_path: assoc.thumb_path, as_group: true, volunteer_name: owner.fullname, volunteer_thumb_path: owner.thumb_path, volunteer_id: owner.id)
 
   	# private news
-  	FactoryGirl.create(:new, group_id: assoc.id, group_type: "Assoc", group_name: assoc.name, group_thumb_path: assoc.thumb_path, as_group: true, volunteer_name: owner.fullname, volunteer_thumb_path: owner.thumb_path, volunteer_id: owner.id, private: true)
+  	FactoryGirl.create(:news, group_id: assoc.id, group_type: "Assoc", group_name: assoc.name, group_thumb_path: assoc.thumb_path, as_group: true, volunteer_name: owner.fullname, volunteer_thumb_path: owner.thumb_path, volunteer_id: owner.id, private: true)
 
   	it "returns public & private news" do
   		log owner
