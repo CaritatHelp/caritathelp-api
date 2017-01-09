@@ -212,7 +212,7 @@ class VolunteersController < ApplicationController
   end
 
   swagger_api :friend_requests do
-    summary "Returns a list of all pendinf friends' invitations"
+    summary "Returns a list of all pending friends' invitations"
     param :header, 'access-token', :string, :required, "Access token"
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
