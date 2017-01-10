@@ -3,8 +3,8 @@ class ApplicationController < ActionController::Base
   include CanCan::ControllerAdditions
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :null_session
-
+  coucou
+  
   before_action :set_locale
   before_filter :cors_preflight_check
   after_filter :cors_set_access_control_headers
