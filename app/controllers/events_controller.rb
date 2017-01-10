@@ -7,7 +7,7 @@ class EventsController < ApplicationController
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
 
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency]
+  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete, :raise_emergency]
@@ -184,7 +184,9 @@ class EventsController < ApplicationController
   swagger_api :invitable_volunteers do
     summary "Get a list of all invitable volunteers"
     param :path, :id, :integer, :required, "Event's id"
-    param :query, :token, :string, :required, "Your token"
+    param :header, 'access-token', :string, :required, "Access token"
+    param :header, :client, :string, :required, "Client token"
+    param :header, :uid, :string, :required, "Volunteer's uid (email address)"
     response :ok
   end
   def invitable_volunteers
