@@ -214,7 +214,7 @@ class MessagesController < ApplicationController
       @chatroom.number_messages += 1
       @chatroom.save!
 
-      send_msg_to_socket(message, @chatroom.id, current_volunteer)
+      send_msg_to_socket(message, @chatroom.id, current_volunteer) unless Rails.env.test?
 
       render :json => create_response(message.attributes
                                        .merge(fullname: current_volunteer.fullname))
