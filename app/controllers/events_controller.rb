@@ -53,6 +53,7 @@ class EventsController < ApplicationController
     param :form, :begin, :date, :required, "Beginning of the event"
     param :form, :end, :date, :required, "End of the event"
     param :form, :place, :string, :optional, "Where the event takes place"
+    param :form, :private, :boolean, :optional, "true to make the event private, false otherwise"
     response :ok
   end
   def create
