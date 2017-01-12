@@ -19,6 +19,7 @@ class New < ActiveRecord::Base
 
   def concerns_user?(volunteer)
     return true unless self.private
+    return true if self.volunteer_id == volunteer.id
 
     class_type = self.group_type.classify.safe_constantize
     if class_type.present?

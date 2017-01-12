@@ -115,7 +115,7 @@ class CommentController < ApplicationController
     if @new.private
       level = current_volunteer.av_links.find_by(assoc_id: @new.group_id).try(:level) if @new.group_type == "Assoc"
       level = current_volunteer.event_volunteers.find_by(event_id: @new.group_id).try(:level) if @new.group_type == "Event"
-      if ((@new.group_type == "Assoc" and (level.blank? or level < AvLink.levels["member"])) || (@new.group_type == "Event" and (level.blank? or level < EventVolunteer.levels["member"])) || (@new.group_type == "Volunteer" and current_volunteer.v_friends.find_by(friend_volunteer_id: @new.group_id)))
+      if ((@new.group_type == "Assoc" and (level.blank? or level < AvLink.levels["member"])) || (@new.group_type == "Event" and (level.blank? or level < EventVolunteer.levels["member"])) || (@new.group_type == "Volunteer" and current_volunteer.v_friends.find_by(friend_volunteer_id: @new.group_id).blank? and current_volunteer.id != @new.group_id))
         render json: create_error(400, t("volunteers.failure.rights"))
       end
     end
