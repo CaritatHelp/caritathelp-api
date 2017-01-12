@@ -14,7 +14,6 @@ class NotificationsController < ApplicationController
     response :ok
   end
   def read
-    # modify to handle authorization
     @notification.read = true
     @notification.save
     render :json => create_response(@notification)
