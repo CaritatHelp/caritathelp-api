@@ -142,26 +142,6 @@ class AssocsController < ApplicationController
       " FROM events WHERE events.assoc_id=#{@assoc.id}" + privacy
 
     render :json => create_response(ActiveRecord::Base.connection.execute(query))
-
-    # events = @assoc.events.select(:id, :title, :place, :begin, :assoc_id, :thumb_path) if @link.present?
-    # events = events.select(&:public).select(:id, :title, :place, :begin, :assoc_id, :thumb_path) if @link.blank?
-
-    # # Map the rights, the number of guests & the number of friends guests
-    # events = events.map { |e|
-    # 	link = e.event_volunteers.find_by(volunteer_id: current_volunteer.id)
-    # 	rights = link.rights if link.present?
-    # 	nb_friends_members = e.event_volunteers.select { |ev| current_volunteer.volunteers.include?(ev.volunteer) }.count
-
-    # 	e.as_json.merge(rights: rights,
-				# 			    		nb_guest: e.event_volunteers.count.to_s,
-				# 			    		nb_friends_members: nb_friends_members.to_s,
-				# 			    		id: e.id.to_s,
-				# 			    		assoc_id: e.assoc_id.to_s,
-				# 			    		begin: e.begin.to_s, # ???
-				# 			    		assoc_name: e.assoc.name)
-    # }
-
-    # render json: create_response(events)
   end
 
   swagger_api :update do
@@ -258,6 +238,9 @@ class AssocsController < ApplicationController
   end
   def invitable_volunteers
     volunteers = current_volunteer.volunteers.select { |volunteer| volunteer.assocs.exclude?(@assoc) }
+    volunteers = volunteers.select { |volunteer|
+    	Notification.find_by(receiver_id: volunteer.id, assoc_id: @assoc.id, notif_type: "InviteMember").blank? and Notification.find_by(sender_id: volunteer.id, assoc_id: @assoc.id, notif_type: "JoinAssoc").blank?
+    }
     render json: create_response(volunteers)
   end
 

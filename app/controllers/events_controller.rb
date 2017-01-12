@@ -192,6 +192,9 @@ class EventsController < ApplicationController
   end
   def invitable_volunteers
     volunteers = @event.assoc.volunteers.select { |volunteer| volunteer.events.exclude?(@event) }
+    volunteers = volunteers.select { |volunteer|
+    	Notification.find_by(receiver_id: volunteer.id, event_id: @event.id, notif_type: "InviteGuest").blank? and Notification.find_by(sender_id: volunteer.id, event_id: @event.id, notif_type: "JoinEvent").blank?
+    }
     render json: create_response(volunteers)
   end
 
