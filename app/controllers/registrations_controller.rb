@@ -44,7 +44,6 @@ class RegistrationsController < DeviseTokenAuth::RegistrationsController
     if @resource
       if @resource.send(resource_update_method, account_update_params)
         yield @resource if block_given?
-        current_volunteer.update_all
         render_update_success
       else
         render_update_error

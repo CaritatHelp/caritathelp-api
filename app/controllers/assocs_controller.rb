@@ -132,7 +132,7 @@ class AssocsController < ApplicationController
       privacy = " AND events.private=false"
     end
 
-    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.assoc_name, events.thumb_path, " +
+    query = "SELECT events.id, events.title, events.place, events.begin, events.assoc_id, events.thumb_path, " +
       "(SELECT event_volunteers.rights FROM event_volunteers WHERE event_volunteers.event_id=" +
       "events.id AND event_volunteers.volunteer_id=#{current_volunteer.id}) AS rights, " +
       "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
@@ -141,7 +141,8 @@ class AssocsController < ApplicationController
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members" +
       " FROM events WHERE events.assoc_id=#{@assoc.id}" + privacy
 
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: @assoc.name) }
+    render :json => create_response(events)
   end
 
   swagger_api :update do
@@ -165,7 +166,6 @@ class AssocsController < ApplicationController
                                              @assoc.name)
         render :json => create_error(400, t("assocs.failure.name.unavailable"))
       elsif @assoc.update!(assoc_params)
-      	@assoc.update_all
         render :json => create_response(@assoc.as_json.merge('rights' => @link.rights))
       else
         render :json => create_error(400, t("assocs.failure.update"))

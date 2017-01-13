@@ -191,7 +191,7 @@ class VolunteersController < ApplicationController
   end
   def events
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
-      "events.assoc_id, events.assoc_name, events.thumb_path, event_volunteers.rights, " +
+      "events.assoc_id, events.thumb_path, event_volunteers.rights, " +
       "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
@@ -209,7 +209,8 @@ class VolunteersController < ApplicationController
       query += " AND events.begin > NOW()"
     end
 
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: @volunteer.assocs.find(e["assoc_id"]).name) }
+    render :json => create_response(events)
   end
 
   swagger_api :friend_requests do
