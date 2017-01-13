@@ -55,6 +55,8 @@ class EventsController < ApplicationController
     param :form, :end, :date, :required, "End of the event"
     param :form, :place, :string, :optional, "Where the event takes place"
     param :form, :private, :boolean, :optional, "true to make the event private, false otherwise"
+    param :form, :latitude, :decimal, :optional, "Event latitude"
+    param :form, :longitude, :decimal, :optional, "Event longitude"
     response :ok
   end
   def create
@@ -153,6 +155,8 @@ class EventsController < ApplicationController
     param :form, :begin, :date, :optional, "Beginning of the event"
     param :form, :end, :date, :optional, "End of the event"
     param :form, :place, :string, :optional, "Where the event takes place"
+    param :form, :latitude, :decimal, :optional, "Event latitude"
+    param :form, :longitude, :decimal, :optional, "Event longitude"
     response :ok
   end
   def update
@@ -349,11 +353,11 @@ class EventsController < ApplicationController
   end
 
   def event_params_creation
-    params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private)
+    params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private, :latitude, :longitude)
   end
 
   def event_params_update
-    params.permit(:title, :description, :place, :begin, :end, :private)
+    params.permit(:title, :description, :place, :begin, :end, :private, :latitude, :longitude)
   end
 
   def set_link
