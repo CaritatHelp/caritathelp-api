@@ -6,9 +6,9 @@ class AssocsController < ApplicationController
   before_action :authenticate_volunteer_if_needed,
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
 
-  before_action :set_assoc, only: [:show, :edit, :update, :notifications, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers, :shelters]
+  before_action :set_assoc, only: [:show, :edit, :update, :members, :events, :delete, :pictures, :main_picture, :news, :invitable_volunteers, :shelters]
   before_action :set_link, only: [:update, :delete, :events]
-  before_action :check_block, only: [:edit, :update, :notifications, :members, :events, :delete, :news]
+  before_action :check_block, only: [:edit, :update, :members, :events, :delete, :news]
   before_action :check_rights, only: [:update, :delete]
 
   swagger_api :index do

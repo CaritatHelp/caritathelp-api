@@ -52,6 +52,11 @@ class ApplicationController < ActionController::Base
           .select("volunteers.id, volunteers.uid").all
       end
 
+      assoc = Assoc.find(notification.assoc_id) if notification.assoc_id.present?
+      event = Event.find(notification.event_id) if notification.event_id.present?
+      sender = Volunteer.find(notification.sender_id) if notification.sender_id.present?
+      receiver = Volunteer.find(notification.receiver_id) if notification.receiver_id.present?
+
       json_msg = {
         token: ENV['NOTIF_CARITATHELP'],
         sender_id: notification.sender_id,
@@ -59,12 +64,12 @@ class ApplicationController < ActionController::Base
         assoc_id: notification.assoc_id,
         event_id: notification.event_id,
         notif_type: notification.notif_type,
-        assoc_name: notification.assoc_name,
-        event_name: notification.event_name,
-        sender_name: notification.sender_name,
-        receiver_name: notification.receiver_name,
-        sender_thumb_path: notification.sender_thumb_path,
-        receiver_thumb_path: notification.receiver_thumb_path,
+        assoc_name: assoc.try(:name),
+        event_name: event.try(:title),
+        sender_name: sender.try(:fullname),
+        receiver_name: receiver.try(:fullname),
+        sender_thumb_path: sender.try(:thumb_path),
+        receiver_thumb_path: receiver.try(:thumb_path),
         concerned_volunteers: concerned_volunteers
       }.to_json
 

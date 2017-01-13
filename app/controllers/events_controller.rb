@@ -7,7 +7,7 @@ class EventsController < ApplicationController
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
 
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency, :invitable_volunteers]
+  before_action :set_event, only: [:show, :edit, :update, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete, :raise_emergency]
@@ -349,9 +349,7 @@ class EventsController < ApplicationController
   end
 
   def event_params_creation
-    params_event = params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private)
-    params_event[:assoc_name] = @assoc.name
-    params_event
+    params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private)
   end
 
   def event_params_update
@@ -374,13 +372,8 @@ class EventsController < ApplicationController
 
   def create_emergency_notification(volunteer)
     {event_id: @event.id,
-     event_name: @event.title,
-     sender_thumb_path: @event.thumb_path,
      sender_id: current_volunteer.id,
-     sender_name: current_volunteer.fullname,
      receiver_id: volunteer.id,
-     receiver_name: volunteer.fullname,
-     receiver_thumb_path: volunteer.thumb_path,
      notif_type: 'Emergency'}
   end
 
