@@ -137,7 +137,15 @@ class VolunteersController < ApplicationController
     n1 = Notification.select { |notification| notification.receiver_id == current_volunteer.id }
     n2 = NotificationVolunteer.select { |link| link.volunteer_id == current_volunteer.id }
          .map { |link| link.notification }
-    render json: create_response((n1 + n2).sort { |a, b| b.created_at <=> a.created_at })
+    notifs = (n1 + n2).sort { |a, b| b.created_at <=> a.created_at }
+    notifs = notifs.map { |n|
+    	assoc = Assoc.find(n.assoc_id) if n.assoc_id.present?
+      event = Event.find(n.event_id) if n.event_id.present?
+      sender = Volunteer.find(n.sender_id) if n.sender_id.present?
+      receiver = Volunteer.find(n.receiver_id) if n.receiver_id.present?
+    	n.as_json.merge(assoc_name: assoc.try(:name), event_name: event.try(:title), sender_name: sender.try(:fullname), receiver_name: receiver.try(:fullname), sender_thumb_path: sender.try(:thumb_path), receiver_thumb_path: receiver.try(:thumb_path))
+    }
+    render json: create_response(notifs)
   end
 
   swagger_api :friends do
@@ -191,7 +199,7 @@ class VolunteersController < ApplicationController
   end
   def events
     query = "SELECT events.id, events.title, events.place, events.begin, events.end, " +
-      "events.assoc_id, events.assoc_name, events.thumb_path, event_volunteers.rights, " +
+      "events.assoc_id, events.thumb_path, event_volunteers.rights, " +
       "(SELECT COUNT(*) FROM event_volunteers WHERE event_volunteers.event_id=events.id) AS nb_guest, " +
       "(SELECT COUNT(*) FROM event_volunteers INNER JOIN v_friends ON " +
       "event_volunteers.volunteer_id=v_friends.friend_volunteer_id " +
@@ -209,7 +217,9 @@ class VolunteersController < ApplicationController
       query += " AND events.begin > NOW()"
     end
 
-    render :json => create_response(ActiveRecord::Base.connection.execute(query))
+    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: Assoc.find(e["assoc_id"]).name) }
+    events = events.sort { |a, b| a["begin"].to_datetime <=> b["begin"].to_datetime }
+    render :json => create_response(events)
   end
 
   swagger_api :friend_requests do
@@ -274,7 +284,10 @@ class VolunteersController < ApplicationController
   end
   def news
     link = current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
-    render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public })
+    render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public }.map { |n|
+    		v = Volunteer.find(n.volunteer_id)
+    		n.as_json.merge(group_name: @volunteer.fullname, group_thumb_path: @volunteer.thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)
+    	})
   end
 
   private

@@ -7,7 +7,7 @@ class EventsController < ApplicationController
                 only: [:index, :show, :pictures, :main_picture], unless: :is_swagger_request?
 
   before_action :set_assoc, only: [:create]
-  before_action :set_event, only: [:show, :edit, :update, :notifications, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency, :invitable_volunteers]
+  before_action :set_event, only: [:show, :edit, :update, :guests, :delete, :pictures, :main_picture, :news, :raise_emergency, :volunteers_from_emergency, :invitable_volunteers]
   before_action :set_link, only: [:update, :delete, :show, :raise_emergency]
   before_action :check_privacy, only: [:show, :guests, :pictures, :main_picture, :news]
   before_action :check_rights, only: [:update, :delete, :raise_emergency]
@@ -37,7 +37,8 @@ class EventsController < ApplicationController
       friends_number = 0 if friends_number.blank?
       event.attributes.merge(rights: link.try(:rights),
                              nb_guest: event.volunteers.count,
-                             nb_friends_members: friends_number)
+                             nb_friends_members: friends_number,
+                             assoc_name: event.assoc.name)
     }
     render json: create_response(events)
   end
@@ -79,7 +80,7 @@ class EventsController < ApplicationController
                                           volunteer_id: current_volunteer.id,
                                           rights: 'host')
 
-      render :json => create_response(new_event.as_json.merge("rights" => "host"))
+      render :json => create_response(new_event.as_json.merge(rights: "host", assoc_name: @assoc.name))
     rescue => e
       begin
         new_event.destroy
@@ -99,11 +100,11 @@ class EventsController < ApplicationController
   end
   def show
     if current_volunteer.blank?
-      render json: create_response(@event) and return
+      render json: create_response(@event.as_json.merge(assoc_name: @event.assoc.name)) and return
     end
 
     if @link != nil
-      render :json => create_response(@event.as_json.merge('rights' => @link.rights)) and return
+      render :json => create_response(@event.as_json.merge(rights: @link.rights, assoc_name: @event.assoc.name)) and return
     end
     rights = nil
 
@@ -123,7 +124,7 @@ class EventsController < ApplicationController
       rights = 'waiting'
     end
 
-    render :json => create_response(@event.as_json.merge('rights' => rights))
+    render :json => create_response(@event.as_json.merge(rights: rights, assoc_name: @event.assoc.name))
   end
 
   swagger_api :guests do
@@ -157,8 +158,7 @@ class EventsController < ApplicationController
   def update
     begin
       @event.update!(event_params_update)
-      @event.update_all
-      render :json => create_response(@event.as_json.merge('rights' => @link.rights))
+      render :json => create_response(@event.as_json.merge(rights: @link.rights, assoc_name: @event.assoc.name))
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
@@ -242,7 +242,10 @@ class EventsController < ApplicationController
   def joining
     events = current_volunteer.notifications.select(&:is_join_event?).select { |notification|
       notification.sender_id == current_volunteer.id
-    }.map { |notification| Event.find(notification.event_id) }
+    }.map { |notification|
+    	e = Event.find(notification.event_id)
+    	e.as_json.merge(assoc_name: e.assoc.name)
+    }
     render json: create_response(events)
   end
 
@@ -278,7 +281,10 @@ class EventsController < ApplicationController
   end
   def news
     rights = current_volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
-    render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
+    render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public }.map { |n|
+    		v = Volunteer.find(n.volunteer_id)
+    		n.as_json.merge(group_name: @event.title, group_thumb_path: @event.thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)
+    	})
   end
 
   swagger_api :raise_emergency do
@@ -343,9 +349,7 @@ class EventsController < ApplicationController
   end
 
   def event_params_creation
-    params_event = params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private)
-    params_event[:assoc_name] = @assoc.name
-    params_event
+    params.permit(:title, :description, :place, :begin, :end, :assoc_id, :private)
   end
 
   def event_params_update
@@ -368,13 +372,8 @@ class EventsController < ApplicationController
 
   def create_emergency_notification(volunteer)
     {event_id: @event.id,
-     event_name: @event.title,
-     sender_thumb_path: @event.thumb_path,
      sender_id: current_volunteer.id,
-     sender_name: current_volunteer.fullname,
      receiver_id: volunteer.id,
-     receiver_name: volunteer.fullname,
-     receiver_thumb_path: volunteer.thumb_path,
      notif_type: 'Emergency'}
   end
 

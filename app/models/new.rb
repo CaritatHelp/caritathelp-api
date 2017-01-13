@@ -10,9 +10,6 @@ class New < ActiveRecord::Base
   validates_inclusion_of :news_type, in: ["Status"]
   validates_inclusion_of :group_type, in: ["Assoc", "Event", "Volunteer"]
 
-  before_create :set_thumb_path
-  before_create :set_name
-
   def public
     !self.private
   end
@@ -27,19 +24,5 @@ class New < ActiveRecord::Base
       return true if group.present? and group.volunteers.include?(volunteer)
     end
     return false
-  end
-
-  private
-
-  # The field is called thumb_path in all models
-  def set_thumb_path
-    self.group_thumb_path = self.group.thumb_path
-  end
-
-  # We could make it more generic by having a 'name' field in each model
-  def set_name
-    self.group_name = self.group.fullname if self.group_type == "Volunteer"
-    self.group_name = self.group.name if self.group_type == "Assoc"
-    self.group_name = self.group.title if self.group_type == "Event"
   end
 end

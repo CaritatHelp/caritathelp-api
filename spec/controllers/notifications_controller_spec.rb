@@ -30,7 +30,7 @@ RSpec.describe NotificationsController, type: :controller do
 
   	# notifications
   	notification_add_friend = FactoryGirl.create(:notification, sender_id: volunteer.id, receiver_id: friend.id, notif_type: "AddFriend")
-  	emergency = FactoryGirl.create(:notification, sender_id: friend.id, receiver_id: volunteer.id, notif_type: "Emergency", event_id: event.id, event_name: event.title, receiver_name: volunteer.fullname, receiver_thumb_path: volunteer.thumb_path)
+  	emergency = FactoryGirl.create(:notification, sender_id: friend.id, receiver_id: volunteer.id, notif_type: "Emergency", event_id: event.id)
 
   	it "successfuly accept an emergency" do
   		log volunteer

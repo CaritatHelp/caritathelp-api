@@ -31,15 +31,4 @@ class Event < ActiveRecord::Base
       self.errors.add(:end, "Can't be before start date") and return false
     end
   end
-
-  def update_all
-  	self.news.each do |n|
-  		n.group_name = self.title
-  		n.save
-  	end
-  	Notification.select { |notif| notif.event_id == self.id }.each do |n|
-  		n.event_name = self.title
-  		n.save
-  	end
-  end
 end

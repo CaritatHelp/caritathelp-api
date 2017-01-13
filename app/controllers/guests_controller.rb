@@ -382,23 +382,14 @@ class GuestsController < ApplicationController
 
   def create_join_event
     [sender_id: current_volunteer.id,
-     sender_name: current_volunteer.fullname,
-     sender_thumb_path: current_volunteer.thumb_path,
-     receiver_thumb_path: @event.thumb_path,
      event_id: @event.id,
-     event_name: @event.title,
      notif_type: 'JoinEvent']
   end
 
   def create_invite_guest
     [event_id: @event.id,
-     event_name: @event.title,
-     sender_thumb_path: @event.thumb_path,
-     receiver_thumb_path: current_volunteer.thumb_path,
      sender_id: current_volunteer.id,
-     sender_name: current_volunteer.fullname,
      receiver_id: @target_volunteer.id,
-     receiver_name: @target_volunteer.fullname,
      notif_type: 'InviteGuest']
   end
 

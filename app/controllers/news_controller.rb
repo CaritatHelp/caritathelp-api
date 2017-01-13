@@ -19,7 +19,24 @@ class NewsController < ApplicationController
     assocs_news = current_volunteer.assocs.map { |assoc| assoc.news.select{ |new| (new.private and current_volunteer.av_links.find_by(assoc_id: assoc.id).level >= AvLink.levels["member"]) or new.public } }.flatten
     events_news = current_volunteer.events.map { |event| event.news.select { |new| (new.private and current_volunteer.event_volunteers.find_by(event_id: event.id).level >= EventVolunteer.levels["member"]) or new.public} }.flatten
 
-    render json: create_response((volunteer_news + friends_news + assocs_news + events_news).sort{ |a, b| b.updated_at <=> a.updated_at }.uniq)
+    news = (volunteer_news + friends_news + assocs_news + events_news).sort{ |a, b| b.updated_at <=> a.updated_at }.uniq
+    news = news.map { |n|
+    		v = Volunteer.find(n.volunteer_id)
+    		name = nil
+    		thumb_path = nil
+    		if n.group_type.eql?("Event")
+    			name = n.group.title
+    			thumb_path = n.group.thumb_path
+    		elsif n.group_type.eql?("Assoc")
+    			name = n.group.name
+    			thumb_path = n.group.thumb_path
+    		elsif n.group_type.eql?("Volunteer")
+    			name = n.group.fullname
+    			thumb_path = n.group.thumb_path
+    		end
+    		n.as_json.merge(group_name: name, group_thumb_path: thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)
+    }
+    render json: create_response(news)
   end
 
   swagger_api :wall_message do
@@ -43,11 +60,22 @@ class NewsController < ApplicationController
 
     new = New.new(new_params)
     new.volunteer_id = current_volunteer.id
-    new.volunteer_name = current_volunteer.fullname
-    new.volunteer_thumb_path = current_volunteer.thumb_path
 
     if new.save
-      render json: create_response(new), status: :ok
+	    name = nil
+	    thumb_path = nil
+	    if new.group_type.eql?("Event")
+	    	name = new.group.title
+	    	thumb_path = new.group.thumb_path
+	    elsif new.group_type.eql?("Assoc")
+	    	name = new.group.name
+	    	thumb_path = new.group.thumb_path
+	    elsif new.group_type.eql?("Volunteer")
+	    	name = new.group.fullname
+	    	thumb_path = new.group.thumb_path
+	    end
+	    v = Volunteer.find(new.volunteer_id)
+      render json: create_response(new.as_json.merge(group_name: name, group_thumb_path: thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)), status: :ok
     else
       render json: create_error(400, new.errors), status: :bad_request
     end
@@ -62,7 +90,20 @@ class NewsController < ApplicationController
     response :ok
   end
   def show
-    render json: create_response(@new)
+    name = nil
+    thumb_path = nil
+    if @new.group_type.eql?("Event")
+    	name = @new.group.title
+    	thumb_path = @new.group.thumb_path
+    elsif @new.group_type.eql?("Assoc")
+    	name = @new.group.name
+    	thumb_path = @new.group.thumb_path
+    elsif @new.group_type.eql?("Volunteer")
+    	name = @new.group.fullname
+    	thumb_path = @new.group.thumb_path
+    end
+    v = Volunteer.find(@new.volunteer_id)
+    render json: create_response(@new.as_json.merge(group_name: name, group_thumb_path: thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path))
   end
 
   swagger_api :comments do
@@ -98,7 +139,20 @@ class NewsController < ApplicationController
     end
 
     if @new.update_attributes(new_update_params)
-      render json: create_response(@new)
+	    name = nil
+	    thumb_path = nil
+	    if @new.group_type.eql?("Event")
+	    	name = @new.group.title
+	    	thumb_path = @new.group.thumb_path
+	    elsif @new.group_type.eql?("Assoc")
+	    	name = @new.group.name
+	    	thumb_path = @new.group.thumb_path
+	    elsif @new.group_type.eql?("Volunteer")
+	    	name = @new.group.fullname
+	    	thumb_path = @new.group.thumb_path
+	    end
+	    v = Volunteer.find(@new.volunteer_id)
+      render json: create_response(@new.as_json.merge(group_name: name, group_thumb_path: thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path))
     else
       render json: create_error(400, @new.errors)
     end

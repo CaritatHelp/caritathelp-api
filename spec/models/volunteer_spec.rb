@@ -63,20 +63,12 @@ RSpec.describe Volunteer, type: :model do
 
 			new1 = FactoryGirl.create(:news, volunteer_id: volunteer.id,
 											group_id: volunteer.id,
-											group_name: volunteer.fullname,
 											group_type: "Volunteer",
-											group_thumb_path: volunteer.thumb_path,
-											as_group: true,
-											volunteer_name: volunteer.fullname,
-											volunteer_thumb_path: volunteer.thumb_path)
+											as_group: true)
 			new2 = FactoryGirl.create(:news, volunteer_id: volunteer.id,
 											group_id: volunteer.id,
-											group_name: volunteer.fullname,
 											group_type: "Volunteer",
-											group_thumb_path: volunteer.thumb_path,
-											as_group: true,
-											volunteer_name: volunteer.fullname,
-											volunteer_thumb_path: volunteer.thumb_path)
+											as_group: true)
 
 
 			it "get the volunteer's associations" do

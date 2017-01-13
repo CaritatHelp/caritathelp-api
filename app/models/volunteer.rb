@@ -104,23 +104,4 @@ class Volunteer < ActiveRecord::Base
     end
     return false
   end
-
-  def update_all
-  	Notification.select { |n| n.receiver_id == self.id }.each do |n|
-  		n.receiver_name = self.fullname
-  		n.save
-  	end
-  	Notification.select { |n| n.sender_id == self.id }.each do |n|
-  		n.sender_name = self.fullname
-  		n.save
-  	end
-  	self.news.each do |n|
-  		n.group_name = self.fullname
-  		n.save
-  	end
-  	New.select { |n| n.volunteer_id == self.id }.each do |n|
-  		n.volunteer_name = self.fullname
-  		n.save
-  	end
-  end
 end

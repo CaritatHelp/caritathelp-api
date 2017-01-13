@@ -38,21 +38,13 @@ RSpec.describe Assoc, type: :model do
 
 		new1 = FactoryGirl.create(:news, volunteer_id: owner.id,
 						group_id: assoc.id,
-						group_name: assoc.name,
 						group_type: "Assoc",
-						group_thumb_path: assoc.thumb_path,
-						as_group: true,
-						volunteer_name: owner.fullname,
-						volunteer_thumb_path: owner.thumb_path)
+						as_group: true)
 
 		new2 = FactoryGirl.create(:news, volunteer_id: owner.id,
 						group_id: assoc.id,
-						group_name: assoc.name,
 						group_type: "Assoc",
-						group_thumb_path: assoc.thumb_path,
-						as_group: true,
-						volunteer_name: owner.fullname,
-						volunteer_thumb_path: owner.thumb_path)
+						as_group: true)
 
 		it "get the association's shelters" do
 			expect(assoc.shelters.count).to eq(1)
