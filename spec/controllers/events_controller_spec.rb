@@ -4,7 +4,8 @@ RSpec.describe EventsController, type: :controller do
   include Devise::Test::ControllerHelpers
 
   describe 'index' do
-  	FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	it "get a list of the existing events" do
   		get :index
@@ -44,7 +45,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'show' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
   	host = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event.id, rights: "host")
 
@@ -65,7 +67,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'guests' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
   	host = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event.id, rights: "host")
   	member = FactoryGirl.create(:volunteer)
@@ -81,7 +84,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'update' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
   	host = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event.id, rights: "host")
   	member = FactoryGirl.create(:volunteer)
@@ -105,7 +109,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'delete' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
   	host = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event.id, rights: "host")
   	member = FactoryGirl.create(:volunteer)
@@ -125,9 +130,10 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'owned' do
-  	event1 = FactoryGirl.create(:event)
-  	event2 = FactoryGirl.create(:event)
-  	event3 = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event1 = FactoryGirl.create(:event, assoc_id: assoc.id)
+  	event2 = FactoryGirl.create(:event, assoc_id: assoc.id)
+  	event3 = FactoryGirl.create(:event, assoc_id: assoc.id)
   	host = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event1.id, rights: "host")
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event2.id, rights: "host")
@@ -142,8 +148,9 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'invited' do
-  	event1 = FactoryGirl.create(:event)
-  	event2 = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event1 = FactoryGirl.create(:event, assoc_id: assoc.id)
+  	event2 = FactoryGirl.create(:event, assoc_id: assoc.id)
   	host = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event1.id, rights: "host")
   	FactoryGirl.create(:event_volunteer, volunteer_id: host.id, event_id: event2.id, rights: "host")
@@ -160,8 +167,9 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'joining' do
-  	event1 = FactoryGirl.create(:event)
-  	event2 = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event1 = FactoryGirl.create(:event, assoc_id: assoc.id)
+  	event2 = FactoryGirl.create(:event, assoc_id: assoc.id)
   	volunteer = FactoryGirl.create(:volunteer)
   	FactoryGirl.create(:notification, sender_id: volunteer.id, event_id: event1.id, notif_type: "JoinEvent")
   	FactoryGirl.create(:notification, sender_id: volunteer.id, event_id: event2.id, notif_type: "JoinEvent")
@@ -175,7 +183,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'pictures' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	it "gets a list of all the event's pictures" do
   		get :pictures, { id: event.id }
@@ -184,7 +193,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'main_picture' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	it "gets a list of the event main picture" do
   		get :pictures, { id: event.id }
@@ -193,7 +203,8 @@ RSpec.describe EventsController, type: :controller do
   end
 
   describe 'news' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	# members
   	host = FactoryGirl.create(:volunteer)
@@ -203,11 +214,11 @@ RSpec.describe EventsController, type: :controller do
   	volunteer = FactoryGirl.create(:volunteer)
 
   	# public news
-  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id)
-  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id)
+  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", as_group: true, volunteer_id: host.id)
+  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", as_group: true, volunteer_id: host.id)
 
   	# private news
-  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", group_name: event.title, group_thumb_path: event.thumb_path, as_group: true, volunteer_name: host.fullname, volunteer_thumb_path: host.thumb_path, volunteer_id: host.id, private: true)
+  	FactoryGirl.create(:news, group_id: event.id, group_type: "Event", as_group: true, volunteer_id: host.id, private: true)
 
   	it "returns public & private news" do
   		log host

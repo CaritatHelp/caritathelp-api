@@ -4,7 +4,8 @@ RSpec.describe GuestsController, type: :controller do
 	include Devise::Test::ControllerHelpers
 
   describe 'kick' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	# members
   	admin = FactoryGirl.create(:volunteer)
@@ -32,7 +33,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'upgrade' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	# members
   	host = FactoryGirl.create(:volunteer)
@@ -82,7 +84,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'join' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# members
   	host = FactoryGirl.create(:volunteer)
@@ -114,7 +117,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'reply_guest' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# members
   	host = FactoryGirl.create(:volunteer)
@@ -150,7 +154,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'invite' do
-  	event = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id)
 
   	# members
   	host = FactoryGirl.create(:volunteer)
@@ -181,7 +186,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'reply_invite' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# members
   	host = FactoryGirl.create(:volunteer)
@@ -215,6 +221,7 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'leave_event' do
+  	assoc = FactoryGirl.create(:assoc)
   	event = FactoryGirl.create(:event, assoc_id: 1)
 
   	# member
@@ -242,7 +249,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'invited' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# host
   	host = FactoryGirl.create(:volunteer)
@@ -271,7 +279,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'uninvite' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# host
   	host = FactoryGirl.create(:volunteer)
@@ -304,7 +313,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'unjoin' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# joining volunteer
   	joiner = FactoryGirl.create(:volunteer)
@@ -327,7 +337,8 @@ RSpec.describe GuestsController, type: :controller do
   end
 
   describe 'waiting' do
-  	event = FactoryGirl.create(:event, private: true)
+  	assoc = FactoryGirl.create(:assoc)
+  	event = FactoryGirl.create(:event, assoc_id: assoc.id, private: true)
 
   	# host
   	host = FactoryGirl.create(:volunteer)

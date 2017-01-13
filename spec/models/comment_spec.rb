@@ -7,12 +7,8 @@ RSpec.describe Comment, type: :model do
 			link_owner = FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: owner.id, rights: "owner", level: 10)
 			news = FactoryGirl.create(:news, volunteer_id: owner.id,
 											group_id: assoc.id,
-											group_name: assoc.name,
 											group_type: "Assoc",
-											group_thumb_path: assoc.thumb_path,
-											as_group: true,
-											volunteer_name: owner.fullname,
-											volunteer_thumb_path: owner.thumb_path)
+											as_group: true)
 			comment = FactoryGirl.create(:comment, volunteer_id: owner.id, new_id: news.id)
 
 			it "creates a comment" do
@@ -33,12 +29,8 @@ RSpec.describe Comment, type: :model do
 			link_owner = FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: owner.id, rights: "owner", level: 10)
 			news = FactoryGirl.create(:news, volunteer_id: owner.id,
 											group_id: assoc.id,
-											group_name: assoc.name,
 											group_type: "Assoc",
-											group_thumb_path: assoc.thumb_path,
-											as_group: true,
-											volunteer_name: owner.fullname,
-											volunteer_thumb_path: owner.thumb_path)
+											as_group: true)
 			comment = FactoryGirl.create(:comment, volunteer_id: owner.id, new_id: news.id)
 
 		it "get the correct writer and news from comment" do

@@ -57,21 +57,13 @@ RSpec.describe Event, type: :model do
 
 			new1 = FactoryGirl.create(:news, volunteer_id: host.id,
 											group_id: event.id,
-											group_name: event.title,
 											group_type: "Event",
-											group_thumb_path: event.thumb_path,
-											as_group: true,
-											volunteer_name: host.fullname,
-											volunteer_thumb_path: host.thumb_path)
+											as_group: true)
 
 			new2 = FactoryGirl.create(:news, volunteer_id: host.id,
 											group_id: event.id,
-											group_name: event.title,
 											group_type: "Event",
-											group_thumb_path: event.thumb_path,
-											as_group: true,
-											volunteer_name: host.fullname,
-											volunteer_thumb_path: host.thumb_path)
+											as_group: true)
 
 			it "get the event's volunteers" do
 				expect(event.volunteers.count).to eq(2)

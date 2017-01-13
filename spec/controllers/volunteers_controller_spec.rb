@@ -38,9 +38,10 @@ RSpec.describe VolunteersController, type: :controller do
 
   describe "notifications" do
   	volunteer = FactoryGirl.create(:volunteer)
-  	FactoryGirl.create(:notification, sender_id: 0, receiver_id: volunteer.id, notif_type: "AddFriend")
-  	FactoryGirl.create(:notification, sender_id: 0, receiver_id: volunteer.id, notif_type: "AddFriend")
-  	FactoryGirl.create(:notification, sender_id: 0, receiver_id: volunteer.id, notif_type: "AddFriend")
+  	friend = FactoryGirl.create(:volunteer)
+  	FactoryGirl.create(:notification, sender_id: friend.id, receiver_id: volunteer.id, notif_type: "AddFriend")
+  	FactoryGirl.create(:notification, sender_id: friend.id, receiver_id: volunteer.id, notif_type: "AddFriend")
+  	FactoryGirl.create(:notification, sender_id: friend.id, receiver_id: volunteer.id, notif_type: "AddFriend")
 
   	it "gets a list of all volunteer's notifications" do
   		log volunteer
@@ -84,9 +85,10 @@ RSpec.describe VolunteersController, type: :controller do
 
   describe "events" do
   	volunteer = FactoryGirl.create(:volunteer)
-  	event1 = FactoryGirl.create(:event)
-  	event2 = FactoryGirl.create(:event)
-  	event3 = FactoryGirl.create(:event)
+  	assoc = FactoryGirl.create(:assoc)
+  	event1 = FactoryGirl.create(:event, assoc_id: assoc.id)
+  	event2 = FactoryGirl.create(:event, assoc_id: assoc.id)
+  	event3 = FactoryGirl.create(:event, assoc_id: assoc.id)
   	FactoryGirl.create(:event_volunteer, volunteer_id: volunteer.id, event_id: event1.id, rights: "member")
   	FactoryGirl.create(:event_volunteer, volunteer_id: volunteer.id, event_id: event2.id, rights: "member")
   	FactoryGirl.create(:event_volunteer, volunteer_id: volunteer.id, event_id: event3.id, rights: "member")
@@ -142,11 +144,11 @@ RSpec.describe VolunteersController, type: :controller do
   	FactoryGirl.create(:v_friend, volunteer_id: friend.id, friend_volunteer_id: volunteer.id)
 
   	# public news
-  	FactoryGirl.create(:news, group_id: volunteer.id, group_type: "Volunteer", group_name: volunteer.fullname, group_thumb_path: volunteer.thumb_path, as_group: true, volunteer_name: volunteer.fullname, volunteer_thumb_path: volunteer.thumb_path, volunteer_id: volunteer.id)
-  	FactoryGirl.create(:news, group_id: volunteer.id, group_type: "Volunteer", group_name: volunteer.fullname, group_thumb_path: volunteer.thumb_path, as_group: true, volunteer_name: volunteer.fullname, volunteer_thumb_path: volunteer.thumb_path, volunteer_id: volunteer.id)
+  	FactoryGirl.create(:news, group_id: volunteer.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer.id)
+  	FactoryGirl.create(:news, group_id: volunteer.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer.id)
 
   	# private news
-  	FactoryGirl.create(:news, group_id: volunteer.id, group_type: "Volunteer", group_name: volunteer.fullname, group_thumb_path: volunteer.thumb_path, as_group: true, volunteer_name: volunteer.fullname, volunteer_thumb_path: volunteer.thumb_path, volunteer_id: volunteer.id, private: true)
+  	FactoryGirl.create(:news, group_id: volunteer.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer.id, private: true)
 
   	it "returns public & private news" do
   		log friend

@@ -217,7 +217,7 @@ class VolunteersController < ApplicationController
       query += " AND events.begin > NOW()"
     end
 
-    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: @volunteer.assocs.find(e["assoc_id"]).name) }
+    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: Assoc.find(e["assoc_id"]).name) }
     events = events.sort { |a, b| a["begin"].to_datetime <=> b["begin"].to_datetime }
     render :json => create_response(events)
   end

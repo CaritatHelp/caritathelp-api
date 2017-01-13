@@ -7,22 +7,14 @@ RSpec.describe New, type: :model do
 			link_owner = FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: owner.id, rights: "owner", level: 10)
 			news = FactoryGirl.create(:news, volunteer_id: owner.id,
 								group_id: assoc.id,
-								group_name: assoc.name,
 								group_type: "Assoc",
-								group_thumb_path: assoc.thumb_path,
-								as_group: true,
-								volunteer_name: owner.fullname,
-								volunteer_thumb_path: owner.thumb_path)
+								as_group: true)
 
 			it "creates a news" do
 				expect { FactoryGirl.create(:news, volunteer_id: owner.id,
 									group_id: assoc.id,
-									group_name: assoc.name,
 									group_type: "Assoc",
-									group_thumb_path: assoc.thumb_path,
-									as_group: true,
-									volunteer_name: owner.fullname,
-									volunteer_thumb_path: owner.thumb_path) }
+									as_group: true) }
 				.to change { New.count }.by(1)
 			end
 
@@ -40,12 +32,8 @@ RSpec.describe New, type: :model do
 			link_owner = FactoryGirl.create(:av_link, assoc_id: assoc.id, volunteer_id: owner.id, rights: "owner", level: 10)
 			news = FactoryGirl.create(:news, volunteer_id: owner.id,
 								group_id: assoc.id,
-								group_name: assoc.name,
 								group_type: "Assoc",
-								group_thumb_path: assoc.thumb_path,
-								as_group: true,
-								volunteer_name: owner.fullname,
-								volunteer_thumb_path: owner.thumb_path)
+								as_group: true)
 			comment1 = FactoryGirl.create(:comment, volunteer_id: owner.id, new_id: news.id)
 			comment2 = FactoryGirl.create(:comment, volunteer_id: owner.id, new_id: news.id)
 

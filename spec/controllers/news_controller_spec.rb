@@ -14,9 +14,9 @@ RSpec.describe NewsController, type: :controller do
   	FactoryGirl.create(:v_friend, volunteer_id: volunteer2.id, friend_volunteer_id: volunteer1.id)
 
   	# news
-  	new1 = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
-  	new2 = FactoryGirl.create(:news, group_id: volunteer2.id, group_type: "Volunteer", group_name: volunteer2.fullname, group_thumb_path: volunteer2.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
-  	new3 = FactoryGirl.create(:news, group_id: volunteer3.id, group_type: "Volunteer", group_name: volunteer3.fullname, group_thumb_path: volunteer3.thumb_path, as_group: true, volunteer_name: volunteer3.fullname, volunteer_thumb_path: volunteer3.thumb_path, volunteer_id: volunteer3.id, private: true)
+  	new1 = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
+  	new2 = FactoryGirl.create(:news, group_id: volunteer2.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
+  	new3 = FactoryGirl.create(:news, group_id: volunteer3.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer3.id, private: true)
 
   	# comments
   	FactoryGirl.create(:comment, new_id: new1.id, volunteer_id: volunteer1.id)
@@ -81,7 +81,7 @@ RSpec.describe NewsController, type: :controller do
   	volunteer2 = FactoryGirl.create(:volunteer)
 
   	# news
-  	new1 = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
+  	new1 = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
 
   	it "successfuly update the news" do
   		log volunteer1
@@ -106,7 +106,7 @@ RSpec.describe NewsController, type: :controller do
   	volunteer2 = FactoryGirl.create(:volunteer)
 
   	# news
-  	new1 = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
+  	new1 = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
 
   	it "successfuly destroy the news" do
   		log volunteer1

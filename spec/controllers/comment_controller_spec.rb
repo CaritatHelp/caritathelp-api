@@ -9,7 +9,7 @@ RSpec.describe CommentController, type: :controller do
   	volunteer2 = FactoryGirl.create(:volunteer)
 
   	# news
-  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
+  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
 
   	it "successfuly creates a comment on the news" do
   		log volunteer1
@@ -30,7 +30,7 @@ RSpec.describe CommentController, type: :controller do
   	volunteer2 = FactoryGirl.create(:volunteer)
 
   	# news
-  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
+  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
 
   	# comments
   	comment = FactoryGirl.create(:comment, new_id: news.id, volunteer_id: volunteer1.id)
@@ -58,7 +58,7 @@ RSpec.describe CommentController, type: :controller do
   	volunteer2 = FactoryGirl.create(:volunteer)
 
   	# news
-  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
+  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
 
   	# comments
   	comment = FactoryGirl.create(:comment, new_id: news.id, volunteer_id: volunteer1.id)
@@ -82,7 +82,7 @@ RSpec.describe CommentController, type: :controller do
   	volunteer2 = FactoryGirl.create(:volunteer)
 
   	# news
-  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", group_name: volunteer1.fullname, group_thumb_path: volunteer1.thumb_path, as_group: true, volunteer_name: volunteer1.fullname, volunteer_thumb_path: volunteer1.thumb_path, volunteer_id: volunteer1.id, private: true)
+  	news = FactoryGirl.create(:news, group_id: volunteer1.id, group_type: "Volunteer", as_group: true, volunteer_id: volunteer1.id, private: true)
 
   	# comments
   	comment = FactoryGirl.create(:comment, new_id: news.id, volunteer_id: volunteer1.id)
