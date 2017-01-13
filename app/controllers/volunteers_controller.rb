@@ -186,6 +186,7 @@ class VolunteersController < ApplicationController
     param :header, 'access-token', :string, :required, "Access token"
     param :header, :client, :string, :required, "Client token"
     param :header, :uid, :string, :required, "Volunteer's uid (email address)"
+    param :query, :range, :string, :optional, "past, current or future"
     response :ok
   end
   def events
@@ -204,7 +205,7 @@ class VolunteersController < ApplicationController
       query += " AND events.end < NOW()"
     elsif range.eql?('current')
       query += " AND events.begin < NOW() AND events.end > NOW()"
-    elsif range.eql?('futur')
+    elsif range.eql?('future')
       query += " AND events.begin > NOW()"
     end
 
