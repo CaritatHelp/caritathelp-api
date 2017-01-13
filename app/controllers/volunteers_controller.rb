@@ -138,7 +138,6 @@ class VolunteersController < ApplicationController
     n2 = NotificationVolunteer.select { |link| link.volunteer_id == current_volunteer.id }
          .map { |link| link.notification }
     notifs = (n1 + n2).sort { |a, b| b.created_at <=> a.created_at }
-
     notifs = notifs.map { |n|
     	assoc = Assoc.find(n.assoc_id) if n.assoc_id.present?
       event = Event.find(n.event_id) if n.event_id.present?
@@ -146,8 +145,7 @@ class VolunteersController < ApplicationController
       receiver = Volunteer.find(n.receiver_id) if n.receiver_id.present?
     	n.as_json.merge(assoc_name: assoc.try(:name), event_name: event.try(:title), sender_name: sender.try(:fullname), receiver_name: receiver.try(:fullname), sender_thumb_path: sender.try(:thumb_path), receiver_thumb_path: receiver.try(:thumb_path))
     }
-
-   	render json: create_response(notifs)
+    render json: create_response(notifs)
   end
 
   swagger_api :friends do
