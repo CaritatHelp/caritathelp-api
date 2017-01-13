@@ -90,40 +90,35 @@ event_one = Event.create(title: 'Soignage de gens',
 												 end: 3.days.from_now,
 												 latitude: 48.85661400000001, # center paris
 												 longitude: 2.3522219000000177,
-												 assoc_id: 1,
-												 assoc_name: croix_rouge[:name])
+												 assoc_id: 1)
 
 event_two = Event.create(title: 'Sauvetage du soldat Ryan',
 												 description: 'Pour faire plaisir à sa maman',
 												 place: 'Normandie',
 												 begin: 2.days.from_now,
 												 end: 5.days.from_now,
-												 assoc_id: 1,
-												 assoc_name: croix_rouge[:name])
+												 assoc_id: 1)
 
 event_three = Event.create(title: 'Donnage de miam miam',
 													 description: 'bonap',
 													 place: 'Paris',
 													 begin: 22.days.from_now,
 													 end: 23.days.from_now,
-													 assoc_id: 2,
-													 assoc_name: resto[:name])
+													 assoc_id: 2)
 
 event_four = Event.create(title: 'Soirée Pizza !',
 													description: "Mais seulement avec de l'ananas",
 													place: 'Italie',
 													begin: 256.days.from_now,
 													end: 258.days.from_now,
-													assoc_id: 2,
-													assoc_name: resto[:name])
+													assoc_id: 2)
 
 event_five = Event.create(title: 'Buffet à volonté',
 													description: 'Sushi Maki Brochette',
 													place: 'Tokyo-Chine',
 													begin: 2.days.from_now,
 													end: 10.days.from_now,
-													assoc_id: 2,
-													assoc_name: resto[:name])
+													assoc_id: 2)
 
 # EventVolunteers
 
@@ -207,7 +202,7 @@ add_friend pierre, jerome
 
 # News
 
-news1 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Aujourd'hui nous comme venu en aide à 3000 personnes")
+news1 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Aujourd'hui nous comme venu en aide à 3000 personnes")
 news1.save
-news2 = event_one.news.build(volunteer_id: robin[:id], volunteer_name: robin[:fullname], volunteer_thumb_path: robin[:thumb_path], news_type: 'Status', content: "Nous sommes à la recherche de médecins volontaires pour une mission humanitaire de grande ampleur", private: true)
+news2 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Nous sommes à la recherche de médecins volontaires pour une mission humanitaire de grande ampleur", private: true)
 news2.save
