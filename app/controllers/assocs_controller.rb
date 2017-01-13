@@ -279,7 +279,10 @@ class AssocsController < ApplicationController
   end
   def news
     rights = current_volunteer.av_links.find_by(assoc_id: @assoc.id).try(:level)
-    render json: create_response(@assoc.news.select { |new| (new.private and rights.present? and rights >= AvLink.levels["member"]) or new.public })
+    render json: create_response(@assoc.news.select { |new| (new.private and rights.present? and rights >= AvLink.levels["member"]) or new.public }.map { |n|
+    		v = Volunteer.find(n.volunteer_id)
+    		n.as_json.merge(group_name: @assoc.name, group_thumb_path: @assoc.thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)
+    	})
   end
 
   swagger_api :shelters do

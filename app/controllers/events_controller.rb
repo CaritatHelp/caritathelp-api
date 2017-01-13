@@ -281,7 +281,10 @@ class EventsController < ApplicationController
   end
   def news
     rights = current_volunteer.event_volunteers.find_by(event_id: @event.id).try(:level)
-    render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public })
+    render json: create_response(@event.news.select { |new| (new.private and rights.present? and rights >= EventVolunteer.levels["member"]) or new.public }.map { |n|
+    		v = Volunteer.find(n.volunteer_id)
+    		n.as_json.merge(group_name: @event.title, group_thumb_path: @event.thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)
+    	})
   end
 
   swagger_api :raise_emergency do

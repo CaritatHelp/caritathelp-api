@@ -275,7 +275,10 @@ class VolunteersController < ApplicationController
   end
   def news
     link = current_volunteer.v_friends.find_by(friend_volunteer_id: @volunteer.id)
-    render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public })
+    render json: create_response(@volunteer.news.select { |new| (new.private and link.present?) or new.public }.map { |n|
+    		v = Volunteer.find(n.volunteer_id)
+    		n.as_json.merge(group_name: @volunteer.fullname, group_thumb_path: @volunteer.thumb_path, volunteer_name: v.fullname, volunteer_thumb_path: v.thumb_path)
+    	})
   end
 
   private
