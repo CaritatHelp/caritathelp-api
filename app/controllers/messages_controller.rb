@@ -217,7 +217,8 @@ class MessagesController < ApplicationController
       send_msg_to_socket(message, @chatroom.id, current_volunteer) unless Rails.env.test?
 
       render :json => create_response(message.attributes
-                                       .merge(fullname: current_volunteer.fullname))
+                                       .merge(fullname: current_volunteer.fullname,
+                                       				thumb_path: current_volunteer.thumb_path))
     rescue => e
       render :json => create_error(400, e.to_s)
     end
