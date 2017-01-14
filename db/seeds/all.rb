@@ -52,6 +52,9 @@ jerome = Volunteer.create(firstname: 'Jerome',
 
 friendship robin, pierre
 friendship robin, nicolas
+friendship jeremy, aude
+friendship jeremy, pierre
+friendship nicolas, pierre
 
 # Assocs
 
@@ -155,27 +158,17 @@ chatter chatroom_two, nicolas
 
 # Messages
 
-Message.create([chatroom_id: chatroom_one[:id], volunteer_id: robin[:id],
-								content: 'Yo mes sous fifres'])
-Message.create([chatroom_id: chatroom_one[:id], volunteer_id: nicolas[:id],
-								content: "J'avoue on est trop soumis à toi, Ô Grand Maître Robin"])
-Message.create([chatroom_id: chatroom_one[:id], volunteer_id: pierre[:id],
-								content: "Je dirais même plus: Ô Grand Maître Robin Le Magnifique"])
-Message.create([chatroom_id: chatroom_one[:id], volunteer_id: jeremy[:id],
-								content: "Robin on t'aime tellement"])
-Message.create([chatroom_id: chatroom_one[:id], volunteer_id: aude[:id],
-								content: "En plus tu es tellement beau et intelligent, c'est ouffff"])
-Message.create([chatroom_id: chatroom_one[:id], volunteer_id: jerome[:id],
-								content: "Moi j'suis nouveau mais j'dois bien avouer qu'ils ont raison"])
+add_message chatroom_one, robin, 'Yo mes sous fifres'
+add_message chatroom_one, nicolas, "J'avoue on est trop soumis à toi, Ô Grand Maître Robin"
+add_message chatroom_one, pierre, "Je dirais même plus: Ô Grand Maître Robin Le Magnifique"
+add_message chatroom_one, jeremy, "Robin on t'aime tellement"
+add_message chatroom_one, aude, "En plus tu es tellement beau et intelligent, c'est ouffff"
+add_message chatroom_one, jerome, "Moi j'suis nouveau mais j'dois bien avouer qu'ils ont raison"
 
-Message.create([chatroom_id: chatroom_two[:id], volunteer_id: robin[:id],
-								content: "Yoyoyo ça va?"])
-Message.create([chatroom_id: chatroom_two[:id], volunteer_id: nicolas[:id],
-								content: "Ouais et toi?"])
-Message.create([chatroom_id: chatroom_two[:id], volunteer_id: robin[:id],
-								content: "Tranquille"])
-Message.create([chatroom_id: chatroom_two[:id], volunteer_id: nicolas[:id],
-								content: "Cool"])
+add_message chatroom_two, robin, "Yoyoyo ça va?"
+add_message chatroom_two, nicolas, "Ouais et toi?"
+add_message chatroom_two, robin, "Tranquille"
+add_message chatroom_two, nicolas, "Cool"
 
 # Shelters
 
@@ -199,10 +192,34 @@ Shelter.create([name: 'Oyé logement', address: 'Rue du swag',
 
 add_friend robin, jerome
 add_friend pierre, jerome
+add_friend jerome, jeremy
+add_friend jerome, aude
+add_friend jerome, nicolas
+
+join_assoc resto, jeremy
 
 # News
 
-news1 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Aujourd'hui nous comme venu en aide à 3000 personnes")
-news1.save
-news2 = event_one.news.build(volunteer_id: robin[:id], news_type: 'Status', content: "Nous sommes à la recherche de médecins volontaires pour une mission humanitaire de grande ampleur", private: true)
-news2.save
+add_news event_one, robin, "Aujourd'hui nous comme venu en aide à 3000 personnes"
+add_news event_one, robin, "Nous sommes à la recherche de médecins volontaires pour une mission humanitaire de grande ampleur", true
+
+add_news event_two, pierre, "Allons tous sauver le soldat Ryan!"
+add_news event_two, pierre, "Youloulou"
+
+add_news event_three, robin, "J'ai faim moi !"
+
+add_news event_four, pierre, "J'adore la pizza !"
+
+add_news event_five, aude, "J'adoooooore les sushis"
+
+add_news robin, robin, "C'est vraiment cool d'être un bénévole!"
+
+super_news = add_news pierre, robin, "Salut Pierre ça va?"
+
+add_news croix_rouge, robin, "Venez aider la Croix Verte!"
+add_news croix_rouge, robin, "Nous sommes ouvert à tous!"
+
+# Comment
+
+add_comment super_news, pierre, "Bah oui ça va mais tu sais tu peux me parler en mp plutôt!"
+add_comment super_news, robin, "Ah oui!"
