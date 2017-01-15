@@ -155,7 +155,7 @@ class GuestsController < ApplicationController
 			event_id = @notif.event_id
 			acceptance = params[:acceptance]
 
-			if acceptance
+			if acceptance == true or acceptance == "true"
 				@notif.notif_type = 'NewGuest'
 				@notif.save!
 				send_notif_to_socket(@notif) unless Rails.env.test?
@@ -237,7 +237,7 @@ class GuestsController < ApplicationController
 			end
 
 			# create guest link if the invited volunteer accept invitation
-			if acceptance
+			if acceptance == true or acceptance == "true"
 				create_guest_link(guest_id, event_id)
 			end
 

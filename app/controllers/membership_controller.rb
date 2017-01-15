@@ -144,7 +144,7 @@ class MembershipController < ApplicationController
       assoc_id = @notif.assoc_id
       acceptance = params[:acceptance]
 
-      if acceptance
+      if acceptance == true or acceptance == "true"
         @notif.notif_type = 'NewMember'
         @notif.save!
         send_notif_to_socket(@notif) unless Rails.env.test?
@@ -222,7 +222,7 @@ class MembershipController < ApplicationController
       end
 
       # create member link if the invited volunteer accept invitation
-      if acceptance
+      if acceptance == true or acceptance == "true"
         create_member_link(member_id, assoc_id)
       end
 

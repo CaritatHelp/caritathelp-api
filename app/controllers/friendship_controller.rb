@@ -68,7 +68,7 @@ class FriendshipController < ApplicationController
         @notif.destroy
       end
 
-      if acceptance
+      if acceptance == true or acceptance == "true"
         create_friend_link(first_id, second_id)
       end
 
