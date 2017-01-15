@@ -24,7 +24,7 @@ class Shelter < ActiveRecord::Base
   private
 
   def if_free_correct
-    errors.add(:free_places, "free_places value must be lower or equal to total_places") unless
+    errors.add(:free_places, "doit être inférieur ou égal à total_places") unless
       free_places != nil and total_places != nil and free_places <= total_places
   end
 end

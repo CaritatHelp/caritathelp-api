@@ -25,10 +25,10 @@ class Event < ActiveRecord::Base
 
   def are_dates_corrects?
     if self.begin < Time.now
-      self.errors.add(:begin, "Can't be before now") and return false
+      self.errors.add(:begin, "Ne peut être antérieur à maintenant") and return false
     end
     if self.end < self.begin
-      self.errors.add(:end, "Can't be before start date") and return false
+      self.errors.add(:end, "Ne peut être antérieur à la date de début") and return false
     end
   end
 end

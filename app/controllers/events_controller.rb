@@ -75,7 +75,7 @@ class EventsController < ApplicationController
 
       new_event = Event.new(event_params_creation)
       if !new_event.save
-        render :json => create_error(400, new_event.errors) and return
+        render :json => create_error(400, new_event.errors.full_messages.to_sentence) and return
       end
 
       event_link = EventVolunteer.create!(event_id: new_event.id,

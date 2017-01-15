@@ -48,8 +48,12 @@ class SheltersController < ApplicationController
         render :json => create_error(400, t("shelters.failure.exist")) and return
       end
 
-      new_shelter = Shelter.create!(shelter_params)
-      render :json => create_response(new_shelter)
+      new_shelter = Shelter.new(shelter_params)
+      if new_shelter.save
+	      render :json => create_response(new_shelter)
+      else
+	      render :json => create_error(400, new_shelter.errors.full_messages.to_sentence) and return
+      end
     rescue => e
       render :json => create_error(400, e.to_s) and return
     end
