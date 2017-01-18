@@ -13,7 +13,7 @@ class Event < ActiveRecord::Base
   validates :assoc_id, presence: true, :on => :create
   validates :begin, presence: true, :on => :create
   validates :end, presence: true, :on => :create
-  validate :are_dates_corrects?, if: lambda { |event| event.begin.present? and event.end.present? }
+  validate :are_dates_corrects?#, if: lambda { |event| event.begin.present? or event.end.present? }
 
   def public
     !self.private
@@ -24,6 +24,12 @@ class Event < ActiveRecord::Base
   end
 
   def are_dates_corrects?
+  	if self.begin.blank?
+      self.errors.add(:begin, "Date de début invalide") and return false
+  	end
+  	if self.end.blank?
+      self.errors.add(:end, "Date de fin invalide") and return false
+  	end
     if self.begin < Time.now
       self.errors.add(:begin, "Ne peut être antérieur à maintenant") and return false
     end

@@ -197,3 +197,9 @@ fr:
               invalid: "invalide"
             password:
               blank: "manquant"
+        event:
+          attributes:
+            begin:
+              blank: "manquant"
+            end:
+              blank: "manquant"

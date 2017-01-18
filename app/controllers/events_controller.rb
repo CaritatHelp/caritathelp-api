@@ -161,8 +161,11 @@ class EventsController < ApplicationController
   end
   def update
     begin
-      @event.update!(event_params_update)
-      render :json => create_response(@event.as_json.merge(rights: @link.rights, assoc_name: @event.assoc.name))
+      if @event.update(event_params_update)
+	      render :json => create_response(@event.as_json.merge(rights: @link.rights, assoc_name: @event.assoc.name))
+      else
+	      render :json => create_error(400, @event.errors.full_messages.to_sentence)
+      end
     rescue Exception => e
       render :json => create_error(400, e.to_s) and return
     end
