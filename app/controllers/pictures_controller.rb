@@ -70,7 +70,7 @@ class PicturesController < ApplicationController
         current_main_picture = Picture.where(:volunteer_id => current_volunteer.id).where(:assoc_id => nil)
           .where(:event_id => nil).where(:is_main => true).first
       end
-      if !current_main_picture.eql?(nil) && actual_params[:picture][:is_main] == "true"
+      if !current_main_picture.eql?(nil) && (actual_params[:picture][:is_main] == "true" or actual_params[:picture][:is_main] == true)
         begin
           current_main_picture.is_main = false
           current_main_picture.save!

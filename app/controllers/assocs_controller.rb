@@ -141,7 +141,7 @@ class AssocsController < ApplicationController
       "WHERE event_id=events.id AND v_friends.volunteer_id=#{current_volunteer.id}) AS nb_friends_members" +
       " FROM events WHERE events.assoc_id=#{@assoc.id}" + privacy
 
-    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: @assoc.name) }
+    events = ActiveRecord::Base.connection.execute(query).map { |e| e.as_json.merge(assoc_name: @assoc.name, begin: e["begin"].to_datetime) }
     render :json => create_response(events)
   end
 
