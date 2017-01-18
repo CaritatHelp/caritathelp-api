@@ -37,7 +37,7 @@ class NotificationsController < ApplicationController
       render json: create_error(400, t("notifications.failure.id")) and return
     end
 
-    if params[:accept]
+    if params[:accept] == true or params[:accept] == "true"
       notif.notif_type = "AcceptedEmergency"
     else
       notif.notif_type = "RefusedEmergency"
