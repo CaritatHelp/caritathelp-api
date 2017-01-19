@@ -216,7 +216,7 @@ Shelter.create([name: 'Croix rouge', address: '47 Avenue Léon Gambetta',
 							 description: "Nourriture et lit gratuit", assoc_id: 1,
 							 latitude: 48.8141777, longitude: 2.3188717])
 Shelter.create([name: 'Epitech Paris', address: '24 Rue Pasteur',
-							 zipcode: 94270, city: 'Le Kremlin-Bicêtre', total_places: 200, free_places: 150,
+							 zipcode: 94270, city: 'Le Kremlin-Bicêtre', total_places: 200, free_places: 0,
 							 description: "L'école de l'innovation!", assoc_id: 2,
 							 latitude: 48.8151016, longitude: 2.3569332])
 
