@@ -81,7 +81,7 @@ class SheltersController < ApplicationController
         render :json => create_error(400, t('shelters.failure.research')) and return
       end
       query = "lower(name) LIKE ?"
-      render :json => create_response(Shelter.select('id, name, city, total_places, free_places, thumb_path')
+      render :json => create_response(Shelter.select('id, name, city, total_places, free_places, thumb_path, latitude, longitude')
                                         .where(query, "%#{name}%"))
     rescue => e
       render :json => create_error(400, t('shelters.failure.research')) and return
