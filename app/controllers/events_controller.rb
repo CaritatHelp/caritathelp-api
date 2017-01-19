@@ -335,7 +335,7 @@ class EventsController < ApplicationController
   def volunteers_from_emergency
     render json: create_response(Notification.select(&:accepted_emergency?).select { |notif|
                                   notif.accepted_emergency? and notif.event_id == @event.id
-                                }.map { |notif| Volunteer.find(notif.receiver_id) })
+                                }.map { |notif| Volunteer.find(notif.receiver_id) }.uniq)
   end
 
   private
